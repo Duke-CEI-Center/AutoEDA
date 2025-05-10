@@ -69,7 +69,7 @@ To run synthesis, use the `run_synthesis_example.sh` script:
 
 The script takes the following arguments:
 - `--design`: Design name (default: "des")
-- `--version-idx`: Index of synthesis configuration to use (default: 0)
+- `--version-idx`: Index of synthesis configuration to use (see `config/synthesis.csv`)
 - `--tech`: Technology library (default: "FreePDK45")
 
 ### Physical Implementation
@@ -84,24 +84,9 @@ The script takes the following arguments:
 - `-d`: Design name (default: "des")
 - `-s`: Synthesis version (e.g., "cpV1_clkP1_drcV1")
 - `-t`: Technology library (default: "FreePDK45")
-- `-g`: Global implementation version index
-- `-p`: Placement version index
-- `-c`: CTS version index
-
-## Example Configuration Selection
-
-To run a complete flow with specific configurations:
-
-1. Choose a synthesis configuration from `synthesis.csv` (e.g., "cpV1_clkP1_drcV1")
-2. Select global implementation settings from `imp_global.csv` (e.g., "VsnU80")
-3. Choose placement settings from `placement.csv` (e.g., "V1")
-4. Select CTS settings from `cts.csv` (e.g., "V1")
-
-Then run the implementation script with these selections:
-
-```bash
-./scripts/run_implementation_example.sh -d des -s cpV1_clkP1_drcV1 -t FreePDK45 -g 0 -p 0 -c 0
-```
+- `-g`: Global implementation version index (see `config/imp_global.csv`)
+- `-p`: Placement version index (see `config/placement.csv`)
+- `-c`: CTS version index (see `config/cts.csv`)
 
 ## Configuration Parameters Reference
 
