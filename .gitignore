@@ -1,0 +1,5 @@
+designs/*/FreePDK45/
+
+__pycache__/
+.DS_Store
+*.log
