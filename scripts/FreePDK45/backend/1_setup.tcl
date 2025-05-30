@@ -1,9 +1,43 @@
 #-------------------------------------------------------------------------------
 # Setting Design name and effort level for various stages
 #-------------------------------------------------------------------------------
-set VERILOG_FILE "${NETLIST_DIR}/${TOP_NAME}.mapped.v"
-set SDC_FILE     "${NETLIST_DIR}/${TOP_NAME}.mapped.sdc"
 
+#-----------------------------------------------------------
+# netlist + 时序文件
+#   自动在 $NETLIST_DIR 中寻找 *.mapped.v / *.mapped.sdc
+#   避免 TOP_NAME 与文件名前缀不一致导致找不到文件
+#-----------------------------------------------------------
+
+# -------- Verilog --------
+set verilog_candidates [glob -nocomplain "${NETLIST_DIR}/*.mapped.v"]
+if {[llength $verilog_candidates] == 0} {
+    puts stderr "**ERROR: no *.mapped.v found in $NETLIST_DIR"
+    exit 1
+}
+set VERILOG_FILE [lindex $verilog_candidates 0]
+
+# -------- SDC --------
+set sdc_candidates [glob -nocomplain "${NETLIST_DIR}/*.mapped.sdc"]
+if {[llength $sdc_candidates] == 0} {
+    puts stderr "**ERROR: no *.mapped.sdc found in $NETLIST_DIR"
+    exit 1
+}
+set SDC_FILE [lindex $sdc_candidates 0]
+
+# -------- 可选 SDF --------
+set sdf_candidates [glob -nocomplain "${NETLIST_DIR}/*.mapped.sdf"]
+if {[llength $sdf_candidates] == 0} {
+    puts    "**WARN: no *.mapped.sdf found in $NETLIST_DIR"
+    set SDF_FILE ""
+} else {
+    set SDF_FILE [lindex $sdf_candidates 0]
+}
+
+puts "INFO: Using Verilog file: $VERILOG_FILE"
+puts "INFO: Using SDC     file: $SDC_FILE"
+if {$SDF_FILE ne ""} { puts "INFO: Using SDF     file: $SDF_FILE" }
+
+set top_module    ${TOP_NAME}   ;# Top design name
 
 set top_module    ${TOP_NAME}   ;# Top design name
 

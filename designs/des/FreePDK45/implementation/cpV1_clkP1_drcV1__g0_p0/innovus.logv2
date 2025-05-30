@@ -1,0 +1,1001 @@
+[05/29 04:25:54      0s] 
+[05/29 04:25:54      0s] Cadence Innovus(TM) Implementation System.
+[05/29 04:25:54      0s] Copyright 2021 Cadence Design Systems, Inc. All rights reserved worldwide.
+[05/29 04:25:54      0s] 
+[05/29 04:25:54      0s] Version:	v21.17-s075_1, built Wed Mar 15 11:17:40 PDT 2023
+[05/29 04:25:54      0s] Options:	-no_gui -batch -execute source /home/yl996/proj/mcp-eda-example/config.tcl; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/tech.tcl; restoreDesign /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat des3; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl; report_cts > pnr_reports/cts_summary.rpt -files /home/yl996/proj/mcp-eda-example/config.tcl /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/tech.tcl /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl 
+[05/29 04:25:54      0s] Date:		Thu May 29 04:25:54 2025
+[05/29 04:25:54      0s] Host:		hl279-cmp-00.egr.duke.edu (x86_64 w/Linux 4.18.0-513.18.1.el8_9.x86_64) (12cores*48cpus*Intel(R) Xeon(R) CPU E5-2687W v4 @ 3.00GHz 30720KB)
+[05/29 04:25:54      0s] OS:		Red Hat Enterprise Linux 8.9 (Ootpa)
+[05/29 04:25:54      0s] 
+[05/29 04:25:54      0s] License:
+[05/29 04:25:54      0s] 		[04:25:54.228770] Configured Lic search path (21.01-s002): 27400@license06.egr.duke.edu:27500@license01.egr.duke.edu
+
+[05/29 04:25:54      0s] 		invs	Innovus Implementation System	21.1	checkout succeeded
+[05/29 04:25:54      0s] 		8 CPU jobs allowed with the current license(s). Use setMultiCpuUsage to set your required CPU count.
+[05/29 04:26:08     14s] Reset Parastics called with the command setExtractRCMode -reset@(#)CDS: Innovus v21.17-s075_1 (64bit) 03/15/2023 11:17 (Linux 3.10.0-693.el7.x86_64)
+[05/29 04:26:10     16s] @(#)CDS: NanoRoute 21.17-s075_1 NR230308-2354/21_17-UB (database version 18.20.604) {superthreading v2.17}
+[05/29 04:26:10     16s] @(#)CDS: AAE 21.17-s026 (64bit) 03/15/2023 (Linux 3.10.0-693.el7.x86_64)
+[05/29 04:26:10     16s] @(#)CDS: CTE 21.17-s025_1 () Mar 14 2023 11:00:06 ( )
+[05/29 04:26:10     16s] @(#)CDS: SYNTECH 21.17-s007_1 () Feb 20 2023 06:56:35 ( )
+[05/29 04:26:10     16s] @(#)CDS: CPE v21.17-s068
+[05/29 04:26:10     16s] @(#)CDS: IQuantus/TQuantus 21.1.1-s939 (64bit) Wed Nov 9 09:34:24 PST 2022 (Linux 3.10.0-693.el7.x86_64)
+[05/29 04:26:10     16s] @(#)CDS: OA 22.60-p087 Thu Feb  9 09:35:26 2023
+[05/29 04:26:10     16s] @(#)CDS: SGN 20.10-d001 (01-Jun-2020) (64 bit executable, Qt5.9.0)
+[05/29 04:26:10     16s] @(#)CDS: RCDB 11.15.0
+[05/29 04:26:10     16s] @(#)CDS: STYLUS 21.12-s019_1 (12/20/2022 05:13 PST)
+[05/29 04:26:10     16s] @(#)CDS: SystemPlanner-21.17Rel-10251 (21.17) (2023-02-02 17:22:51+0800)
+[05/29 04:26:10     16s] Create and set the environment variable TMPDIR to /tmp/innovus_temp_3057430_hl279-cmp-00.egr.duke.edu_yl996_DDbd0A.
+
+[05/29 04:26:10     16s] Change the soft stacksize limit to 0.2%RAM (1030 mbytes). Set global soft_stack_size_limit to change the value.
+[05/29 04:26:12     18s] 
+[05/29 04:26:12     18s] **INFO:  MMMC transition support version v31-84 
+[05/29 04:26:12     18s] 
+[05/29 04:26:12     18s] <CMD> set_global _enable_mmmc_by_default_flow      $CTE::mmmc_default
+[05/29 04:26:12     18s] <CMD> suppressMessage ENCEXT-2799
+[05/29 04:26:12     18s] Executing cmd 'source /home/yl996/proj/mcp-eda-example/config.tcl; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/tech.tcl; restoreDesign /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat des3; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl; report_cts > pnr_reports/cts_summary.rpt' ...
+[05/29 04:26:12     18s] <CMD> restoreDesign /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat des3
+[05/29 04:26:12     18s] #% Begin load design ... (date=05/29 04:26:12, mem=914.0M)
+[05/29 04:26:13     18s] Loading design 'des3' saved by 'Innovus' '21.17-s075_1' on 'Thu May 29 04:24:31 2025'.
+[05/29 04:26:13     18s] % Begin Load MMMC data ... (date=05/29 04:26:13, mem=916.1M)
+[05/29 04:26:13     18s] % End Load MMMC data ... (date=05/29 04:26:13, total cpu=0:00:00.1, real=0:00:00.0, peak res=916.8M, current mem=916.8M)
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/NangateOpenCellLibrary.lef ...
+[05/29 04:26:13     18s] Set DBUPerIGU to M2 pitch 380.
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_1024x136_17.lef ...
+[05/29 04:26:13     18s] **ERROR: (IMPLF-82):	The y coordinate value 61.3175
+in pin 'addr0[2]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 61.4525
+in pin 'addr0[2]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 64.0475
+in pin 'addr0[3]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 64.1825
+in pin 'addr0[3]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 66.2575
+in pin 'addr0[4]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 66.3925
+in pin 'addr0[4]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 68.9875
+in pin 'addr0[5]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 69.1225
+in pin 'addr0[5]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 71.1975
+in pin 'addr0[6]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 71.3325
+in pin 'addr0[6]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 73.9275
+in pin 'addr0[7]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 74.0625
+in pin 'addr0[7]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 76.1375
+in pin 'addr0[8]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 76.2725
+in pin 'addr0[8]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 78.8675
+in pin 'addr0[9]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 79.0025
+in pin 'addr0[9]' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 5.6775
+in pin 'csb0' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 5.8125
+in pin 'csb0' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 8.4075
+in pin 'web0' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**ERROR: (IMPLF-82):	The y coordinate value 8.5425
+in pin 'web0' in macro 'freepdk45_sram_1rw0r_1024x136_17' is not on Manufacturing Grid.
+This is likely to result in placement/routing that cannot be manufactured. Check the manufacturing grid defined in the technology LEF file (MANUFACTURINGGRID) and make sure the value is an integral multiple of the grid.
+**WARN: (EMS-27):	Message (IMPLF-82) has exceeded the current message display limit of 20.
+[05/29 04:26:13     18s] To increase the message display limit, refer to the product command reference manual.
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_128x44.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_20x64.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_22x64.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_256x64.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_45x512.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_512x45.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_512x64.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_64x160_20.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_64x176_22.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_64x20_64.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_64x40_20.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_64x44_22.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_64x512.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_64x80_20.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1rw0r_64x88_22.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_11x128.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_120x16.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_128x120_30.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_128x124_31.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_128x32_32.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_128x40.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_128x44_11.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_128x4_1.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_128x52_13.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_128x56_14.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_12x256.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_13x128.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_14x128.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_16x120.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_16x32_32.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_16x72.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_2048x8_2.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_256x128_64.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_256x48_12.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_256x4_1.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_27x96_32.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_28x128_32.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_31x128.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_32x120.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_32x128_32.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_32x240.lef ...
+[05/29 04:26:13     18s] 
+[05/29 04:26:13     18s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_32x32.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_32x32_32.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_32x64_32.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_32x72.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_32x96_32.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_34x128_32.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_38x96_32.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_40x128.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_40x240.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_40x64_32.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_40x72.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_48x32_32.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_512x64_64.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_64x32_32.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_64x512.lef ...
+[05/29 04:26:13     19s] 
+[05/29 04:26:13     19s] Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/freepdk45_sram_1w1r_96x32_32.lef ...
+[05/29 04:26:13     19s] 
+##  Check design process and node:  
+##  Both design process and tech node are not set.
+
+[05/29 04:26:13     19s] Loading view definition file from /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/viewDefinition.tcl
+[05/29 04:26:13     19s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/NangateOpenCellLibrary_PDKv1_3_v2010_12/Front_End/Liberty/CCS/NangateOpenCellLibrary_slow_ccs.lib' ...
+[05/29 04:26:15     20s] Read 134 cells in library 'NangateOpenCellLibrary' 
+[05/29 04:26:15     20s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_1024x136_17/freepdk45_sram_1rw0r_1024x136_17_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     20s] Read 1 cells in library 'freepdk45_sram_1rw0r_1024x136_17_SS_0p95V_125C_lib' 
+[05/29 04:26:15     20s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_128x44/freepdk45_sram_1rw0r_128x44_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     20s] Read 1 cells in library 'freepdk45_sram_1rw0r_128x44_SS_0p95V_125C_lib' 
+[05/29 04:26:15     20s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_20x64/freepdk45_sram_1rw0r_20x64_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     20s] Read 1 cells in library 'freepdk45_sram_1rw0r_20x64_SS_0p95V_125C_lib' 
+[05/29 04:26:15     20s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_22x64/freepdk45_sram_1rw0r_22x64_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     20s] Read 1 cells in library 'freepdk45_sram_1rw0r_22x64_SS_0p95V_125C_lib' 
+[05/29 04:26:15     20s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_256x64/freepdk45_sram_1rw0r_256x64_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     20s] Read 1 cells in library 'freepdk45_sram_1rw0r_256x64_SS_0p95V_125C_lib' 
+[05/29 04:26:15     20s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_45x512/freepdk45_sram_1rw0r_45x512_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     20s] Read 1 cells in library 'freepdk45_sram_1rw0r_45x512_SS_0p95V_125C_lib' 
+[05/29 04:26:15     20s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_512x45/freepdk45_sram_1rw0r_512x45_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_512x45_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_512x64/freepdk45_sram_1rw0r_512x64_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_512x64_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x160_20/freepdk45_sram_1rw0r_64x160_20_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x160_20_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x176_22/freepdk45_sram_1rw0r_64x176_22_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x176_22_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x20_64/freepdk45_sram_1rw0r_64x20_64_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x20_64_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x40_20/freepdk45_sram_1rw0r_64x40_20_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x40_20_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x44_22/freepdk45_sram_1rw0r_64x44_22_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x44_22_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x512/freepdk45_sram_1rw0r_64x512_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x512_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x80_20/freepdk45_sram_1rw0r_64x80_20_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x80_20_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x88_22/freepdk45_sram_1rw0r_64x88_22_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x88_22_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_120x16/freepdk45_sram_1w1r_120x16_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_120x16_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x120_30/freepdk45_sram_1w1r_128x120_30_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_128x120_30_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x124_31/freepdk45_sram_1w1r_128x124_31_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_128x124_31_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x32_32/freepdk45_sram_1w1r_128x32_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_128x32_32_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x40/freepdk45_sram_1w1r_128x40_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_128x40_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x44_11/freepdk45_sram_1w1r_128x44_11_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_128x44_11_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x4_1/freepdk45_sram_1w1r_128x4_1_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_128x4_1_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x52_13/freepdk45_sram_1w1r_128x52_13_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_128x52_13_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x56_14/freepdk45_sram_1w1r_128x56_14_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_128x56_14_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_16x120/freepdk45_sram_1w1r_16x120_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_16x120_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_16x32_32/freepdk45_sram_1w1r_16x32_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_16x32_32_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_16x72/freepdk45_sram_1w1r_16x72_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_16x72_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_2048x8_2/freepdk45_sram_1w1r_2048x8_2_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_2048x8_2_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_256x128_64/freepdk45_sram_1w1r_256x128_64_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_256x128_64_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_256x48_12/freepdk45_sram_1w1r_256x48_12_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_256x48_12_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_256x4_1/freepdk45_sram_1w1r_256x4_1_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_256x4_1_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_27x96_32/freepdk45_sram_1w1r_27x96_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_27x96_32_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_28x128_32/freepdk45_sram_1w1r_28x128_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_28x128_32_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_31x128/freepdk45_sram_1w1r_31x128_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_31x128_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x120/freepdk45_sram_1w1r_32x120_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_32x120_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x128_32/freepdk45_sram_1w1r_32x128_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_32x128_32_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x240/freepdk45_sram_1w1r_32x240_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_32x240_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x32/freepdk45_sram_1w1r_32x32_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_32x32_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x32_32/freepdk45_sram_1w1r_32x32_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_32x32_32_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x64_32/freepdk45_sram_1w1r_32x64_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     21s] Read 1 cells in library 'freepdk45_sram_1w1r_32x64_32_SS_0p95V_125C_lib' 
+[05/29 04:26:15     21s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x72/freepdk45_sram_1w1r_32x72_SS_0p95V_125C.lib' ...
+[05/29 04:26:15     22s] Read 1 cells in library 'freepdk45_sram_1w1r_32x72_SS_0p95V_125C_lib' 
+[05/29 04:26:15     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x96_32/freepdk45_sram_1w1r_32x96_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_32x96_32_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_34x128_32/freepdk45_sram_1w1r_34x128_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_34x128_32_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_38x96_32/freepdk45_sram_1w1r_38x96_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_38x96_32_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_40x128/freepdk45_sram_1w1r_40x128_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_40x128_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_40x240/freepdk45_sram_1w1r_40x240_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_40x240_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_40x64_32/freepdk45_sram_1w1r_40x64_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_40x64_32_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_40x72/freepdk45_sram_1w1r_40x72_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_40x72_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_48x32_32/freepdk45_sram_1w1r_48x32_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_48x32_32_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_512x64_64/freepdk45_sram_1w1r_512x64_64_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_512x64_64_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_64x32_32/freepdk45_sram_1w1r_64x32_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_64x32_32_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_64x512/freepdk45_sram_1w1r_64x512_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_64x512_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading slow timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_96x32_32/freepdk45_sram_1w1r_96x32_32_SS_0p95V_125C.lib' ...
+[05/29 04:26:16     22s] Read 1 cells in library 'freepdk45_sram_1w1r_96x32_32_SS_0p95V_125C_lib' 
+[05/29 04:26:16     22s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/NangateOpenCellLibrary_PDKv1_3_v2010_12/Front_End/Liberty/CCS/NangateOpenCellLibrary_fast_ccs.lib' ...
+[05/29 04:26:17     24s] Read 134 cells in library 'NangateOpenCellLibrary' 
+[05/29 04:26:17     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_1024x136_17/freepdk45_sram_1rw0r_1024x136_17_FF_1p25V_0C.lib' ...
+[05/29 04:26:17     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_1024x136_17_FF_1p25V_0C_lib' 
+[05/29 04:26:17     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_128x44/freepdk45_sram_1rw0r_128x44_FF_1p25V_0C.lib' ...
+[05/29 04:26:17     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_128x44_FF_1p25V_0C_lib' 
+[05/29 04:26:17     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_20x64/freepdk45_sram_1rw0r_20x64_FF_1p25V_0C.lib' ...
+[05/29 04:26:17     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_20x64_FF_1p25V_0C_lib' 
+[05/29 04:26:17     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_22x64/freepdk45_sram_1rw0r_22x64_FF_1p25V_0C.lib' ...
+[05/29 04:26:17     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_22x64_FF_1p25V_0C_lib' 
+[05/29 04:26:17     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_256x64/freepdk45_sram_1rw0r_256x64_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_256x64_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_45x512/freepdk45_sram_1rw0r_45x512_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_45x512_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_512x45/freepdk45_sram_1rw0r_512x45_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_512x45_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_512x64/freepdk45_sram_1rw0r_512x64_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_512x64_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x160_20/freepdk45_sram_1rw0r_64x160_20_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x160_20_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x176_22/freepdk45_sram_1rw0r_64x176_22_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x176_22_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x20_64/freepdk45_sram_1rw0r_64x20_64_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x20_64_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x40_20/freepdk45_sram_1rw0r_64x40_20_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x40_20_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x44_22/freepdk45_sram_1rw0r_64x44_22_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x44_22_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x512/freepdk45_sram_1rw0r_64x512_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x512_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x80_20/freepdk45_sram_1rw0r_64x80_20_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x80_20_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1rw0r_64x88_22/freepdk45_sram_1rw0r_64x88_22_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1rw0r_64x88_22_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_120x16/freepdk45_sram_1w1r_120x16_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_120x16_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x120_30/freepdk45_sram_1w1r_128x120_30_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_128x120_30_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x124_31/freepdk45_sram_1w1r_128x124_31_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_128x124_31_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x32_32/freepdk45_sram_1w1r_128x32_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_128x32_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x40/freepdk45_sram_1w1r_128x40_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_128x40_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x44_11/freepdk45_sram_1w1r_128x44_11_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_128x44_11_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x4_1/freepdk45_sram_1w1r_128x4_1_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_128x4_1_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x52_13/freepdk45_sram_1w1r_128x52_13_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_128x52_13_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_128x56_14/freepdk45_sram_1w1r_128x56_14_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_128x56_14_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_16x120/freepdk45_sram_1w1r_16x120_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_16x120_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_16x32_32/freepdk45_sram_1w1r_16x32_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_16x32_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_16x72/freepdk45_sram_1w1r_16x72_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_16x72_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_2048x8_2/freepdk45_sram_1w1r_2048x8_2_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_2048x8_2_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_256x128_64/freepdk45_sram_1w1r_256x128_64_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     24s] Read 1 cells in library 'freepdk45_sram_1w1r_256x128_64_FF_1p25V_0C_lib' 
+[05/29 04:26:18     24s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_256x48_12/freepdk45_sram_1w1r_256x48_12_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_256x48_12_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_256x4_1/freepdk45_sram_1w1r_256x4_1_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_256x4_1_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_27x96_32/freepdk45_sram_1w1r_27x96_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_27x96_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_28x128_32/freepdk45_sram_1w1r_28x128_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_28x128_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_31x128/freepdk45_sram_1w1r_31x128_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_31x128_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x120/freepdk45_sram_1w1r_32x120_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_32x120_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x128_32/freepdk45_sram_1w1r_32x128_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_32x128_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x240/freepdk45_sram_1w1r_32x240_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_32x240_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x32/freepdk45_sram_1w1r_32x32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_32x32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x32_32/freepdk45_sram_1w1r_32x32_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_32x32_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x64_32/freepdk45_sram_1w1r_32x64_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_32x64_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x72/freepdk45_sram_1w1r_32x72_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_32x72_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_32x96_32/freepdk45_sram_1w1r_32x96_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_32x96_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_34x128_32/freepdk45_sram_1w1r_34x128_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_34x128_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_38x96_32/freepdk45_sram_1w1r_38x96_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_38x96_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_40x128/freepdk45_sram_1w1r_40x128_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_40x128_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_40x240/freepdk45_sram_1w1r_40x240_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_40x240_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_40x64_32/freepdk45_sram_1w1r_40x64_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_40x64_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_40x72/freepdk45_sram_1w1r_40x72_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_40x72_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_48x32_32/freepdk45_sram_1w1r_48x32_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_48x32_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_512x64_64/freepdk45_sram_1w1r_512x64_64_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_512x64_64_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_64x32_32/freepdk45_sram_1w1r_64x32_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:18     25s] Read 1 cells in library 'freepdk45_sram_1w1r_64x32_32_FF_1p25V_0C_lib' 
+[05/29 04:26:18     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_64x512/freepdk45_sram_1w1r_64x512_FF_1p25V_0C.lib' ...
+[05/29 04:26:19     25s] Read 1 cells in library 'freepdk45_sram_1w1r_64x512_FF_1p25V_0C_lib' 
+[05/29 04:26:19     25s] Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_96x32_32/freepdk45_sram_1w1r_96x32_32_FF_1p25V_0C.lib' ...
+[05/29 04:26:19     25s] Read 1 cells in library 'freepdk45_sram_1w1r_96x32_32_FF_1p25V_0C_lib' 
+[05/29 04:26:19     25s] Ending "PreSetAnalysisView" (total cpu=0:00:06.7, real=0:00:06.0, peak res=1078.0M, current mem=953.5M)
+[05/29 04:26:19     25s] *** End library_loading (cpu=0.11min, real=0.10min, mem=78.0M, fe_cpu=0.43min, fe_real=0.42min, fe_mem=1037.3M) ***
+[05/29 04:26:19     25s] % Begin Load netlist data ... (date=05/29 04:26:19, mem=953.5M)
+[05/29 04:26:19     25s] *** Begin netlist parsing (mem=1037.3M) ***
+[05/29 04:26:19     25s] Created 188 new cells from 110 timing libraries.
+[05/29 04:26:19     25s] Reading netlist ...
+[05/29 04:26:19     25s] Backslashed names will retain backslash and a trailing blank character.
+[05/29 04:26:19     25s] Reading verilogBinary netlist '/home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/vbin/des3.v.bin'
+[05/29 04:26:19     25s] 
+[05/29 04:26:19     25s] *** Memory Usage v#1 (Current mem = 1049.352M, initial mem = 494.898M) ***
+[05/29 04:26:19     25s] *** End netlist parsing (cpu=0:00:00.0, real=0:00:00.0, mem=1049.4M) ***
+[05/29 04:26:19     25s] % End Load netlist data ... (date=05/29 04:26:19, total cpu=0:00:00.1, real=0:00:00.0, peak res=975.3M, current mem=975.3M)
+[05/29 04:26:19     25s] Top level cell is des3.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_1024x136_17' found in library 'freepdk45_sram_1rw0r_1024x136_17_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_128x44_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_128x44' found in library 'freepdk45_sram_1rw0r_128x44_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_20x64_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_20x64' found in library 'freepdk45_sram_1rw0r_20x64_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_22x64_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_22x64' found in library 'freepdk45_sram_1rw0r_22x64_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_256x64_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_256x64' found in library 'freepdk45_sram_1rw0r_256x64_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_45x512_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_45x512' found in library 'freepdk45_sram_1rw0r_45x512_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_512x45_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_512x45' found in library 'freepdk45_sram_1rw0r_512x45_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_512x64_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_512x64' found in library 'freepdk45_sram_1rw0r_512x64_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_64x160_20_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_64x160_20' found in library 'freepdk45_sram_1rw0r_64x160_20_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_64x176_22_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_64x176_22' found in library 'freepdk45_sram_1rw0r_64x176_22_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_64x20_64_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_64x20_64' found in library 'freepdk45_sram_1rw0r_64x20_64_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_64x40_20_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_64x40_20' found in library 'freepdk45_sram_1rw0r_64x40_20_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_64x44_22_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_64x44_22' found in library 'freepdk45_sram_1rw0r_64x44_22_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_64x512_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_64x512' found in library 'freepdk45_sram_1rw0r_64x512_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_64x80_20_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_64x80_20' found in library 'freepdk45_sram_1rw0r_64x80_20_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_64x88_22_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_64x88_22' found in library 'freepdk45_sram_1rw0r_64x88_22_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1w1r_120x16_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1w1r_120x16' found in library 'freepdk45_sram_1w1r_120x16_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1w1r_128x120_30_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1w1r_128x120_30' found in library 'freepdk45_sram_1w1r_128x120_30_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1w1r_128x124_31_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1w1r_128x124_31' found in library 'freepdk45_sram_1w1r_128x124_31_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1w1r_128x32_32_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1w1r_128x32_32' found in library 'freepdk45_sram_1w1r_128x32_32_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1w1r_128x40_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
+[05/29 04:26:19     25s] Message <TECHLIB-606> has exceeded the message display limit of '20'. Use 'set_message -no_limit -id list_of_msgIDs' to reset the message limit.
+[05/29 04:26:19     25s] Hooked 376 DB cells to tlib cells.
+[05/29 04:26:19     26s] Ending "BindLib:" (total cpu=0:00:00.2, real=0:00:00.0, peak res=1001.7M, current mem=1001.7M)
+[05/29 04:26:19     26s] 1 empty module found.
+[05/29 04:26:19     26s] Starting recursive module instantiation check.
+[05/29 04:26:19     26s] No recursion found.
+[05/29 04:26:19     26s] Building hierarchical netlist for Cell des3 ...
+[05/29 04:26:19     26s] *** Netlist is unique.
+[05/29 04:26:19     26s] Setting Std. cell height to 2800 DBU (smallest netlist inst).
+[05/29 04:26:19     26s] ** info: there are 383 modules.
+[05/29 04:26:19     26s] ** info: there are 2892 stdCell insts.
+[05/29 04:26:19     26s] 
+[05/29 04:26:19     26s] *** Memory Usage v#1 (Current mem = 1102.234M, initial mem = 494.898M) ***
+[05/29 04:26:19     26s] *info: set bottom ioPad orient R0
+[05/29 04:26:19     26s] Start create_tracks
+[05/29 04:26:19     26s] Generated pitch 1.68 in metal10 is different from 1.6 defined in technology file in preferred direction.
+[05/29 04:26:19     26s] Generated pitch 0.84 in metal8 is different from 0.8 defined in technology file in preferred direction.
+[05/29 04:26:19     26s] Generated pitch 0.84 in metal7 is different from 0.8 defined in technology file in preferred direction.
+[05/29 04:26:19     26s] Loading preference file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/gui.pref.tcl ...
+[05/29 04:26:19     26s] ##  Process: 45            (User Set)               
+[05/29 04:26:19     26s] ##     Node: (not set)                           
+[05/29 04:26:19     26s] 
+##  Check design process and node:  
+##  Design tech node is not set.
+
+[05/29 04:26:19     26s] Applying the recommended capacitance filtering threshold values for 45nm process node: total_c_th=0, relative_c_th=1 and coupling_c_th=0.1.
+[05/29 04:26:19     26s] 	These values will be used by all post-route extraction engines, including TQuantus, IQuantus and Quantus QRC extraction.
+[05/29 04:26:19     26s] 	Capacitance filtering mode(-capFilterMode option of the setExtractRCMode) is 'relAndCoup' for all engines.
+[05/29 04:26:19     26s] 	The accuracy mode for postRoute effortLevel low extraction will be set to 'high'.
+[05/29 04:26:19     26s] 	Default value for EffortLevel(-effortLevel option of the setExtractRCMode) in postRoute extraction mode will be 'medium' if Quantus QRC technology file is specified else 'low'.
+[05/29 04:26:19     26s] Change floorplan default-technical-site to 'FreePDK45_38x28_10R_NP_162NW_34O'.
+[05/29 04:26:19     26s] Extraction setup Delayed 
+[05/29 04:26:19     26s] *Info: initialize multi-corner CTS.
+[05/29 04:26:19     26s] Ending "SetAnalysisView" (total cpu=0:00:00.1, real=0:00:00.0, peak res=1286.4M, current mem=1017.1M)
+[05/29 04:26:20     26s] Tech dependent Parameter, Build TLibAnalyzer for: cellAreaConsiderPadding
+[05/29 04:26:20     26s] 
+[05/29 04:26:20     26s] TimeStamp Creating Cell Server ...(0, 1, 1, 1) in restoreDesign Begin ...
+[05/29 04:26:20     26s] Summary for sequential cells identification: 
+[05/29 04:26:20     26s]   Identified SBFF number: 16
+[05/29 04:26:20     26s]   Identified MBFF number: 0
+[05/29 04:26:20     26s]   Identified SB Latch number: 0
+[05/29 04:26:20     26s]   Identified MB Latch number: 0
+[05/29 04:26:20     26s]   Not identified SBFF number: 0
+[05/29 04:26:20     26s]   Not identified MBFF number: 0
+[05/29 04:26:20     26s]   Not identified SB Latch number: 0
+[05/29 04:26:20     26s]   Not identified MB Latch number: 0
+[05/29 04:26:20     26s]   Number of sequential cells which are not FFs: 13
+[05/29 04:26:20     26s] Total number of combinational cells: 93
+[05/29 04:26:20     26s] Total number of sequential cells: 29
+[05/29 04:26:20     26s] Total number of tristate cells: 6
+[05/29 04:26:20     26s] Total number of level shifter cells: 0
+[05/29 04:26:20     26s] Total number of power gating cells: 0
+[05/29 04:26:20     26s] Total number of isolation cells: 0
+[05/29 04:26:20     26s] Total number of power switch cells: 0
+[05/29 04:26:20     26s] Total number of pulse generator cells: 0
+[05/29 04:26:20     26s] Total number of always on buffers: 0
+[05/29 04:26:20     26s] Total number of retention cells: 0
+[05/29 04:26:20     26s] Total number of physical cells: 6
+[05/29 04:26:20     26s] List of usable buffers: BUF_X1 BUF_X2 BUF_X4 BUF_X8 BUF_X16 BUF_X32 CLKBUF_X1 CLKBUF_X2 CLKBUF_X3
+[05/29 04:26:20     26s] Total number of usable buffers: 9
+[05/29 04:26:20     26s] List of unusable buffers:
+[05/29 04:26:20     26s] Total number of unusable buffers: 0
+[05/29 04:26:20     26s] List of usable inverters: INV_X1 INV_X2 INV_X4 INV_X8 INV_X16 INV_X32
+[05/29 04:26:20     26s] Total number of usable inverters: 6
+[05/29 04:26:20     26s] List of unusable inverters:
+[05/29 04:26:20     26s] Total number of unusable inverters: 0
+[05/29 04:26:20     26s] List of identified usable delay cells:
+[05/29 04:26:20     26s] Total number of identified usable delay cells: 0
+[05/29 04:26:20     26s] List of identified unusable delay cells:
+[05/29 04:26:20     26s] Total number of identified unusable delay cells: 0
+[05/29 04:26:20     26s] 
+[05/29 04:26:20     26s] TimeStamp Creating Cell Server ...(0, 1, 1, 1) in restoreDesign End ...
+[05/29 04:26:20     26s] No delay cells were detected in the set of buffers. Buffers will be used to fix hold violations.
+[05/29 04:26:20     26s] 
+[05/29 04:26:20     26s] TimeStamp Deleting Cell Server Begin ...
+[05/29 04:26:20     26s] 
+[05/29 04:26:20     26s] TimeStamp Deleting Cell Server End ...
+[05/29 04:26:20     26s] Ending "Cell type marking" (total cpu=0:00:00.0, real=0:00:00.0, peak res=1293.6M, current mem=1293.6M)
+[05/29 04:26:20     26s] 
+[05/29 04:26:20     26s] TimeStamp Creating Cell Server ...(0, 0, 0, 0) in restoreDesign Begin ...
+[05/29 04:26:20     26s] Summary for sequential cells identification: 
+[05/29 04:26:20     26s]   Identified SBFF number: 16
+[05/29 04:26:20     26s]   Identified MBFF number: 0
+[05/29 04:26:20     26s]   Identified SB Latch number: 0
+[05/29 04:26:20     26s]   Identified MB Latch number: 0
+[05/29 04:26:20     26s]   Not identified SBFF number: 0
+[05/29 04:26:20     26s]   Not identified MBFF number: 0
+[05/29 04:26:20     26s]   Not identified SB Latch number: 0
+[05/29 04:26:20     26s]   Not identified MB Latch number: 0
+[05/29 04:26:20     26s]   Number of sequential cells which are not FFs: 13
+[05/29 04:26:20     26s] 
+[05/29 04:26:20     26s] Trim Metal Layers:
+[05/29 04:26:20     26s]  Visiting view : worst
+[05/29 04:26:20     26s]    : PowerDomain = none : Weighted F : unweighted  = 33.30 (1.000) with rcCorner = 0
+[05/29 04:26:20     26s]    : PowerDomain = none : Weighted F : unweighted  = 32.20 (1.000) with rcCorner = -1
+[05/29 04:26:20     26s]  Visiting view : best
+[05/29 04:26:20     26s]    : PowerDomain = none : Weighted F : unweighted  = 6.00 (1.000) with rcCorner = 0
+[05/29 04:26:20     26s]    : PowerDomain = none : Weighted F : unweighted  = 5.50 (1.000) with rcCorner = -1
+[05/29 04:26:20     26s] 
+[05/29 04:26:20     26s] TimeStamp Creating Cell Server ...(0, 0, 0, 0) in restoreDesign End ...
+[05/29 04:26:20     26s] 
+[05/29 04:26:20     26s] TimeStamp Deleting Cell Server Begin ...
+[05/29 04:26:20     26s] 
+[05/29 04:26:20     26s] TimeStamp Deleting Cell Server End ...
+[05/29 04:26:20     26s] Reading floorplan file - /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.fp.gz (mem = 1364.5M).
+[05/29 04:26:20     26s] % Begin Load floorplan data ... (date=05/29 04:26:20, mem=1295.3M)
+[05/29 04:26:20     26s] *info: reset 3166 existing net BottomPreferredLayer and AvoidDetour
+[05/29 04:26:20     26s] Deleting old partition specification.
+[05/29 04:26:20     26s] Set FPlanBox to (0 0 123880 123200)
+[05/29 04:26:20     26s] Start create_tracks
+[05/29 04:26:20     26s] Generated pitch 1.68 in metal10 is different from 1.6 defined in technology file in preferred direction.
+[05/29 04:26:20     26s] Generated pitch 0.84 in metal8 is different from 0.8 defined in technology file in preferred direction.
+[05/29 04:26:20     26s] Generated pitch 0.84 in metal7 is different from 0.8 defined in technology file in preferred direction.
+[05/29 04:26:20     26s]  ... processed partition successfully.
+[05/29 04:26:20     26s] Reading binary special route file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.fp.spr.gz (Created by Innovus v21.17-s075_1 on Thu May 29 04:24:28 2025, version: 1)
+[05/29 04:26:20     26s] Convert 0 swires and 0 svias from compressed groups
+[05/29 04:26:20     26s] 0 swires and 0 svias were compressed
+[05/29 04:26:20     26s] 0 swires and 0 svias were decompressed from small or sparse groups
+[05/29 04:26:20     26s] Ending "Read special route file" (total cpu=0:00:00.0, real=0:00:00.0, peak res=1296.4M, current mem=1296.4M)
+[05/29 04:26:20     26s] Extracting standard cell pins and blockage ...... 
+[05/29 04:26:20     26s] Pin and blockage extraction finished
+[05/29 04:26:20     26s] % End Load floorplan data ... (date=05/29 04:26:20, total cpu=0:00:00.1, real=0:00:00.0, peak res=1298.1M, current mem=1298.1M)
+[05/29 04:26:20     26s] Reading congestion map file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.route.congmap.gz ...
+[05/29 04:26:20     26s] % Begin Load SymbolTable ... (date=05/29 04:26:20, mem=1298.2M)
+[05/29 04:26:20     26s] % End Load SymbolTable ... (date=05/29 04:26:20, total cpu=0:00:00.0, real=0:00:00.0, peak res=1298.9M, current mem=1298.9M)
+[05/29 04:26:20     26s] Loading place ...
+[05/29 04:26:20     26s] % Begin Load placement data ... (date=05/29 04:26:20, mem=1298.9M)
+[05/29 04:26:20     26s] Reading placement file - /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.place.gz.
+[05/29 04:26:20     26s] ** Reading stdCellPlacement_binary (Created by Innovus v21.17-s075_1 on Thu May 29 04:24:28 2025, version# 2) ...
+[05/29 04:26:20     26s] Read Views for adaptive view pruning ...
+[05/29 04:26:20     26s] Read 0 views from Binary DB for adaptive view pruning
+[05/29 04:26:20     26s] *** Completed restorePlace (cpu=0:00:00.0 real=0:00:00.0 mem=1367.5M) ***
+[05/29 04:26:20     26s] Total net length = 2.860e+00 (1.430e+00 1.430e+00) (ext = 0.000e+00)
+[05/29 04:26:20     26s] % End Load placement data ... (date=05/29 04:26:20, total cpu=0:00:00.0, real=0:00:00.0, peak res=1299.4M, current mem=1299.4M)
+[05/29 04:26:20     26s] % Begin Load routing data ... (date=05/29 04:26:20, mem=1299.7M)
+[05/29 04:26:20     26s] Reading routing file - /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.route.gz.
+[05/29 04:26:20     26s] Reading Innovus routing data (Created by Innovus v21.17-s075_1 on Thu May 29 04:24:28 2025 Format: 20.1) ...
+[05/29 04:26:20     26s] *** Total 3166 nets are successfully restored.
+[05/29 04:26:20     26s] *** Completed restoreRoute (cpu=0:00:00.0 real=0:00:00.0 mem=1364.5M) ***
+[05/29 04:26:20     26s] % End Load routing data ... (date=05/29 04:26:20, total cpu=0:00:00.0, real=0:00:00.0, peak res=1300.8M, current mem=1300.1M)
+[05/29 04:26:20     26s] TAT_INFO: restoreCongMap REAL = 0 : CPU = 0 : MEM = 0.
+[05/29 04:26:20     26s] Reading property file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.prop
+[05/29 04:26:20     26s] *** Completed restoreProperty (cpu=0:00:00.0 real=0:00:00.0 mem=1367.5M) ***
+[05/29 04:26:21     27s] eee: readRCCornerMetaData, file read unsuccessful: /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/extraction/extractionMetaData.gz
+[05/29 04:26:21     27s] Extraction setup Started 
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] Trim Metal Layers:
+[05/29 04:26:21     27s] Initializing multi-corner RC extraction with 1 active RC Corners ...
+[05/29 04:26:21     27s] Reading Capacitance Table File /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/mmmc/NCSU_FreePDK_45nm.capTbl ...
+[05/29 04:26:21     27s] Cap table was created using Encounter 08.10-p004_1.
+[05/29 04:26:21     27s] Process name: master_techFreePDK45.
+[05/29 04:26:21     27s] Importing multi-corner RC tables ... 
+[05/29 04:26:21     27s] Summary of Active RC-Corners : 
+[05/29 04:26:21     27s]  
+[05/29 04:26:21     27s]  Analysis View: worst
+[05/29 04:26:21     27s]     RC-Corner Name        : default
+[05/29 04:26:21     27s]     RC-Corner Index       : 0
+[05/29 04:26:21     27s]     RC-Corner Temperature : 25 Celsius
+[05/29 04:26:21     27s]     RC-Corner Cap Table   : '/home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/mmmc/NCSU_FreePDK_45nm.capTbl'
+[05/29 04:26:21     27s]     RC-Corner PreRoute Res Factor         : 1
+[05/29 04:26:21     27s]     RC-Corner PreRoute Cap Factor         : 1
+[05/29 04:26:21     27s]     RC-Corner PostRoute Res Factor        : 1 {1 1 1}
+[05/29 04:26:21     27s]     RC-Corner PostRoute Cap Factor        : 1 {1 1 1}
+[05/29 04:26:21     27s]     RC-Corner PostRoute XCap Factor       : 1 {1 1 1}
+[05/29 04:26:21     27s]     RC-Corner PreRoute Clock Res Factor   : 1	[Derived from postRoute_res (effortLevel low)]
+[05/29 04:26:21     27s]     RC-Corner PreRoute Clock Cap Factor   : 1	[Derived from postRoute_cap (effortLevel low)]
+[05/29 04:26:21     27s]     RC-Corner PostRoute Clock Cap Factor  : 1 {1 1 1} 	[Derived from postRoute_cap (effortLevel low)]
+[05/29 04:26:21     27s]     RC-Corner PostRoute Clock Res Factor  : 1 {1 1 1} 	[Derived from postRoute_res (effortLevel low)]
+[05/29 04:26:21     27s]     RC-Corner PostRoute Clock coupling capacitance Factor : 1 {1 1 1} 
+[05/29 04:26:21     27s]  
+[05/29 04:26:21     27s]  Analysis View: best
+[05/29 04:26:21     27s]     RC-Corner Name        : default
+[05/29 04:26:21     27s]     RC-Corner Index       : 0
+[05/29 04:26:21     27s]     RC-Corner Temperature : 25 Celsius
+[05/29 04:26:21     27s]     RC-Corner Cap Table   : '/home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/mmmc/NCSU_FreePDK_45nm.capTbl'
+[05/29 04:26:21     27s]     RC-Corner PreRoute Res Factor         : 1
+[05/29 04:26:21     27s]     RC-Corner PreRoute Cap Factor         : 1
+[05/29 04:26:21     27s]     RC-Corner PostRoute Res Factor        : 1 {1 1 1}
+[05/29 04:26:21     27s]     RC-Corner PostRoute Cap Factor        : 1 {1 1 1}
+[05/29 04:26:21     27s]     RC-Corner PostRoute XCap Factor       : 1 {1 1 1}
+[05/29 04:26:21     27s]     RC-Corner PreRoute Clock Res Factor   : 1	[Derived from postRoute_res (effortLevel low)]
+[05/29 04:26:21     27s]     RC-Corner PreRoute Clock Cap Factor   : 1	[Derived from postRoute_cap (effortLevel low)]
+[05/29 04:26:21     27s]     RC-Corner PostRoute Clock Cap Factor  : 1 {1 1 1} 	[Derived from postRoute_cap (effortLevel low)]
+[05/29 04:26:21     27s]     RC-Corner PostRoute Clock Res Factor  : 1 {1 1 1} 	[Derived from postRoute_res (effortLevel low)]
+[05/29 04:26:21     27s]     RC-Corner PostRoute Clock coupling capacitance Factor : 1 {1 1 1} 
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] Trim Metal Layers:
+[05/29 04:26:21     27s] LayerId::1 widthSet size::4
+[05/29 04:26:21     27s] LayerId::2 widthSet size::4
+[05/29 04:26:21     27s] LayerId::3 widthSet size::4
+[05/29 04:26:21     27s] LayerId::4 widthSet size::4
+[05/29 04:26:21     27s] LayerId::5 widthSet size::4
+[05/29 04:26:21     27s] LayerId::6 widthSet size::4
+[05/29 04:26:21     27s] LayerId::7 widthSet size::4
+[05/29 04:26:21     27s] LayerId::8 widthSet size::4
+[05/29 04:26:21     27s] LayerId::9 widthSet size::4
+[05/29 04:26:21     27s] LayerId::10 widthSet size::3
+[05/29 04:26:21     27s] Updating RC grid for preRoute extraction ...
+[05/29 04:26:21     27s] eee: pegSigSF::1.070000
+[05/29 04:26:21     27s] Initializing multi-corner capacitance tables ... 
+[05/29 04:26:21     27s] Initializing multi-corner resistance tables ...
+[05/29 04:26:21     27s] eee: l::1 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] eee: l::2 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] eee: l::3 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] eee: l::4 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] eee: l::5 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] eee: l::6 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] eee: l::7 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] eee: l::8 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] eee: l::9 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] eee: l::10 avDens::0.000000 usedTrk::0.000000 availTrk::0.000000 sigTrk::0.000000
+[05/29 04:26:21     27s] {RT default 0 10 10 {4 1} {7 0} {9 0} 3}
+[05/29 04:26:21     27s] eee: LAM: n=40 LLS=2-3 HLS=3-5 rDens=0.000000 uaWl=0.000000 uaWlH=0.000000 aWlH=0.000000 lMod=0 pMax=0.850000 pMod=82 wcR=0.535700 newSi=0.000000 wHLS=1.339250 siPrev=0 viaL=0.000000 crit=0.000000 shortMod=0.000000 fMod=0.000000 
+[05/29 04:26:21     27s] Start generating vias ..
+[05/29 04:26:21     27s] #create default rule from bind_ndr_rule rule=0x7f475bc67f50 0x7f473c1d8018
+[05/29 04:26:21     27s] ### import design signature (1): route=1 fixed_route=1 flt_obj=0 vio=1905142130 swire=1 shield_wire=1 net_attr=1 dirty_area=0 del_dirty_area=0 cell=0 placement=0 pin_access=1 inst_pattern=1 via=1605868471 routing_via=1
+[05/29 04:26:21     27s] #Skip building auto via since it is not turned on.
+[05/29 04:26:21     27s] Extracting standard cell pins and blockage ...... 
+[05/29 04:26:21     27s] Pin and blockage extraction finished
+[05/29 04:26:21     27s] Via generation completed.
+[05/29 04:26:21     27s] % Begin Load power constraints ... (date=05/29 04:26:21, mem=1320.7M)
+[05/29 04:26:21     27s] % End Load power constraints ... (date=05/29 04:26:21, total cpu=0:00:00.0, real=0:00:00.0, peak res=1320.9M, current mem=1320.9M)
+[05/29 04:26:21     27s] % Begin load AAE data ... (date=05/29 04:26:21, mem=1335.4M)
+[05/29 04:26:21     27s] % End load AAE data ... (date=05/29 04:26:21, total cpu=0:00:00.0, real=0:00:00.0, peak res=1335.4M, current mem=1335.4M)
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] TimeStamp Creating Cell Server ...(0, 1, 1, 1) in restoreDesign Begin ...
+[05/29 04:26:21     27s] Summary for sequential cells identification: 
+[05/29 04:26:21     27s]   Identified SBFF number: 16
+[05/29 04:26:21     27s]   Identified MBFF number: 0
+[05/29 04:26:21     27s]   Identified SB Latch number: 0
+[05/29 04:26:21     27s]   Identified MB Latch number: 0
+[05/29 04:26:21     27s]   Not identified SBFF number: 0
+[05/29 04:26:21     27s]   Not identified MBFF number: 0
+[05/29 04:26:21     27s]   Not identified SB Latch number: 0
+[05/29 04:26:21     27s]   Not identified MB Latch number: 0
+[05/29 04:26:21     27s]   Number of sequential cells which are not FFs: 13
+[05/29 04:26:21     27s] Total number of combinational cells: 93
+[05/29 04:26:21     27s] Total number of sequential cells: 29
+[05/29 04:26:21     27s] Total number of tristate cells: 6
+[05/29 04:26:21     27s] Total number of level shifter cells: 0
+[05/29 04:26:21     27s] Total number of power gating cells: 0
+[05/29 04:26:21     27s] Total number of isolation cells: 0
+[05/29 04:26:21     27s] Total number of power switch cells: 0
+[05/29 04:26:21     27s] Total number of pulse generator cells: 0
+[05/29 04:26:21     27s] Total number of always on buffers: 0
+[05/29 04:26:21     27s] Total number of retention cells: 0
+[05/29 04:26:21     27s] Total number of physical cells: 6
+[05/29 04:26:21     27s] List of usable buffers: BUF_X1 BUF_X2 BUF_X4 BUF_X8 BUF_X16 BUF_X32 CLKBUF_X1 CLKBUF_X2 CLKBUF_X3
+[05/29 04:26:21     27s] Total number of usable buffers: 9
+[05/29 04:26:21     27s] List of unusable buffers:
+[05/29 04:26:21     27s] Total number of unusable buffers: 0
+[05/29 04:26:21     27s] List of usable inverters: INV_X1 INV_X2 INV_X4 INV_X8 INV_X16 INV_X32
+[05/29 04:26:21     27s] Total number of usable inverters: 6
+[05/29 04:26:21     27s] List of unusable inverters:
+[05/29 04:26:21     27s] Total number of unusable inverters: 0
+[05/29 04:26:21     27s] List of identified usable delay cells:
+[05/29 04:26:21     27s] Total number of identified usable delay cells: 0
+[05/29 04:26:21     27s] List of identified unusable delay cells:
+[05/29 04:26:21     27s] Total number of identified unusable delay cells: 0
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] TimeStamp Creating Cell Server ...(0, 1, 1, 1) in restoreDesign End ...
+[05/29 04:26:21     27s] No delay cells were detected in the set of buffers. Buffers will be used to fix hold violations.
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] TimeStamp Deleting Cell Server Begin ...
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] TimeStamp Deleting Cell Server End ...
+[05/29 04:26:21     27s] #% End load design ... (date=05/29 04:26:21, total cpu=0:00:09.2, real=0:00:09.0, peak res=1369.9M, current mem=1335.7M)
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] *** Summary of all messages that are not suppressed in this session:
+[05/29 04:26:21     27s] Severity  ID               Count  Summary                                  
+[05/29 04:26:21     27s] ERROR     IMPLF-82         96866  %s is not on Manufacturing Grid. This is...
+[05/29 04:26:21     27s] WARNING   TECHLIB-606        108  An inconsistency was found during interp...
+[05/29 04:26:21     27s] *** Message Summary: 108 warning(s), 96866 error(s)
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] <CMD> set_ccopt_property buffer_cells {CLKBUF_X1 CLKBUF_X2 CLKBUF_X3 CLKBUF_X4 CLKBUF_X8}
+[05/29 04:26:21     27s] <CMD> set_ccopt_property clock_gating_cells {CLKGATE_X1 CLKGATE_X2 CLKGATE_X4 CLKGATE_X8}
+[05/29 04:26:21     27s] <CMD> set_ccopt_property cell_density 0.5
+[05/29 04:26:21     27s] <CMD> set_ccopt_property clock_gate_buffering_location below
+[05/29 04:26:21     27s] <CMD> set_ccopt_property clone_clock_gates true
+[05/29 04:26:21     27s] <CMD> setNanoRouteMode -routeWithTimingDriven false -routeDesignFixClockNets true
+[05/29 04:26:21     27s] <CMD> ccopt_design -cts
+[05/29 04:26:21     27s] *** ccopt_design #1 [begin] : totSession cpu/real = 0:00:27.6/0:00:26.7 (1.0), mem = 1394.1M
+[05/29 04:26:21     27s] Runtime...
+[05/29 04:26:21     27s] **INFO: User's settings:
+[05/29 04:26:21     27s] setNanoRouteMode -extractThirdPartyCompatible  false
+[05/29 04:26:21     27s] setNanoRouteMode -routeDesignFixClockNets      true
+[05/29 04:26:21     27s] setNanoRouteMode -routeWithTimingDriven        false
+[05/29 04:26:21     27s] setDesignMode -flowEffort                      express
+[05/29 04:26:21     27s] setDesignMode -powerEffort                     none
+[05/29 04:26:21     27s] setDesignMode -process                         45
+[05/29 04:26:21     27s] setExtractRCMode -coupling_c_th                0.1
+[05/29 04:26:21     27s] setExtractRCMode -engine                       preRoute
+[05/29 04:26:21     27s] setExtractRCMode -relative_c_th                1
+[05/29 04:26:21     27s] setExtractRCMode -total_c_th                   0
+[05/29 04:26:21     27s] setDelayCalMode -engine                        aae
+[05/29 04:26:21     27s] setPlaceMode -MXPBoundaryLevel                 7
+[05/29 04:26:21     27s] setPlaceMode -MXPConstraintFile                {}
+[05/29 04:26:21     27s] setPlaceMode -MXPControlSetting                0
+[05/29 04:26:21     27s] setPlaceMode -MXPLogicHierAware                0
+[05/29 04:26:21     27s] setPlaceMode -MXPPreplaceSetting               5
+[05/29 04:26:21     27s] setPlaceMode -MXPRefineSetting                 17
+[05/29 04:26:21     27s] setPlaceMode -place_global_place_io_pins       false
+[05/29 04:26:21     27s] setPlaceMode -timingDriven                     true
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] (ccopt_design): CTS Engine: auto. Used Spec: CCOPT spec from create_ccopt_clock_tree_spec.
+[05/29 04:26:21     27s] (ccopt_design): create_ccopt_clock_tree_spec
+[05/29 04:26:21     27s] Creating clock tree spec for modes (timing configs): default
+[05/29 04:26:21     27s] extract_clock_generator_skew_groups=true: create_ccopt_clock_tree_spec will generate skew groups with a name prefix of "_clock_gen" to balance clock generator connected flops with the clock generator they drive.
+[05/29 04:26:21     27s] Tech dependent Parameter, Build TLibAnalyzer for: cellAreaConsiderPadding
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] TimeStamp Creating Cell Server ...(0, 0, 0, 0) Begin ...
+[05/29 04:26:21     27s] Summary for sequential cells identification: 
+[05/29 04:26:21     27s]   Identified SBFF number: 16
+[05/29 04:26:21     27s]   Identified MBFF number: 0
+[05/29 04:26:21     27s]   Identified SB Latch number: 0
+[05/29 04:26:21     27s]   Identified MB Latch number: 0
+[05/29 04:26:21     27s]   Not identified SBFF number: 0
+[05/29 04:26:21     27s]   Not identified MBFF number: 0
+[05/29 04:26:21     27s]   Not identified SB Latch number: 0
+[05/29 04:26:21     27s]   Not identified MB Latch number: 0
+[05/29 04:26:21     27s]   Number of sequential cells which are not FFs: 13
+[05/29 04:26:21     27s]  Visiting view : worst
+[05/29 04:26:21     27s]    : PowerDomain = none : Weighted F : unweighted  = 33.10 (1.000) with rcCorner = 0
+[05/29 04:26:21     27s]    : PowerDomain = none : Weighted F : unweighted  = 32.20 (1.000) with rcCorner = -1
+[05/29 04:26:21     27s]  Visiting view : best
+[05/29 04:26:21     27s]    : PowerDomain = none : Weighted F : unweighted  = 5.90 (1.000) with rcCorner = 0
+[05/29 04:26:21     27s]    : PowerDomain = none : Weighted F : unweighted  = 5.50 (1.000) with rcCorner = -1
+[05/29 04:26:21     27s] TLC MultiMap info (StdDelay):
+[05/29 04:26:21     27s]   : fast + fast + 1 + no RcCorner := 5.5ps
+[05/29 04:26:21     27s]   : fast + fast + 1 + default := 5.9ps
+[05/29 04:26:21     27s]   : slow + slow + 1 + no RcCorner := 32.2ps
+[05/29 04:26:21     27s]   : slow + slow + 1 + default := 33.1ps
+[05/29 04:26:21     27s]  Setting StdDelay to: 33.1ps
+[05/29 04:26:21     27s] 
+[05/29 04:26:21     27s] TimeStamp Creating Cell Server ...(0, 0, 0, 0) End ...
+[05/29 04:26:21     27s] Reset timing graph...
+[05/29 04:26:21     27s] Ignoring AAE DB Resetting ...
+[05/29 04:26:21     27s] Reset timing graph done.
+[05/29 04:26:21     27s] Ignoring AAE DB Resetting ...
+[05/29 04:26:22     28s] Analyzing clock structure...
+[05/29 04:26:22     28s] Analyzing clock structure done.
+[05/29 04:26:22     28s] Reset timing graph...
+[05/29 04:26:22     28s] Ignoring AAE DB Resetting ...
+[05/29 04:26:22     28s] Reset timing graph done.
+[05/29 04:26:22     28s] Extracting original clock gating for clk...
+[05/29 04:26:22     28s]   clock_tree clk contains 128 sinks and 0 clock gates.
+[05/29 04:26:22     28s] Extracting original clock gating for clk done.
+[05/29 04:26:22     28s] The skew group clk/default was created. It contains 128 sinks and 1 sources.
+[05/29 04:26:22     28s] Checking clock tree convergence...
+[05/29 04:26:22     28s] Checking clock tree convergence done.
+[05/29 04:26:22     28s] Placement constraints of type 'region' or 'fence' will not be downgraded to 'guide' because the property change_fences_to_guides has been set to false.
+[05/29 04:26:22     28s] Set place::cacheFPlanSiteMark to 1
+[05/29 04:26:22     28s] CCOpt::Phase::Initialization...
+[05/29 04:26:22     28s] Check Prerequisites...
+[05/29 04:26:22     28s] **ERROR: (IMPCCOPT-4254):	Design must be placed before running 'ccopt_check_prerequisites_internal'.
+Check Prerequisites interrupted. (took cpu=0:00:00.0 real=0:00:00.0)
+[05/29 04:26:22     28s] CCOpt::Phase::Initialization interrupted. (took cpu=0:00:00.0 real=0:00:00.0)
+[05/29 04:26:22     28s] **ERROR: (IMPCCOPT-2196):	Cannot run ccopt_design because the command prerequisites were not met. Review the previous error messages for more details about the failure.
+[05/29 04:26:22     28s] Set place::cacheFPlanSiteMark to 0
+[05/29 04:26:22     28s] All LLGs are deleted
+[05/29 04:26:22     28s] Before cleanup instance map, number of data still kept is (map:0, fakeMap:0, inst:0).
+[05/29 04:26:22     28s] After cleanup instance map, number of data still kept is (map:0, fakeMap:0, inst:0).
+[05/29 04:26:22     28s] OPERPROF: Starting spSiteCleanup(true) at level 1, MEM:1504.6M, EPOCH TIME: 1748507182.144956
+[05/29 04:26:22     28s] OPERPROF: Finished spSiteCleanup(true) at level 1, CPU:0.000, REAL:0.000, MEM:1504.6M, EPOCH TIME: 1748507182.145207
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] *** Summary of all messages that are not suppressed in this session:
+[05/29 04:26:22     28s] Severity  ID               Count  Summary                                  
+[05/29 04:26:22     28s] ERROR     IMPCCOPT-2196        1  Cannot run ccopt_design because the comm...
+[05/29 04:26:22     28s] ERROR     IMPCCOPT-4254        1  Design must be placed before running '%s...
+[05/29 04:26:22     28s] *** Message Summary: 0 warning(s), 2 error(s)
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] *** ccopt_design #1 [finish] : cpu/real = 0:00:00.5/0:00:00.5 (1.0), totSession cpu/real = 0:00:28.1/0:00:27.2 (1.0), mem = 1504.6M
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] =============================================================================================
+[05/29 04:26:22     28s]  Final TAT Report : ccopt_design #1                                             21.17-s075_1
+[05/29 04:26:22     28s] =============================================================================================
+[05/29 04:26:22     28s]  Step Name                  Count        Real  (       % )      Step Total Real / CPU  Scale
+[05/29 04:26:22     28s] ---------------------------------------------------------------------------------------------
+[05/29 04:26:22     28s] [ CellServerInit         ]      1   0:00:00.0  (   0.8 % )     0:00:00.0 /  0:00:00.0    0.0
+[05/29 04:26:22     28s] [ MISC                   ]          0:00:00.5  (  99.2 % )     0:00:00.5 /  0:00:00.5    1.0
+[05/29 04:26:22     28s] ---------------------------------------------------------------------------------------------
+[05/29 04:26:22     28s]  ccopt_design #1 TOTAL              0:00:00.5  ( 100.0 % )     0:00:00.5 /  0:00:00.5    1.0
+[05/29 04:26:22     28s] ---------------------------------------------------------------------------------------------
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] **ERROR: (IMPSYT-7114):	Invalid return code while executing command 'source /home/yl996/proj/mcp-eda-example/config.tcl; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/tech.tcl; restoreDesign /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat des3; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl; report_cts > pnr_reports/cts_summary.rpt'. Review the following error in command 'source /home/yl996/proj/mcp-eda-example/config.tcl; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/tech.tcl; restoreDesign /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat des3; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl; report_cts > pnr_reports/cts_summary.rpt' then restart.
+[05/29 04:26:22     28s] Error info: source /home/yl996/proj/mcp-eda-example/config.tcl; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/tech.tcl; restoreDesign /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat des3; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl; report_cts > pnr_reports/cts_summary.rpt: 
+[05/29 04:26:22     28s]     while executing
+[05/29 04:26:22     28s] "ccopt_design -monolithicflow_only -cts"
+[05/29 04:26:22     28s]     ("eval" body line 1)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "eval ccopt_design $step $args"
+[05/29 04:26:22     28s]     (procedure "ccopt_design" line 47)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "ccopt_design -cts"
+[05/29 04:26:22     28s]     (file "/home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl" line 17)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "::se_source_orig /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl"
+[05/29 04:26:22     28s]     ("uplevel" body line 1)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "uplevel [concat ::se_source_orig $args]"
+[05/29 04:26:22     28s]     (procedure "source" line 194)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl"
+[05/29 04:26:22     28s]     ("eval" body line 1)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "eval {source /home/yl996/proj/mcp-eda-example/config.tcl; source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/tech.tcl; restoreDesign /home/yl99..."
+[05/29 04:26:22     28s]     (in namespace inscope "::" script line 1)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "namespace inscope :: eval $executeCmd".
+[05/29 04:26:22     28s] Sourcing file "/home/yl996/proj/mcp-eda-example/config.tcl" ...
+[05/29 04:26:22     28s] Sourcing file "/home/yl996/proj/mcp-eda-example/scripts/FreePDK45/tech.tcl" ...
+[05/29 04:26:22     28s] Sourcing file "/home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl" ...
+[05/29 04:26:22     28s] <CMD> set_ccopt_property buffer_cells {CLKBUF_X1 CLKBUF_X2 CLKBUF_X3 CLKBUF_X4 CLKBUF_X8}
+[05/29 04:26:22     28s] <CMD> set_ccopt_property clock_gating_cells {CLKGATE_X1 CLKGATE_X2 CLKGATE_X4 CLKGATE_X8}
+[05/29 04:26:22     28s] <CMD> set_ccopt_property cell_density 0.5
+[05/29 04:26:22     28s] <CMD> set_ccopt_property clock_gate_buffering_location below
+[05/29 04:26:22     28s] <CMD> set_ccopt_property clone_clock_gates true
+[05/29 04:26:22     28s] <CMD> setNanoRouteMode -routeWithTimingDriven false -routeDesignFixClockNets true
+[05/29 04:26:22     28s] <CMD> ccopt_design -cts
+[05/29 04:26:22     28s] #% Begin ccopt_design (date=05/29 04:26:22, mem=1410.2M)
+[05/29 04:26:22     28s] *** ccopt_design #2 [begin] : totSession cpu/real = 0:00:28.2/0:00:27.2 (1.0), mem = 1480.6M
+[05/29 04:26:22     28s] **INFO: User's settings:
+[05/29 04:26:22     28s] setNanoRouteMode -extractThirdPartyCompatible  false
+[05/29 04:26:22     28s] setNanoRouteMode -routeDesignFixClockNets      true
+[05/29 04:26:22     28s] setNanoRouteMode -routeWithTimingDriven        false
+[05/29 04:26:22     28s] setDesignMode -flowEffort                      express
+[05/29 04:26:22     28s] setDesignMode -powerEffort                     none
+[05/29 04:26:22     28s] setDesignMode -process                         45
+[05/29 04:26:22     28s] setExtractRCMode -coupling_c_th                0.1
+[05/29 04:26:22     28s] setExtractRCMode -engine                       preRoute
+[05/29 04:26:22     28s] setExtractRCMode -relative_c_th                1
+[05/29 04:26:22     28s] setExtractRCMode -total_c_th                   0
+[05/29 04:26:22     28s] setDelayCalMode -engine                        aae
+[05/29 04:26:22     28s] setPlaceMode -MXPBoundaryLevel                 7
+[05/29 04:26:22     28s] setPlaceMode -MXPConstraintFile                {}
+[05/29 04:26:22     28s] setPlaceMode -MXPControlSetting                0
+[05/29 04:26:22     28s] setPlaceMode -MXPLogicHierAware                0
+[05/29 04:26:22     28s] setPlaceMode -MXPPreplaceSetting               5
+[05/29 04:26:22     28s] setPlaceMode -MXPRefineSetting                 17
+[05/29 04:26:22     28s] setPlaceMode -place_global_place_io_pins       false
+[05/29 04:26:22     28s] setPlaceMode -timingDriven                     true
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] (ccopt_design): CTS Engine: auto. Used Spec: pre-existing CCOPT spec.
+[05/29 04:26:22     28s] Not setting up route_type 'default_route_type_nonleaf' from CTS mode settings, as it has already been done
+[05/29 04:26:22     28s] Not setting up route_type 'default_route_type_leaf' from CTS mode settings, as it has already been done
+[05/29 04:26:22     28s] Placement constraints of type 'region' or 'fence' will not be downgraded to 'guide' because the property change_fences_to_guides has been set to false.
+[05/29 04:26:22     28s] Set place::cacheFPlanSiteMark to 1
+[05/29 04:26:22     28s] CCOpt::Phase::Initialization...
+[05/29 04:26:22     28s] Check Prerequisites...
+[05/29 04:26:22     28s] **ERROR: (IMPCCOPT-4254):	Design must be placed before running 'ccopt_check_prerequisites_internal'.
+Check Prerequisites interrupted. (took cpu=0:00:00.0 real=0:00:00.0)
+[05/29 04:26:22     28s] CCOpt::Phase::Initialization interrupted. (took cpu=0:00:00.0 real=0:00:00.0)
+[05/29 04:26:22     28s] **ERROR: (IMPCCOPT-2196):	Cannot run ccopt_design because the command prerequisites were not met. Review the previous error messages for more details about the failure.
+[05/29 04:26:22     28s] Set place::cacheFPlanSiteMark to 0
+[05/29 04:26:22     28s] All LLGs are deleted
+[05/29 04:26:22     28s] Before cleanup instance map, number of data still kept is (map:0, fakeMap:0, inst:0).
+[05/29 04:26:22     28s] After cleanup instance map, number of data still kept is (map:0, fakeMap:0, inst:0).
+[05/29 04:26:22     28s] OPERPROF: Starting spSiteCleanup(true) at level 1, MEM:1480.6M, EPOCH TIME: 1748507182.210187
+[05/29 04:26:22     28s] OPERPROF: Finished spSiteCleanup(true) at level 1, CPU:0.000, REAL:0.000, MEM:1480.6M, EPOCH TIME: 1748507182.210295
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] *** Summary of all messages that are not suppressed in this session:
+[05/29 04:26:22     28s] Severity  ID               Count  Summary                                  
+[05/29 04:26:22     28s] ERROR     IMPCCOPT-2196        1  Cannot run ccopt_design because the comm...
+[05/29 04:26:22     28s] ERROR     IMPCCOPT-4254        1  Design must be placed before running '%s...
+[05/29 04:26:22     28s] *** Message Summary: 0 warning(s), 2 error(s)
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] *** ccopt_design #2 [finish] : cpu/real = 0:00:00.0/0:00:00.0 (1.3), totSession cpu/real = 0:00:28.2/0:00:27.3 (1.0), mem = 1480.6M
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] =============================================================================================
+[05/29 04:26:22     28s]  Final TAT Report : ccopt_design #2                                             21.17-s075_1
+[05/29 04:26:22     28s] =============================================================================================
+[05/29 04:26:22     28s]  Step Name                  Count        Real  (       % )      Step Total Real / CPU  Scale
+[05/29 04:26:22     28s] ---------------------------------------------------------------------------------------------
+[05/29 04:26:22     28s] [ MISC                   ]          0:00:00.0  ( 100.0 % )     0:00:00.0 /  0:00:00.0    1.3
+[05/29 04:26:22     28s] ---------------------------------------------------------------------------------------------
+[05/29 04:26:22     28s]  ccopt_design #2 TOTAL              0:00:00.0  ( 100.0 % )     0:00:00.0 /  0:00:00.0    1.3
+[05/29 04:26:22     28s] ---------------------------------------------------------------------------------------------
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] #% End ccopt_design (date=05/29 04:26:22, total cpu=0:00:00.1, real=0:00:00.0, peak res=1410.2M, current mem=1410.2M)
+[05/29 04:26:22     28s] **ERROR: (IMPSYT-6692):	Invalid return code while executing '/home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl' was returned and script processing was stopped. Review the following error in '/home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl' then restart.
+[05/29 04:26:22     28s] Error info: /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl: 
+[05/29 04:26:22     28s]     while executing
+[05/29 04:26:22     28s] "ccopt_design -monolithicflow_only -cts"
+[05/29 04:26:22     28s]     ("eval" body line 1)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "eval ccopt_design $step $args"
+[05/29 04:26:22     28s]     (procedure "ccopt_design" line 47)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "ccopt_design -cts"
+[05/29 04:26:22     28s]     (file "/home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl" line 17)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "::se_source_orig /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl"
+[05/29 04:26:22     28s]     ("uplevel" body line 1)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "uplevel [concat ::se_source_orig $args]"
+[05/29 04:26:22     28s]     (procedure "source" line 194)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl"
+[05/29 04:26:22     28s]     ("uplevel" body line 1)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "uplevel #0 source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl"
+[05/29 04:26:22     28s]     ("eval" body line 1)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "eval {uplevel #0 source /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/5_cts.tcl}"
+[05/29 04:26:22     28s]     (in namespace inscope "::" script line 1)
+[05/29 04:26:22     28s]     invoked from within
+[05/29 04:26:22     28s] "namespace inscope :: eval "uplevel #0 source $fileName"".
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] *** Memory Usage v#1 (Current mem = 1480.555M, initial mem = 494.898M) ***
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] *** Summary of all messages that are not suppressed in this session:
+[05/29 04:26:22     28s] Severity  ID               Count  Summary                                  
+[05/29 04:26:22     28s] ERROR     IMPLF-82         96866  %s is not on Manufacturing Grid. This is...
+[05/29 04:26:22     28s] ERROR     IMPSYT-6692          1  Invalid return code while executing '%s'...
+[05/29 04:26:22     28s] ERROR     IMPSYT-7114          1  Invalid return code while executing comm...
+[05/29 04:26:22     28s] ERROR     IMPCCOPT-2196        2  Cannot run ccopt_design because the comm...
+[05/29 04:26:22     28s] ERROR     IMPCCOPT-4254        2  Design must be placed before running '%s...
+[05/29 04:26:22     28s] WARNING   TECHLIB-606        108  An inconsistency was found during interp...
+[05/29 04:26:22     28s] *** Message Summary: 108 warning(s), 96872 error(s)
+[05/29 04:26:22     28s] 
+[05/29 04:26:22     28s] --- Ending "Innovus" (totcpu=0:00:28.2, real=0:00:28.0, mem=1480.6M) ---
