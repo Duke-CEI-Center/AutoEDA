@@ -14,3 +14,4 @@ addStripe -nets VSS -layer M4 -direction vertical -width 1.8 -spacing 1.8 -set_t
 
 sroute -connect { corePin } -layerChangeRange { M1 M4 } -blockPinTarget { nearestTarget } -corePinTarget { firstAfterRowEnd } -allowJogging 1 -crossoverViaLayerRange { M1 M4 } -nets { VDD VSS} -allowLayerChange 1 -targetViaLayerRange { M1 M4 }
 
+saveDesign pnr_save/powerplan.enc

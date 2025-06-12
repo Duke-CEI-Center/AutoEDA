@@ -4,7 +4,7 @@
 
 set cts_start_time [clock seconds]
 
-set_ccopt_property buffer_cells $env(CLKBUF_CELLS)
+set_ccopt_property buffer_cells $CLKBUF_CELLS
 set_ccopt_property clock_gating_cells $CLKGT_CELLS
 # set_ccopt_property inverter_cells $INV_CELLS
 

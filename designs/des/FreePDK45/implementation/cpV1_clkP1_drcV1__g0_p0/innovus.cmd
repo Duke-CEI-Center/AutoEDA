@@ -1,7 +1,7 @@
 #######################################################
 #                                                     
 #  Innovus Command Logging File                     
-#  Created on Thu May 29 04:24:20 2025                
+#  Created on Wed Jun 11 21:59:37 2025                
 #                                                     
 #######################################################
 
@@ -57,6 +57,3 @@ checkFPlan > pnr_reports/init_check.rpt
 defOut pnr_out/init.def
 saveDesign pnr_save/floorplan.enc
 summaryReport -outfile pnr_reports/floorplan_summary.rpt
-saveDesign pnr_save/floorplan.enc.dat
-setMultiCpuUsage -localCpu 8
-setLibraryUnit -cap 1pf -time 1ns

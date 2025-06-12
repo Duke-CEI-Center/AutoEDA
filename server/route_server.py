@@ -1,58 +1,39 @@
 #!/usr/bin/env python3
-"""
-MCP · Global & Detail Routing Service            (端口 3339)
-
-Usage
------
-cd ~/proj/mcp-eda-example
-python3 server/route_server.py        # 监听 0.0.0.0:3339
-
-HTTP 例：
-curl -X POST http://localhost:3339/route/run \
-     -H "Content-Type: application/json" \
-     -d '{"design":"des","tech":"FreePDK45","impl_ver":"cpV1_clkP1_drcV1__g0_p0","g_idx":0,"p_idx":0,"c_idx":0,"force":true}'
-"""
-from __future__ import annotations
 
 import csv
 import datetime as dt
 import gzip
-import json
 import logging
 import os
 import pathlib
-import re
 import subprocess
 import sys
-from typing import Dict
+import glob
+from typing import Dict, Optional
 
 from fastapi import FastAPI
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
-# ────────────────────────── 0. 环境 & 日志 ──────────────────────────
-BIN_DIRS = [
-    "/opt/cadence/innovus221/tools/bin",
-    "/opt/cadence/genus172/bin",
-]
-os.environ["PATH"] = ":".join(BIN_DIRS + [os.environ.get("PATH", "")])
+os.environ["PATH"] = (
+    "/opt/cadence/innovus221/tools/bin:"
+    "/opt/cadence/genus172/bin:" + os.environ.get("PATH", "")
+)
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent        # ~/proj/mcp-eda-example
-LOG_DIR = ROOT / "logs" / "route"
+LOG_DIR = pathlib.Path(__file__).resolve().parent.parent / "logs" / "route"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
-
 LOG_FILE = LOG_DIR / "route_api.log"
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname).1s] %(name)s:%(lineno)d  %(message)s",
+    format="%(asctime)s [%(levelname).1s] %(message)s",
     handlers=[
-        logging.handlers.RotatingFileHandler(LOG_FILE, maxBytes=5 << 20, backupCount=3),
+        logging.FileHandler(LOG_FILE),
         logging.StreamHandler(sys.stdout),
     ],
 )
 logger = logging.getLogger("route_server")
 
-# ────────────────────────── 1. 常量 ──────────────────────────
-BACKEND_DIR_TMPL = ROOT / "scripts" / "{tech}" / "backend"      # 运行时 format
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+BACKEND_DIR_TMPL = ROOT / "scripts" / "{tech}" / "backend"
 IMP_CSV = ROOT / "config" / "imp_global.csv"
 PLC_CSV = ROOT / "config" / "placement.csv"
 CTS_CSV = ROOT / "config" / "cts.csv"
@@ -65,144 +46,119 @@ ROUTE_RPTS = [
     "route_timing.rpt.gz",
 ]
 
-# ────────────────────────── 2. 数据模型 ──────────────────────────
 class RtReq(BaseModel):
-    design: str                                  # eg. "des"
-    tech: str = "FreePDK45"                      # 工艺，以 scripts/{tech}/backend 为准
-    impl_ver: str                                # 实现版本目录名
-    g_idx: int = 0                               # imp_global.csv 行号
-    p_idx: int = 0                               # placement.csv 行号
-    c_idx: int = 0                               # cts.csv 行号
-    force: bool = False                          # true=删除旧报告并覆盖 snapshot
-    top_module: str | None = Field(
-        None, description="override TOP_NAME; 留空则从 designs/{design}/config.tcl 里解析"
-    )
+    design:      str
+    tech:        str = "FreePDK45"
+    impl_ver:    str
+    g_idx:       int = 0
+    p_idx:       int = 0
+    c_idx:       int = 0
+    restore_enc: str
+    force:       bool = False
+    top_module:  Optional[str] = None
 
 class RtResp(BaseModel):
-    status: str
-    log_path: str
-    rpt_paths: Dict[str, str]                    # {report_name: relative_path | 'not found'}
+    status:    str
+    log_path:  str
+    rpt_paths: Dict[str, str]
 
-# ────────────────────────── 3. 工具函数 ──────────────────────────
 def read_csv_row(path: pathlib.Path, idx: int) -> dict:
     rows = list(csv.DictReader(path.open()))
     if not rows:
         raise ValueError(f"{path.name} is empty")
     if idx >= len(rows):
-        raise IndexError(f"{path.name}: row {idx} out of range (total {len(rows)})")
+        raise IndexError(f"{path.name}: row {idx} out of range")
     return rows[idx]
 
-TOP_RE = re.compile(r"""^\s*set\s+TOP_NAME\s+"([^"]+)""")
-def parse_top_from_config(cfg: pathlib.Path) -> str | None:
+def parse_top_from_config(cfg: pathlib.Path) -> Optional[str]:
     if not cfg.exists():
         return None
     for line in cfg.read_text().splitlines():
-        m = TOP_RE.match(line)
-        if m:
-            return m.group(1)
+        if line.strip().startswith("set TOP_NAME"):
+            return line.split('"')[1]
     return None
 
-def run(cmd: str, logfile: pathlib.Path, cwd: pathlib.Path, env_extra: dict):
+def run(cmd: str, log_file: pathlib.Path, cwd: pathlib.Path, env_extra: dict):
     env = os.environ.copy()
     env.update(env_extra)
-
-    logger.info("launching Innovus cmd → %s", cmd)
-    logger.debug("merged env =\n%s", json.dumps(env, indent=2))
-
-    with logfile.open("w") as lf, subprocess.Popen(
+    logger.info("Launching Innovus cmd → %s", cmd)
+    with log_file.open("w") as lf, subprocess.Popen(
         cmd,
-        cwd=cwd,
+        cwd=str(cwd),
         shell=True,
-        text=True,
-        bufsize=1,
+        universal_newlines=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         executable="/bin/bash",
         env=env,
-    ) as p:
-        for line in iter(p.stdout.readline, ""):
+    ) as proc:
+        for line in proc.stdout:
             lf.write(line)
-        p.wait()
+        proc.wait()
+    if proc.returncode != 0:
+        raise RuntimeError(f"Innovus exited with code {proc.returncode}")
 
-    if p.returncode != 0:
-        raise RuntimeError(f"Innovus exited with code {p.returncode}")
-
-# ────────────────────────── 4. FastAPI ──────────────────────────
 app = FastAPI(title="MCP · Routing Service")
 
 @app.post("/route/run", response_model=RtResp)
 def route_run(req: RtReq):
-    """Run Innovus 7_route.tcl (global+detail routing)."""
-
-    impl_dir = ROOT / "designs" / req.design / req.tech / "implementation" / req.impl_ver
-    enc_dat  = impl_dir / "pnr_save" / "floorplan.enc.dat"
+    des_root = ROOT / "designs" / req.design / req.tech
+    impl_dir = des_root / "implementation" / req.impl_ver
     if not impl_dir.exists():
         return RtResp(status="error: implementation dir not found", log_path="", rpt_paths={})
-    if not enc_dat.exists():
-        return RtResp(status="error: floorplan.enc.dat not found", log_path="", rpt_paths={})
 
-    # reports 目录
+    cts_enc = pathlib.Path(req.restore_enc)
+    if not cts_enc.exists():
+        return RtResp(status="error: restore_enc not found", log_path="", rpt_paths={})
+
     rpt_dir = impl_dir / "pnr_reports"
     rpt_dir.mkdir(exist_ok=True)
     if req.force:
         for rpt in ROUTE_RPTS:
             (rpt_dir / rpt).unlink(missing_ok=True)
-        # 若需彻底重跑，可同时删除旧 route snapshot
-        (impl_dir / "pnr_save" / "route.enc.dat").unlink(missing_ok=True)
+        (impl_dir / "pnr_save" / "route.enc").unlink(missing_ok=True)
 
-    # 解析顶层名
     if req.top_module:
-        top_name = req.top_module
+        top = req.top_module
     else:
         parsed = parse_top_from_config(ROOT / "designs" / req.design / "config.tcl")
-        top_name = parsed or req.design
+        top = parsed or req.design
 
-    # 组合环境变量（后覆盖前）
     env = {
-        "BASE_DIR": str(ROOT),
-        "TOP_NAME": top_name,
-        "FILE_FORMAT": "verilog",
+        "BASE_DIR":   str(ROOT),
+        "TOP_NAME":   top,
+        "FILE_FORMAT":"verilog",
     }
     env.update(read_csv_row(IMP_CSV, req.g_idx))
     env.update(read_csv_row(PLC_CSV, req.p_idx))
     env.update(read_csv_row(CTS_CSV, req.c_idx))
 
-    # backend 脚本路径
     backend_dir = pathlib.Path(str(BACKEND_DIR_TMPL).format(tech=req.tech))
-    config_tcl  = ROOT / "config.tcl"
-    tech_tcl    = ROOT / "scripts" / req.tech / "tech.tcl"
-    route_tcl   = backend_dir / "7_route.tcl"
+    route_tcl    = backend_dir / "7_route.tcl"
+    files_arg    = str(route_tcl)
+    exec_cmd     = f'restoreDesign "{cts_enc.resolve()}" "{top}"'
 
-    exec_cmd = (
-        f'source "{config_tcl}"; '
-        f'source "{tech_tcl}"; '
-        f'restoreDesign "{enc_dat}" "{top_name}"; '
-        f'source "{route_tcl}"'
-    )
     innovus_cmd = (
-        "innovus -no_gui -batch "
-        f'-execute "{exec_cmd}" '
-        f'-files "{config_tcl} {tech_tcl} {route_tcl}"'
+        f'innovus -no_gui -batch '
+        f'-files "{files_arg}" '
+        f'-execute "{exec_cmd}"'
     )
 
-    # 运行
-    ts = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts       = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = LOG_DIR / f"{req.design}_route_{ts}.log"
     try:
         run(innovus_cmd, log_file, impl_dir, env)
     except Exception as e:
-        logger.exception("routing failed")
+        logger.exception("Routing failed")
         return RtResp(status=f"error: {e}", log_path=str(log_file), rpt_paths={})
 
-    # 收集报告（只返回相对路径，避免巨大 JSON）
     rpt_paths: Dict[str, str] = {}
     for rpt in ROUTE_RPTS:
-        fp = rpt_dir / rpt
-        rpt_paths[rpt] = str(fp.relative_to(ROOT)) if fp.exists() else "not found"
+        p = rpt_dir / rpt
+        rpt_paths[rpt] = str(p.relative_to(ROOT)) if p.exists() else "not found"
 
     return RtResp(status="ok", log_path=str(log_file), rpt_paths=rpt_paths)
 
-# ────────────────────────── 5. CLI ──────────────────────────
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("route_server:app", host="0.0.0.0", port=3339, reload=False)

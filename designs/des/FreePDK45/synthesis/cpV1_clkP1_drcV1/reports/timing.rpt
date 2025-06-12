@@ -9,7 +9,7 @@ Report : timing
         -transition_time
 Design : des3
 Version: V-2023.12-SP2
-Date   : Thu May 29 04:24:02 2025
+Date   : Mon Jun  9 21:37:15 2025
 ****************************************
 
  # A fanout number of 10 was used for high fanout net computations.

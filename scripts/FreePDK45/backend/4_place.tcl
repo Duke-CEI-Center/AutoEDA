@@ -2,7 +2,6 @@
 # Placement
 #-------------------------------------------------------------------------------
 
-set place_start_time [clock seconds]
 
 # TODO: verify there's no tapcell
 # deleteFiller -cell $TAPCELL
@@ -42,14 +41,11 @@ optDesign -preCTS -outDir pnr_reports/place_opt
 report_timing -max_paths 100 > pnr_reports/place_opt_timing.rpt.gz
 
 
-puts "\[Info\] The Placement stage duration is [expr [clock seconds] - $place_start_time] sec"
-puts "\[Info\] The total duration is [expr [clock seconds] - $start_time] sec"
-
 #-------------------------------------------------------------------------------
 # Log info & save design
 #-------------------------------------------------------------------------------
 
-do_power_analysis place_opt_power
+# do_power_analysis place_opt_power
 
 defOut pnr_out/place.def
 summaryReport -outfile pnr_reports/placement_summary.rpt
@@ -58,14 +54,14 @@ set netFile "pnr_reports/_net_info.txt"
 set netFd [open $netFile w]
 set cellFile "pnr_reports/_cell_info.txt"
 set cellFd [open $cellFile w]
+# 
+# getNetInfo $netFd
+# getCellInfo $cellFd
 
-getNetInfo $netFd
-getCellInfo $cellFd
+# close $netFd
+# close $cellFd
 
-close $netFd
-close $cellFd
-
-exec gzip $cellFile $netFile &
+# exec gzip $cellFile $netFile &
 
 
 saveNetlist pnr_out/${top_module}_place.v
