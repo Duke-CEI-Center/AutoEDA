@@ -6,7 +6,7 @@ Warning: Design 'des3' contains 4 high-fanout nets. A fanout number of 10 will b
 Report : qor
 Design : des3
 Version: V-2023.12-SP2
-Date   : Mon Jun  9 21:37:15 2025
+Date   : Tue Jun 17 00:34:42 2025
 ****************************************
 
 
@@ -66,12 +66,12 @@ Date   : Mon Jun  9 21:37:15 2025
 
   Compile CPU Statistics
   -----------------------------------------
-  Resource Sharing:                    1.50
+  Resource Sharing:                    1.48
   Logic Optimization:                  1.16
-  Mapping Optimization:                6.55
+  Mapping Optimization:                6.72
   -----------------------------------------
-  Overall Compile Time:               11.78
-  Overall Compile Wall Clock Time:    28.75
+  Overall Compile Time:               11.94
+  Overall Compile Wall Clock Time:    28.96
 
   --------------------------------------------------------------------
 

@@ -4,8 +4,8 @@
 
 set cts_start_time [clock seconds]
 
-set_ccopt_property buffer_cells $CLKBUF_CELLS
-set_ccopt_property clock_gating_cells $CLKGT_CELLS
+set_ccopt_property buffer_cells $env(CLKBUF_CELLS)
+set_ccopt_property clock_gating_cells $env(CLKGT_CELLS)
 # set_ccopt_property inverter_cells $INV_CELLS
 
 set_ccopt_property cell_density $env(cts_cell_density)
@@ -40,7 +40,7 @@ report_timing -max_paths 100 -path_group Reg2Reg > pnr_reports/cts_opt_timing.rp
 report_ccopt_clock_tree_structure -file pnr_reports/ccopt.txt
 defOut pnr_out/clock.def
 
-saveNetlist pnr_out/${top_module}_cts.v
+saveNetlist pnr_out/${env(TOP_NAME)}_cts.v
 
 setExtractRCMode -engine preRoute
 extractRC
@@ -49,4 +49,7 @@ rcOut -spef pnr_out/RC_cts.spef.gz
 saveDesign pnr_save/cts.enc
 
 puts "\[Info\] The CTS stage duration is [expr [clock seconds] - $cts_start_time] sec"
-puts "\[Info\] The total duration is [expr [clock seconds] - $start_time] sec"
+
+if {[info exists start_time]} {
+    puts "\[Info\] The total duration is [expr [clock seconds] - $start_time] sec"
+}

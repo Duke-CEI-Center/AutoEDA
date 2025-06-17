@@ -1,18 +1,6 @@
 #!/usr/bin/env python3
-"""
-MCP · Synthesis-Compile Service
 
-Start:
-    cd ~/proj/mcp-eda-example
-    python3 server/synth_compile_server.py
-
-Test:
-    curl -X POST http://localhost:3334/compile/run \
-         -H "Content-Type: application/json" \
-         -d '{"design":"des","tech":"FreePDK45","version_idx":0,"force":true}'
-"""
-
-import subprocess, pathlib, datetime, os
+import subprocess, pathlib, datetime, os, argparse         
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -33,7 +21,7 @@ class CompileResp(BaseModel):
     reports:  dict
 
 def run_shell(cmd: str, logfile: pathlib.Path):
-    """In the ROOT directory, run `cmd` in bash and redirect both stdout and stderr to `logfile`."""
+    """在项目根目录执行 `cmd`（bash），stdout+stderr→logfile。"""
     with logfile.open("w") as lf:
         proc = subprocess.Popen(
             cmd,
@@ -43,7 +31,7 @@ def run_shell(cmd: str, logfile: pathlib.Path):
             universal_newlines=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            env=os.environ.copy()
+            env=os.environ.copy(),
         )
         for line in proc.stdout:
             lf.write(line)
@@ -69,7 +57,9 @@ def compile_stage(req: CompileReq):
 
     synth_root = ROOT / "designs" / req.design / req.tech / "synthesis"
     if not synth_root.exists():
-        return CompileResp(status="error: synthesis output not found", log_path=str(log_file), reports={})
+        return CompileResp(status="error: synthesis output not found",
+                           log_path=str(log_file), reports={})
+
     latest_ver = max(synth_root.iterdir(), key=lambda p: p.stat().st_mtime)
     rpt_dir    = latest_ver / "reports"
 
@@ -81,6 +71,20 @@ def compile_stage(req: CompileReq):
     return CompileResp(status="ok", log_path=str(log_file), reports=reports)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.getenv("SYN_PORT", 13334)),
+        help="listen port (env SYN_PORT overrides; default 13334)",
+    )
+    args = parser.parse_args()
+
     import uvicorn
-    uvicorn.run("synth_compile_server:app",
-                host="0.0.0.0", port=3334, reload=False, log_level="info")
+    uvicorn.run(
+        "synth_compile_server:app",
+        host="0.0.0.0",
+        port=args.port,
+        reload=False,
+        log_level="info",
+    )

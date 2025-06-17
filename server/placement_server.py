@@ -1,13 +1,7 @@
 #!/usr/bin/env python3
 
 from typing import Optional
-import subprocess
-import pathlib
-import datetime
-import os
-import logging
-import sys
-import csv
+import subprocess, pathlib, datetime, os, logging, sys, csv, argparse   
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -16,20 +10,22 @@ os.environ["PATH"] = (
     "/opt/cadence/genus172/bin:" + os.environ.get("PATH", "")
 )
 
+ROOT     = pathlib.Path(__file__).resolve().parent.parent
+LOG_ROOT = ROOT / "logs"
+LOG_ROOT.mkdir(exist_ok=True)
+LOG_DIR  = LOG_ROOT / "placement"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("/home/yl996//proj/mcp-eda-example/pl_api.log"),
+        logging.FileHandler(LOG_ROOT / "pl_api.log"), 
         logging.StreamHandler(sys.stdout),
     ],
 )
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
 BACKEND = ROOT / "scripts" / "FreePDK45" / "backend"
-LOG_DIR = ROOT / "logs" / "placement"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-
 IMP_CSV = ROOT / "config" / "imp_global.csv"
 PLC_CSV = ROOT / "config" / "placement.csv"
 
@@ -99,11 +95,9 @@ def place_run(req: PlReq):
     # place_tcl = BACKEND / "4_place.tcl"
     # files_arg = str(place_tcl)
 
-    setup_tcl     = BACKEND / "1_setup.tcl"
     place_tcl = BACKEND / "4_place.tcl"
 
     files_list = [
-        str(setup_tcl),
         str(place_tcl),
     ]
     files_arg = " ".join(files_list)
@@ -140,5 +134,19 @@ def place_run(req: PlReq):
     return PlResp(status="ok", log_path=str(log_file), report=report_text)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.getenv("PLACEMENT_PORT", 13337)),
+        help="listen port (env PLACEMENT_PORT overrides; default 13337)",
+    )
+    args = parser.parse_args()
+
     import uvicorn
-    uvicorn.run("placement_server:app", host="0.0.0.0", port=3337, reload=False)
+    uvicorn.run(
+        "placement_server:app",
+        host="0.0.0.0",
+        port=args.port,
+        reload=False,
+    )

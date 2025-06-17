@@ -1,7 +1,7 @@
 #######################################################
 #                                                     
 #  Innovus Command Logging File                     
-#  Created on Wed Jun 11 22:00:37 2025                
+#  Created on Tue Jun 17 00:36:06 2025                
 #                                                     
 #######################################################
 
@@ -151,15 +151,15 @@ set_global timing_enable_path_group_priority false
 set_global timing_constraint_enable_group_path_resetting false
 getOptMode -allowPreCTSClkSrcPaths -quiet
 set_global _is_ipo_interactive_path_groups 1
-group_path -name in2reg_tmp.2825410 -from {0x3 0x6} -to 0x7 -ignore_source_of_trigger_arc
+group_path -name in2reg_tmp.3949272 -from {0x3 0x6} -to 0x7 -ignore_source_of_trigger_arc
 getOptMode -allowPreCTSClkSrcPaths -quiet
 set_global _is_ipo_interactive_path_groups 1
-group_path -name in2out_tmp.2825410 -from {0xa 0xd} -to 0xe -ignore_source_of_trigger_arc
+group_path -name in2out_tmp.3949272 -from {0xa 0xd} -to 0xe -ignore_source_of_trigger_arc
 set_global _is_ipo_interactive_path_groups 1
-group_path -name reg2reg_tmp.2825410 -from 0x10 -to 0x11
+group_path -name reg2reg_tmp.3949272 -from 0x10 -to 0x11
 set_global _is_ipo_interactive_path_groups 1
-group_path -name reg2out_tmp.2825410 -from 0x14 -to 0x15
-setPathGroupOptions reg2reg_tmp.2825410 -effortLevel high
+group_path -name reg2out_tmp.3949272 -from 0x14 -to 0x15
+setPathGroupOptions reg2reg_tmp.3949272 -effortLevel high
 get_capacitance_unit
 isAnalysisModeSetup
 getAnalysisMode -analysisType -quiet
@@ -178,9 +178,9 @@ get_delay_corner $dcCorner -library_set
 get_library_set $libSetName -si
 get_delay_corner $dcCorner -late_library_set
 get_delay_corner $dcCorner -early_library_set
-reset_path_group -name reg2out_tmp.2825410
+reset_path_group -name reg2out_tmp.3949272
 set_global _is_ipo_interactive_path_groups 0
-reset_path_group -name in2out_tmp.2825410
+reset_path_group -name in2out_tmp.3949272
 set_global _is_ipo_interactive_path_groups 0
 setDelayCalMode -ignoreNetLoad false
 set delaycal_use_default_delay_limit 1000
@@ -202,9 +202,9 @@ scanReorder
 setDelayCalMode -engine aae
 all_setup_analysis_views
 getPlaceMode -exp_slack_driven -quiet
-reset_path_group -name reg2reg_tmp.2825410
+reset_path_group -name reg2reg_tmp.3949272
 set_global _is_ipo_interactive_path_groups 0
-reset_path_group -name in2reg_tmp.2825410
+reset_path_group -name in2reg_tmp.3949272
 set_global _is_ipo_interactive_path_groups 0
 set_global timing_enable_path_group_priority $gpsPrivate::optSave_ctePGPriority
 set_global timing_constraint_enable_group_path_resetting $gpsPrivate::optSave_ctePGResetting
@@ -235,18 +235,18 @@ set_global timing_enable_path_group_priority false
 set_global timing_constraint_enable_group_path_resetting false
 getOptMode -allowPreCTSClkSrcPaths -quiet
 set_global _is_ipo_interactive_path_groups 1
-group_path -name in2reg_tmp.2825410 -from {0x19 0x1c} -to 0x1d -ignore_source_of_trigger_arc
+group_path -name in2reg_tmp.3949272 -from {0x19 0x1c} -to 0x1d -ignore_source_of_trigger_arc
 getOptMode -allowPreCTSClkSrcPaths -quiet
 set_global _is_ipo_interactive_path_groups 1
-group_path -name in2out_tmp.2825410 -from {0x20 0x23} -to 0x24 -ignore_source_of_trigger_arc
+group_path -name in2out_tmp.3949272 -from {0x20 0x23} -to 0x24 -ignore_source_of_trigger_arc
 set_global _is_ipo_interactive_path_groups 1
-group_path -name reg2reg_tmp.2825410 -from 0x26 -to 0x27
+group_path -name reg2reg_tmp.3949272 -from 0x26 -to 0x27
 set_global _is_ipo_interactive_path_groups 1
-group_path -name reg2out_tmp.2825410 -from 0x2a -to 0x2b
-setPathGroupOptions reg2reg_tmp.2825410 -effortLevel high
-reset_path_group -name reg2out_tmp.2825410
+group_path -name reg2out_tmp.3949272 -from 0x2a -to 0x2b
+setPathGroupOptions reg2reg_tmp.3949272 -effortLevel high
+reset_path_group -name reg2out_tmp.3949272
 set_global _is_ipo_interactive_path_groups 0
-reset_path_group -name in2out_tmp.2825410
+reset_path_group -name in2out_tmp.3949272
 set_global _is_ipo_interactive_path_groups 0
 setDelayCalMode -ignoreNetLoad false
 set delaycal_use_default_delay_limit 1000
@@ -287,9 +287,9 @@ getPlaceMode -congRepairCleanupPadding -quiet
 getPlaceMode -quiet -wireLenOptEffort
 all_setup_analysis_views
 getPlaceMode -exp_slack_driven -quiet
-reset_path_group -name reg2reg_tmp.2825410
+reset_path_group -name reg2reg_tmp.3949272
 set_global _is_ipo_interactive_path_groups 0
-reset_path_group -name in2reg_tmp.2825410
+reset_path_group -name in2reg_tmp.3949272
 set_global _is_ipo_interactive_path_groups 0
 set_global timing_enable_path_group_priority $gpsPrivate::optSave_ctePGPriority
 set_global timing_constraint_enable_group_path_resetting $gpsPrivate::optSave_ctePGResetting
@@ -348,3 +348,15 @@ checkPlace pnr_reports/check_place.out
 setOptMode -maxDensity 0.8 -powerEffort low -reclaimArea false -fixFanoutLoad false
 optDesign -preCTS -outDir pnr_reports/place_opt
 report_timing -max_paths 100 > pnr_reports/place_opt_timing.rpt.gz
+set_default_switching_activity -input_activity 0.2 -seq_activity 0.1
+propagate_activity
+set_power_output_dir pnr_reports/place_opt_power
+report_power -cap -pg_net -format=detailed -outfile design.rpt.gz
+report_power -clock_network all -outfile clock.rpt.gz
+defOut pnr_out/place.def
+summaryReport -outfile pnr_reports/placement_summary.rpt
+saveNetlist pnr_out/des3_place.v
+setExtractRCMode -engine preRoute -effortLevel low
+extractRC
+rcOut -spef pnr_out/RC_place.spef.gz
+saveDesign pnr_save/placement.enc

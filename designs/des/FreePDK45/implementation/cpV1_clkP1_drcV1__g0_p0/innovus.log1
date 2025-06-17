@@ -4,12 +4,12 @@ Copyright 2021 Cadence Design Systems, Inc. All rights reserved worldwide.
 
 Version:	v21.17-s075_1, built Wed Mar 15 11:17:40 PDT 2023
 Options:	-no_gui -batch -execute restoreDesign "/home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat" des3;  -files /home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/3_powerplan.tcl 
-Date:		Wed Jun 11 21:59:48 2025
+Date:		Tue Jun 17 00:35:17 2025
 Host:		hl279-cmp-00.egr.duke.edu (x86_64 w/Linux 4.18.0-553.54.1.el8_10.x86_64) (12cores*48cpus*Intel(R) Xeon(R) CPU E5-2687W v4 @ 3.00GHz 30720KB)
 OS:		Red Hat Enterprise Linux 8.10 (Ootpa)
 
 License:
-		[21:59:48.228842] Configured Lic search path (21.01-s002): 27400@license06.egr.duke.edu:27500@license01.egr.duke.edu
+		[00:35:17.228738] Configured Lic search path (21.01-s002): 27400@license06.egr.duke.edu:27500@license01.egr.duke.edu
 
 		invs	Innovus Implementation System	21.1	checkout succeeded
 		8 CPU jobs allowed with the current license(s). Use setMultiCpuUsage to set your required CPU count.
@@ -21,10 +21,10 @@ Change the soft stacksize limit to 0.2%RAM (1030 mbytes). Set global soft_stack_
 <CMD> suppressMessage ENCEXT-2799
 Executing cmd 'restoreDesign "/home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat" des3; ' ...
 <CMD> restoreDesign /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat des3
-#% Begin load design ... (date=06/11 22:00:06, mem=914.2M)
-Loading design 'des3' saved by 'Innovus' '21.17-s075_1' on 'Wed Jun 11 21:59:47 2025'.
-% Begin Load MMMC data ... (date=06/11 22:00:07, mem=916.9M)
-% End Load MMMC data ... (date=06/11 22:00:07, total cpu=0:00:00.0, real=0:00:00.0, peak res=917.8M, current mem=917.8M)
+#% Begin load design ... (date=06/17 00:35:35, mem=864.8M)
+Loading design 'des3' saved by 'Innovus' '21.17-s075_1' on 'Tue Jun 17 00:35:16 2025'.
+% Begin Load MMMC data ... (date=06/17 00:35:35, mem=867.9M)
+% End Load MMMC data ... (date=06/17 00:35:35, total cpu=0:00:00.0, real=0:00:00.0, peak res=868.7M, current mem=868.7M)
 default
 
 Loading LEF file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/lef/NangateOpenCellLibrary.lef ...
@@ -432,17 +432,17 @@ Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK4
 Read 1 cells in library 'freepdk45_sram_1w1r_64x512_FF_1p25V_0C_lib' 
 Reading fast timing library '/home/yl996/proj/mcp-eda-example/libraries/FreePDK45/OpenRAM/macros/freepdk45_sram_1w1r_96x32_32/freepdk45_sram_1w1r_96x32_32_FF_1p25V_0C.lib' ...
 Read 1 cells in library 'freepdk45_sram_1w1r_96x32_32_FF_1p25V_0C_lib' 
-*** End library_loading (cpu=0.10min, real=0.10min, mem=74.0M, fe_cpu=0.42min, fe_real=0.42min, fe_mem=1033.8M) ***
-% Begin Load netlist data ... (date=06/11 22:00:13, mem=954.3M)
-*** Begin netlist parsing (mem=1033.8M) ***
+*** End library_loading (cpu=0.10min, real=0.08min, mem=74.0M, fe_cpu=0.42min, fe_real=0.40min, fe_mem=1034.4M) ***
+% Begin Load netlist data ... (date=06/17 00:35:42, mem=905.2M)
+*** Begin netlist parsing (mem=1034.4M) ***
 Created 188 new cells from 110 timing libraries.
 Reading netlist ...
 Backslashed names will retain backslash and a trailing blank character.
 Reading verilogBinary netlist '/home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/vbin/des3.v.bin'
 
-*** Memory Usage v#1 (Current mem = 1045.812M, initial mem = 494.906M) ***
-*** End netlist parsing (cpu=0:00:00.0, real=0:00:00.0, mem=1045.8M) ***
-% End Load netlist data ... (date=06/11 22:00:13, total cpu=0:00:00.1, real=0:00:00.0, peak res=976.2M, current mem=976.2M)
+*** Memory Usage v#1 (Current mem = 1046.375M, initial mem = 486.906M) ***
+*** End netlist parsing (cpu=0:00:00.0, real=0:00:00.0, mem=1046.4M) ***
+% End Load netlist data ... (date=06/17 00:35:42, total cpu=0:00:00.1, real=0:00:00.0, peak res=927.1M, current mem=927.1M)
 Top level cell is des3.
 **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_1024x136_17' found in library 'freepdk45_sram_1rw0r_1024x136_17_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_128x44_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
 **WARN: (TECHLIB-606):	An inconsistency was found during interpolated library checking of library set 'slow'. Cell 'freepdk45_sram_1rw0r_128x44' found in library 'freepdk45_sram_1rw0r_128x44_SS_0p95V_125C_lib', but missing in library 'freepdk45_sram_1rw0r_20x64_SS_0p95V_125C_lib'. This can potentially cause issues during delay calculation.
@@ -474,7 +474,7 @@ Building hierarchical netlist for Cell des3 ...
 ** info: there are 383 modules.
 ** info: there are 2892 stdCell insts.
 
-*** Memory Usage v#1 (Current mem = 1103.695M, initial mem = 494.906M) ***
+*** Memory Usage v#1 (Current mem = 1103.258M, initial mem = 486.906M) ***
 *info: set bottom ioPad orient R0
 Start create_tracks
 Generated pitch 1.68 in metal10 is different from 1.6 defined in technology file in preferred direction.
@@ -518,8 +518,8 @@ Total number of identified usable delay cells: 0
 List of identified unusable delay cells:
 Total number of identified unusable delay cells: 0
 No delay cells were detected in the set of buffers. Buffers will be used to fix hold violations.
-Reading floorplan file - /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.fp.gz (mem = 1364.8M).
-% Begin Load floorplan data ... (date=06/11 22:00:13, mem=1295.5M)
+Reading floorplan file - /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.fp.gz (mem = 1365.5M).
+% Begin Load floorplan data ... (date=06/17 00:35:42, mem=1244.8M)
 *info: reset 3166 existing net BottomPreferredLayer and AvoidDetour
 Deleting old partition specification.
 Set FPlanBox to (0 0 123880 123200)
@@ -528,35 +528,35 @@ Generated pitch 1.68 in metal10 is different from 1.6 defined in technology file
 Generated pitch 0.84 in metal8 is different from 0.8 defined in technology file in preferred direction.
 Generated pitch 0.84 in metal7 is different from 0.8 defined in technology file in preferred direction.
  ... processed partition successfully.
-Reading binary special route file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.fp.spr.gz (Created by Innovus v21.17-s075_1 on Wed Jun 11 21:59:44 2025, version: 1)
+Reading binary special route file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.fp.spr.gz (Created by Innovus v21.17-s075_1 on Tue Jun 17 00:35:13 2025, version: 1)
 Convert 0 swires and 0 svias from compressed groups
 0 swires and 0 svias were compressed
 0 swires and 0 svias were decompressed from small or sparse groups
-Ending "Read special route file" (total cpu=0:00:00.0, real=0:00:00.0, peak res=1295.5M, current mem=1295.5M)
+Ending "Read special route file" (total cpu=0:00:00.0, real=0:00:00.0, peak res=1246.0M, current mem=1246.0M)
 Extracting standard cell pins and blockage ...... 
 Pin and blockage extraction finished
-% End Load floorplan data ... (date=06/11 22:00:14, total cpu=0:00:00.1, real=0:00:01.0, peak res=1298.3M, current mem=1298.3M)
+% End Load floorplan data ... (date=06/17 00:35:43, total cpu=0:00:00.1, real=0:00:01.0, peak res=1247.4M, current mem=1247.4M)
 Reading congestion map file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.route.congmap.gz ...
-% Begin Load SymbolTable ... (date=06/11 22:00:14, mem=1298.3M)
-% End Load SymbolTable ... (date=06/11 22:00:14, total cpu=0:00:00.0, real=0:00:00.0, peak res=1299.1M, current mem=1299.1M)
+% Begin Load SymbolTable ... (date=06/17 00:35:43, mem=1247.6M)
+% End Load SymbolTable ... (date=06/17 00:35:43, total cpu=0:00:00.0, real=0:00:00.0, peak res=1248.4M, current mem=1248.4M)
 Loading place ...
-% Begin Load placement data ... (date=06/11 22:00:14, mem=1299.1M)
+% Begin Load placement data ... (date=06/17 00:35:43, mem=1248.4M)
 Reading placement file - /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.place.gz.
-** Reading stdCellPlacement_binary (Created by Innovus v21.17-s075_1 on Wed Jun 11 21:59:44 2025, version# 2) ...
+** Reading stdCellPlacement_binary (Created by Innovus v21.17-s075_1 on Tue Jun 17 00:35:13 2025, version# 2) ...
 Read Views for adaptive view pruning ...
 Read 0 views from Binary DB for adaptive view pruning
-*** Completed restorePlace (cpu=0:00:00.0 real=0:00:00.0 mem=1366.8M) ***
+*** Completed restorePlace (cpu=0:00:00.0 real=0:00:00.0 mem=1368.5M) ***
 Total net length = 2.860e+00 (1.430e+00 1.430e+00) (ext = 0.000e+00)
-% End Load placement data ... (date=06/11 22:00:14, total cpu=0:00:00.0, real=0:00:00.0, peak res=1299.5M, current mem=1299.5M)
-% Begin Load routing data ... (date=06/11 22:00:14, mem=1299.5M)
+% End Load placement data ... (date=06/17 00:35:43, total cpu=0:00:00.0, real=0:00:00.0, peak res=1248.9M, current mem=1248.9M)
+% Begin Load routing data ... (date=06/17 00:35:43, mem=1248.9M)
 Reading routing file - /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.route.gz.
-Reading Innovus routing data (Created by Innovus v21.17-s075_1 on Wed Jun 11 21:59:44 2025 Format: 20.1) ...
+Reading Innovus routing data (Created by Innovus v21.17-s075_1 on Tue Jun 17 00:35:13 2025 Format: 20.1) ...
 *** Total 3166 nets are successfully restored.
-*** Completed restoreRoute (cpu=0:00:00.0 real=0:00:00.0 mem=1363.8M) ***
-% End Load routing data ... (date=06/11 22:00:14, total cpu=0:00:00.0, real=0:00:00.0, peak res=1300.9M, current mem=1300.2M)
+*** Completed restoreRoute (cpu=0:00:00.0 real=0:00:00.0 mem=1365.5M) ***
+% End Load routing data ... (date=06/17 00:35:43, total cpu=0:00:00.0, real=0:00:00.0, peak res=1250.2M, current mem=1249.6M)
 TAT_INFO: restoreCongMap REAL = 0 : CPU = 0 : MEM = 0.
 Reading property file /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/des3.prop
-*** Completed restoreProperty (cpu=0:00:00.0 real=0:00:00.0 mem=1366.8M) ***
+*** Completed restoreProperty (cpu=0:00:00.0 real=0:00:00.0 mem=1368.5M) ***
 Extraction setup Started 
 Initializing multi-corner RC extraction with 1 active RC Corners ...
 Reading Capacitance Table File /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0/pnr_save/floorplan.enc.dat/libs/mmmc/NCSU_FreePDK_45nm.capTbl ...
@@ -604,11 +604,11 @@ Start generating vias ..
 Extracting standard cell pins and blockage ...... 
 Pin and blockage extraction finished
 Via generation completed.
-% Begin Load power constraints ... (date=06/11 22:00:15, mem=1321.7M)
-% End Load power constraints ... (date=06/11 22:00:15, total cpu=0:00:00.0, real=0:00:00.0, peak res=1321.9M, current mem=1321.9M)
+% Begin Load power constraints ... (date=06/17 00:35:44, mem=1270.2M)
+% End Load power constraints ... (date=06/17 00:35:44, total cpu=0:00:00.0, real=0:00:00.0, peak res=1270.4M, current mem=1270.4M)
 fast slow typical
-% Begin load AAE data ... (date=06/11 22:00:15, mem=1336.4M)
-% End load AAE data ... (date=06/11 22:00:15, total cpu=0:00:00.0, real=0:00:00.0, peak res=1336.4M, current mem=1336.4M)
+% Begin load AAE data ... (date=06/17 00:35:44, mem=1285.0M)
+% End load AAE data ... (date=06/17 00:35:44, total cpu=0:00:00.0, real=0:00:00.0, peak res=1285.0M, current mem=1285.0M)
 Total number of combinational cells: 93
 Total number of sequential cells: 29
 Total number of tristate cells: 6
@@ -633,7 +633,7 @@ Total number of identified usable delay cells: 0
 List of identified unusable delay cells:
 Total number of identified unusable delay cells: 0
 No delay cells were detected in the set of buffers. Buffers will be used to fix hold violations.
-#% End load design ... (date=06/11 22:00:15, total cpu=0:00:08.5, real=0:00:08.0, peak res=1370.9M, current mem=1336.7M)
+#% End load design ... (date=06/17 00:35:44, total cpu=0:00:08.5, real=0:00:09.0, peak res=1319.4M, current mem=1285.3M)
 
 *** Summary of all messages that are not suppressed in this session:
 Severity  ID               Count  Summary                                  
@@ -650,15 +650,15 @@ Sourcing file "/home/yl996/proj/mcp-eda-example/scripts/FreePDK45/backend/3_powe
 The power planner are extend the stripe antenna to the first ring.
 Stripes will break as close as possible to obstructions.
 <CMD> addStripe -nets VDD -layer M4 -direction vertical -width 1.8 -spacing 1.8 -set_to_set_distance 100 -start_from left -start_offset 2 -switch_layer_over_obs false -max_same_layer_jog_length 2 -padcore_ring_top_layer_limit M6 -padcore_ring_bottom_layer_limit M1 -block_ring_top_layer_limit M6 -block_ring_bottom_layer_limit M1 -use_wire_group 0 -snap_wire_center_to_grid None -skip_via_on_pin {  standardcell } -skip_via_on_wire_shape {  noshape }
-#% Begin addStripe (date=06/11 22:00:15, mem=1337.4M)
+#% Begin addStripe (date=06/17 00:35:44, mem=1285.8M)
 
-viaInitial starts at Wed Jun 11 22:00:15 2025
-viaInitial ends at Wed Jun 11 22:00:15 2025
+viaInitial starts at Tue Jun 17 00:35:44 2025
+viaInitial ends at Tue Jun 17 00:35:44 2025
 
-Initialize fgc environment(mem: 1393.4M) ...  done(cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1395.4M)
-Loading cell geometries (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1395.4M)
-Loading wires (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1395.4M)
-Loading via instances (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1395.4M)
+Initialize fgc environment(mem: 1393.1M) ...  done(cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1396.1M)
+Loading cell geometries (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1396.1M)
+Loading wires (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1396.1M)
+Loading via instances (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1396.1M)
 Starting stripe generation ...
 Non-Default Mode Option Settings :
   -use_exact_spacing  1
@@ -674,14 +674,14 @@ ViaGen created 0 via, deleted 0 via to avoid violation.
 +--------+----------------+----------------+
 | metal4 |        1       |       NA       |
 +--------+----------------+----------------+
-#% End addStripe (date=06/11 22:00:15, total cpu=0:00:00.1, real=0:00:00.0, peak res=1343.7M, current mem=1343.7M)
+#% End addStripe (date=06/17 00:35:44, total cpu=0:00:00.0, real=0:00:00.0, peak res=1292.8M, current mem=1292.8M)
 <CMD> addStripe -nets VSS -layer M4 -direction vertical -width 1.8 -spacing 1.8 -set_to_set_distance 100 -start_from right -start_offset 2 -switch_layer_over_obs false -max_same_layer_jog_length 2 -padcore_ring_top_layer_limit M6 -padcore_ring_bottom_layer_limit M1 -block_ring_top_layer_limit M6 -block_ring_bottom_layer_limit M1 -use_wire_group 0 -snap_wire_center_to_grid None -skip_via_on_pin {  standardcell } -skip_via_on_wire_shape {  noshape }
-#% Begin addStripe (date=06/11 22:00:15, mem=1343.7M)
+#% Begin addStripe (date=06/17 00:35:44, mem=1292.8M)
 
-Initialize fgc environment(mem: 1395.4M) ...  done(cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1395.4M)
-Loading cell geometries (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1395.4M)
-Loading wires (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1395.4M)
-Loading via instances (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1395.4M)
+Initialize fgc environment(mem: 1396.1M) ...  done(cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1396.1M)
+Loading cell geometries (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1396.1M)
+Loading wires (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1396.1M)
+Loading via instances (cpu: 0:00:00.0, real: 0:00:00.0, peak mem: 1396.1M)
 Starting stripe generation ...
 Non-Default Mode Option Settings :
   -use_exact_spacing  1
@@ -697,11 +697,11 @@ ViaGen created 0 via, deleted 0 via to avoid violation.
 +--------+----------------+----------------+
 | metal4 |        1       |       NA       |
 +--------+----------------+----------------+
-#% End addStripe (date=06/11 22:00:15, total cpu=0:00:00.0, real=0:00:00.0, peak res=1343.9M, current mem=1343.9M)
+#% End addStripe (date=06/17 00:35:44, total cpu=0:00:00.0, real=0:00:00.0, peak res=1292.8M, current mem=1292.8M)
 <CMD> sroute -connect { corePin } -layerChangeRange { M1 M4 } -blockPinTarget { nearestTarget } -corePinTarget { firstAfterRowEnd } -allowJogging 1 -crossoverViaLayerRange { M1 M4 } -nets { VDD VSS} -allowLayerChange 1 -targetViaLayerRange { M1 M4 }
-#% Begin sroute (date=06/11 22:00:15, mem=1343.9M)
+#% Begin sroute (date=06/17 00:35:44, mem=1292.8M)
 **WARN: (IMPSR-4058):	Sroute option: blockPinTarget should be used in conjunction with option: -connect blockPin. 
-*** Begin SPECIAL ROUTE on Wed Jun 11 22:00:15 2025 ***
+*** Begin SPECIAL ROUTE on Tue Jun 17 00:35:44 2025 ***
 SPECIAL ROUTE ran on directory: /home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/cpV1_clkP1_drcV1__g0_p0
 SPECIAL ROUTE ran on machine: hl279-cmp-00.egr.duke.edu (Linux 4.18.0-553.54.1.el8_10.x86_64 Xeon 3.00Ghz)
 
@@ -726,7 +726,7 @@ srouteRoutePowerBarPortOnBothDir set to true
 srouteStopBlockPin set to "nearestTarget"
 srouteTopLayerLimit set to 4
 srouteTopTargetLayerLimit set to 4
-End option processing: cpu: 0:00:00, real: 0:00:00, peak: 2744.00 megs.
+End option processing: cpu: 0:00:00, real: 0:00:00, peak: 2745.00 megs.
 
 Reading DB technology information...
 Finished reading DB technology information.
@@ -748,7 +748,7 @@ CPU time for VDD FollowPin 0 seconds
 CPU time for VSS FollowPin 0 seconds
   Number of Core ports routed: 0
   Number of Followpin connections: 45
-End power routing: cpu: 0:00:00, real: 0:00:00, peak: 2755.00 megs.
+End power routing: cpu: 0:00:00, real: 0:00:00, peak: 2756.00 megs.
 
 
 
@@ -765,49 +765,49 @@ ViaGen created 135 vias, deleted 0 via to avoid violation.
 |  via2  |       45       |        0       |
 |  via3  |       45       |        0       |
 +--------+----------------+----------------+
-#% End sroute (date=06/11 22:00:15, total cpu=0:00:00.1, real=0:00:00.0, peak res=1352.0M, current mem=1352.0M)
+#% End sroute (date=06/17 00:35:44, total cpu=0:00:00.1, real=0:00:00.0, peak res=1301.2M, current mem=1301.2M)
 <CMD> saveDesign pnr_save/powerplan.enc
-#% Begin save design ... (date=06/11 22:00:15, mem=1355.4M)
-% Begin Save ccopt configuration ... (date=06/11 22:00:15, mem=1355.4M)
-% End Save ccopt configuration ... (date=06/11 22:00:15, total cpu=0:00:00.0, real=0:00:00.0, peak res=1357.1M, current mem=1357.1M)
-% Begin Save netlist data ... (date=06/11 22:00:15, mem=1377.1M)
+#% Begin save design ... (date=06/17 00:35:44, mem=1304.4M)
+% Begin Save ccopt configuration ... (date=06/17 00:35:44, mem=1304.4M)
+% End Save ccopt configuration ... (date=06/17 00:35:44, total cpu=0:00:00.0, real=0:00:00.0, peak res=1306.2M, current mem=1306.2M)
+% Begin Save netlist data ... (date=06/17 00:35:44, mem=1326.3M)
 Writing Binary DB to pnr_save/powerplan.enc.dat/des3.v.bin in single-threaded mode...
-% End Save netlist data ... (date=06/11 22:00:15, total cpu=0:00:00.0, real=0:00:00.0, peak res=1379.3M, current mem=1377.1M)
+% End Save netlist data ... (date=06/17 00:35:44, total cpu=0:00:00.0, real=0:00:00.0, peak res=1326.5M, current mem=1326.3M)
 Saving symbol-table file ...
 Saving congestion map file pnr_save/powerplan.enc.dat/des3.route.congmap.gz ...
-% Begin Save AAE data ... (date=06/11 22:00:15, mem=1377.1M)
+% Begin Save AAE data ... (date=06/17 00:35:44, mem=1326.3M)
 Saving AAE Data ...
-% End Save AAE data ... (date=06/11 22:00:15, total cpu=0:00:00.0, real=0:00:00.0, peak res=1377.1M, current mem=1377.1M)
+% End Save AAE data ... (date=06/17 00:35:45, total cpu=0:00:00.0, real=0:00:00.0, peak res=1326.3M, current mem=1326.3M)
 Saving preference file pnr_save/powerplan.enc.dat/gui.pref.tcl ...
 Saving mode setting ...
 Saving global file ...
-% Begin Save floorplan data ... (date=06/11 22:00:16, mem=1381.3M)
+% Begin Save floorplan data ... (date=06/17 00:35:45, mem=1330.5M)
 Saving floorplan file ...
 Convert 0 swires and 0 svias from compressed groups
-% End Save floorplan data ... (date=06/11 22:00:16, total cpu=0:00:00.0, real=0:00:00.0, peak res=1382.2M, current mem=1382.2M)
-Saving PG file pnr_save/powerplan.enc.dat/des3.pg.gz, version#2, (Created by Innovus v21.17-s075_1 on Wed Jun 11 22:00:16 2025)
-*** Completed savePGFile (cpu=0:00:00.0 real=0:00:00.0 mem=1433.3M) ***
+% End Save floorplan data ... (date=06/17 00:35:45, total cpu=0:00:00.0, real=0:00:00.0, peak res=1331.4M, current mem=1331.4M)
+Saving PG file pnr_save/powerplan.enc.dat/des3.pg.gz, version#2, (Created by Innovus v21.17-s075_1 on Tue Jun 17 00:35:45 2025)
+*** Completed savePGFile (cpu=0:00:00.0 real=0:00:00.0 mem=1433.0M) ***
 Saving Drc markers ...
 ... No Drc file written since there is no markers found.
-% Begin Save placement data ... (date=06/11 22:00:16, mem=1382.5M)
+% Begin Save placement data ... (date=06/17 00:35:45, mem=1331.4M)
 ** Saving stdCellPlacement_binary (version# 2) ...
 Save Adaptive View Pruning View Names to Binary file
-% End Save placement data ... (date=06/11 22:00:16, total cpu=0:00:00.0, real=0:00:00.0, peak res=1383.5M, current mem=1383.5M)
-% Begin Save routing data ... (date=06/11 22:00:16, mem=1383.5M)
+% End Save placement data ... (date=06/17 00:35:45, total cpu=0:00:00.0, real=0:00:00.0, peak res=1332.4M, current mem=1332.4M)
+% Begin Save routing data ... (date=06/17 00:35:45, mem=1332.4M)
 Saving route file ...
-*** Completed saveRoute (cpu=0:00:00.0 real=0:00:00.0 mem=1433.3M) ***
-% End Save routing data ... (date=06/11 22:00:16, total cpu=0:00:00.0, real=0:00:00.0, peak res=1383.6M, current mem=1383.6M)
+*** Completed saveRoute (cpu=0:00:00.0 real=0:00:00.0 mem=1433.0M) ***
+% End Save routing data ... (date=06/17 00:35:45, total cpu=0:00:00.0, real=0:00:00.0, peak res=1332.5M, current mem=1332.5M)
 Saving property file pnr_save/powerplan.enc.dat/des3.prop
-*** Completed saveProperty (cpu=0:00:00.0 real=0:00:00.0 mem=1436.3M) ***
-% Begin Save power constraints data ... (date=06/11 22:00:16, mem=1384.6M)
-% End Save power constraints data ... (date=06/11 22:00:16, total cpu=0:00:00.0, real=0:00:00.0, peak res=1384.6M, current mem=1384.6M)
+*** Completed saveProperty (cpu=0:00:00.0 real=0:00:00.0 mem=1436.0M) ***
+% Begin Save power constraints data ... (date=06/17 00:35:45, mem=1333.5M)
+% End Save power constraints data ... (date=06/17 00:35:45, total cpu=0:00:00.0, real=0:00:00.0, peak res=1333.5M, current mem=1333.5M)
 default
 Generated self-contained design powerplan.enc.dat
-#% End save design ... (date=06/11 22:00:19, total cpu=0:00:00.7, real=0:00:04.0, peak res=1412.1M, current mem=1386.3M)
+#% End save design ... (date=06/17 00:35:49, total cpu=0:00:00.7, real=0:00:05.0, peak res=1361.2M, current mem=1335.2M)
 *** Message Summary: 0 warning(s), 0 error(s)
 
 
-*** Memory Usage v#1 (Current mem = 1475.633M, initial mem = 494.906M) ***
+*** Memory Usage v#1 (Current mem = 1475.383M, initial mem = 486.906M) ***
 *** Message Summary: 109 warning(s), 96866 error(s)
 
---- Ending "Innovus" (totcpu=0:00:27.8, real=0:00:31.0, mem=1475.6M) ---
+--- Ending "Innovus" (totcpu=0:00:27.9, real=0:00:32.0, mem=1475.4M) ---

@@ -1,16 +1,8 @@
 #!/usr/bin/env python3
 
-import csv
-import datetime as dt
-import gzip
-import logging
-import os
-import pathlib
-import subprocess
-import sys
-import glob
-from typing import Dict, Optional
 
+from typing import Optional, Dict
+import subprocess, pathlib, datetime, os, logging, sys, csv, argparse
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -19,20 +11,19 @@ os.environ["PATH"] = (
     "/opt/cadence/genus172/bin:" + os.environ.get("PATH", "")
 )
 
-LOG_DIR = pathlib.Path(__file__).resolve().parent.parent / "logs" / "route"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-LOG_FILE = LOG_DIR / "route_api.log"
+ROOT     = pathlib.Path(__file__).resolve().parent.parent
+LOG_ROOT = ROOT / "logs"; LOG_ROOT.mkdir(exist_ok=True)
+LOG_DIR  = LOG_ROOT / "route"; LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname).1s] %(message)s",
+    format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler(LOG_FILE),
+        logging.FileHandler(LOG_ROOT / "route_api.log"),
         logging.StreamHandler(sys.stdout),
     ],
 )
-logger = logging.getLogger("route_server")
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
 BACKEND_DIR_TMPL = ROOT / "scripts" / "{tech}" / "backend"
 IMP_CSV = ROOT / "config" / "imp_global.csv"
 PLC_CSV = ROOT / "config" / "placement.csv"
@@ -62,41 +53,29 @@ class RtResp(BaseModel):
     log_path:  str
     rpt_paths: Dict[str, str]
 
+def safe_unlink(path: pathlib.Path):
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+
 def read_csv_row(path: pathlib.Path, idx: int) -> dict:
     rows = list(csv.DictReader(path.open()))
-    if not rows:
-        raise ValueError(f"{path.name} is empty")
     if idx >= len(rows):
-        raise IndexError(f"{path.name}: row {idx} out of range")
+        raise IndexError("%s row %d OOR" % (path.name, idx))
     return rows[idx]
 
-def parse_top_from_config(cfg: pathlib.Path) -> Optional[str]:
-    if not cfg.exists():
-        return None
-    for line in cfg.read_text().splitlines():
-        if line.strip().startswith("set TOP_NAME"):
-            return line.split('"')[1]
-    return None
-
 def run(cmd: str, log_file: pathlib.Path, cwd: pathlib.Path, env_extra: dict):
-    env = os.environ.copy()
-    env.update(env_extra)
-    logger.info("Launching Innovus cmd → %s", cmd)
+    env = os.environ.copy(); env.update(env_extra)
     with log_file.open("w") as lf, subprocess.Popen(
-        cmd,
-        cwd=str(cwd),
-        shell=True,
+        cmd, cwd=str(cwd), shell=True, executable="/bin/bash",
         universal_newlines=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        executable="/bin/bash",
-        env=env,
-    ) as proc:
-        for line in proc.stdout:
-            lf.write(line)
-        proc.wait()
-    if proc.returncode != 0:
-        raise RuntimeError(f"Innovus exited with code {proc.returncode}")
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
+    ) as p:
+        for ln in p.stdout: lf.write(ln)
+        p.wait()
+    if p.returncode != 0:
+        raise RuntimeError("Innovus exited %d" % p.returncode)
 
 app = FastAPI(title="MCP · Routing Service")
 
@@ -111,54 +90,44 @@ def route_run(req: RtReq):
     if not cts_enc.exists():
         return RtResp(status="error: restore_enc not found", log_path="", rpt_paths={})
 
-    rpt_dir = impl_dir / "pnr_reports"
-    rpt_dir.mkdir(exist_ok=True)
+    rpt_dir = impl_dir / "pnr_reports"; rpt_dir.mkdir(exist_ok=True)
     if req.force:
         for rpt in ROUTE_RPTS:
-            (rpt_dir / rpt).unlink(missing_ok=True)
-        (impl_dir / "pnr_save" / "route.enc").unlink(missing_ok=True)
+            safe_unlink(rpt_dir / rpt)
+        safe_unlink(impl_dir / "pnr_save" / "route.enc")
 
-    if req.top_module:
-        top = req.top_module
-    else:
-        parsed = parse_top_from_config(ROOT / "designs" / req.design / "config.tcl")
-        top = parsed or req.design
+    top = req.top_module or parse_top_from_config(des_root.parent / "config.tcl") or req.design
 
-    env = {
-        "BASE_DIR":   str(ROOT),
-        "TOP_NAME":   top,
-        "FILE_FORMAT":"verilog",
-    }
+    env = {"BASE_DIR": str(ROOT), "TOP_NAME": top, "FILE_FORMAT": "verilog"}
     env.update(read_csv_row(IMP_CSV, req.g_idx))
     env.update(read_csv_row(PLC_CSV, req.p_idx))
     env.update(read_csv_row(CTS_CSV, req.c_idx))
 
     backend_dir = pathlib.Path(str(BACKEND_DIR_TMPL).format(tech=req.tech))
-    route_tcl    = backend_dir / "7_route.tcl"
-    files_arg    = str(route_tcl)
-    exec_cmd     = f'restoreDesign "{cts_enc.resolve()}" "{top}"'
+    route_tcl   = backend_dir / "7_route.tcl"
 
-    innovus_cmd = (
-        f'innovus -no_gui -batch '
-        f'-files "{files_arg}" '
-        f'-execute "{exec_cmd}"'
-    )
+    exec_cmd   = 'restoreDesign "{}" "{}"'.format(cts_enc.resolve(), top)
+    innovus_cmd = 'innovus -no_gui -batch -files "{}" -execute "{}"'.format(route_tcl, exec_cmd)
 
-    ts       = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
+    ts       = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     log_file = LOG_DIR / f"{req.design}_route_{ts}.log"
+
     try:
         run(innovus_cmd, log_file, impl_dir, env)
     except Exception as e:
-        logger.exception("Routing failed")
-        return RtResp(status=f"error: {e}", log_path=str(log_file), rpt_paths={})
+        return RtResp(status="error: %s" % e, log_path=str(log_file), rpt_paths={})
 
-    rpt_paths: Dict[str, str] = {}
-    for rpt in ROUTE_RPTS:
-        p = rpt_dir / rpt
-        rpt_paths[rpt] = str(p.relative_to(ROOT)) if p.exists() else "not found"
+    rpt_paths = {r: (rpt_dir / r).exists() and str((rpt_dir / r).relative_to(ROOT)) or "not found"
+                 for r in ROUTE_RPTS}
 
     return RtResp(status="ok", log_path=str(log_file), rpt_paths=rpt_paths)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--port", type=int,
+                        default=int(os.getenv("ROUTE_PORT", 13339)),
+                        help="listen port (env ROUTE_PORT overrides; default 13339)")
+    args = parser.parse_args()
+
     import uvicorn
-    uvicorn.run("route_server:app", host="0.0.0.0", port=3339, reload=False)
+    uvicorn.run("route_server:app", host="0.0.0.0", port=args.port, reload=False)

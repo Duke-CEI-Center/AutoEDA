@@ -1,29 +1,6 @@
 #!/usr/bin/env python3
-"""
-MCP · Synthesis-Setup Service
 
-Start:
-    cd ~/proj/mcp-eda-example
-    python3 server/synth_setup_server.py
-
-Test:
-    curl -X POST http://localhost:3333/setup/run \
-         -H "Content-Type: application/json" \
-         -d '{"design":"des","tech":"FreePDK45","version_idx":0,"force":true}'
-
-Returns JSON:
-    {
-      "status": "...",
-      "log_path": "...",
-      "reports": { "check_design.rpt": "..." }
-    }
-"""
-
-import subprocess
-import os
-import pathlib
-import datetime
-
+import subprocess, os, pathlib, datetime, argparse     
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -39,9 +16,9 @@ class SetupReq(BaseModel):
     force:       bool = False
 
 class SetupResp(BaseModel):
-    status:    str
-    log_path:  str
-    reports:   dict
+    status:   str
+    log_path: str
+    reports:  dict
 
 def run_shell(cmd: str, cwd: pathlib.Path, log_file: pathlib.Path):
     with log_file.open("w") as lf:
@@ -83,21 +60,33 @@ def synth_setup(req: SetupReq):
 
     synth_root = ROOT / "designs" / req.design / req.tech / "synthesis"
     if not synth_root.exists():
-        return SetupResp(status="error: synthesis directory not found", log_path=str(log_file), reports={})
+        return SetupResp(status="error: synthesis directory not found",
+                         log_path=str(log_file), reports={})
 
     latest_ver = max(synth_root.iterdir(), key=lambda p: p.stat().st_mtime)
     rpt_path   = latest_ver / "reports" / "check_design.rpt"
-    if rpt_path.exists():
-        rpt_text = rpt_path.read_text()
-    else:
-        rpt_text = "check_design.rpt not generated"
+    rpt_text   = rpt_path.read_text() if rpt_path.exists() else "check_design.rpt not generated"
 
     return SetupResp(
         status   = "ok",
         log_path = str(log_file),
-        reports  = {"check_design.rpt": rpt_text}
+        reports  = {"check_design.rpt": rpt_text},
     )
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.getenv("SETUP_PORT", 13333)),
+        help="listen port (env SETUP_PORT overrides; default 13333)",
+    )
+    args = parser.parse_args()
+
     import uvicorn
-    uvicorn.run("synth_setup_server:app", host="0.0.0.0", port=3333, reload=False)
+    uvicorn.run(
+        "synth_setup_server:app",
+        host="0.0.0.0",
+        port=args.port,
+        reload=False,
+    )

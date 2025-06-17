@@ -1,16 +1,5 @@
 #!/usr/bin/env python3
-"""
-MCP · Power-plan Service   (PG-stripe generation)
 
-Start:
-    cd ~/proj/mcp-eda-example
-    python3 server/powerplan_server.py        # 监听 0.0.0.0:3336
-
-Example:
-    curl -X POST http://localhost:3336/power/run \
-         -H "Content-Type: application/json" \
-         -d '{"design":"des","tech":"FreePDK45","impl_ver":"cpV1_clkP1_drcV1__g0_p0","restore_enc":"<path_to_floorplan_enc>","force":true}'
-"""
 from typing import Optional
 import subprocess
 import pathlib
@@ -21,27 +10,32 @@ import sys
 import gzip
 import glob
 import csv
+import argparse                    
 from fastapi import FastAPI
 from pydantic import BaseModel
+
 
 os.environ["PATH"] = (
     "/opt/cadence/innovus221/tools/bin:"
     "/opt/cadence/genus172/bin:" + os.environ.get("PATH", "")
 )
 
+ROOT      = pathlib.Path(__file__).resolve().parent.parent
+LOG_ROOT  = ROOT / "logs"                 
+LOG_ROOT.mkdir(exist_ok=True)
+LOG_DIR   = LOG_ROOT / "powerplan"            
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("/home/yl996/pwr_api.log"),
+        logging.FileHandler(LOG_ROOT / "pwr_api.log"), 
         logging.StreamHandler(sys.stdout),
     ],
 )
 
-ROOT    = pathlib.Path(__file__).resolve().parent.parent
 BACKEND = ROOT / "scripts" / "FreePDK45" / "backend"
-LOG_DIR = ROOT / "logs" / "powerplan"; LOG_DIR.mkdir(parents=True, exist_ok=True)
-
 IMP_CSV = ROOT / "config" / "imp_global.csv"
 
 class PwrReq(BaseModel):
@@ -157,6 +151,21 @@ def powerplan(req: PwrReq):
 
     return PwrResp(status="ok", log_path=str(log_file), report=report_text)
 
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.getenv("POWERPLAN_PORT", 13336)),
+        help="listen port (env POWERPLAN_PORT overrides; default 13336)",
+    )
+    args = parser.parse_args()
+
     import uvicorn
-    uvicorn.run("powerplan_server:app", host="0.0.0.0", port=3336, reload=False)
+    uvicorn.run(
+        "powerplan_server:app",
+        host="0.0.0.0",
+        port=args.port,
+        reload=False,
+    )

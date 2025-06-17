@@ -1,7 +1,7 @@
 #!/bin/csh -f
 # V0.1 create static html files
 
-set log_dir = ".DC_log_snapshot_D20250609_213645.017884"
+set log_dir = ".DC_log_snapshot_D20250617_003412.125564"
 set html_file = "/home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/synthesis/cpV1_clkP1_drcV1/default.html"
 set make_csh = "./make.csh"
 

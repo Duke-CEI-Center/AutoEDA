@@ -1,21 +1,7 @@
 #!/usr/bin/env python3
-"""
-REST service that runs the Innovus backend flow
-(1_setup.tcl → 2_floorplan.tcl) with optional restoreDesign.
-
-POST  /floorplan/run
-"""
 
 from typing import Optional
-import subprocess
-import pathlib
-import datetime
-import os
-import csv
-import logging
-import sys
-import glob
-import gzip
+import subprocess, pathlib, datetime, os, csv, logging, sys, glob, gzip, argparse   # ★ argparse
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -25,22 +11,24 @@ os.environ["PATH"] = (
     + os.environ.get("PATH", "")
 )
 
+ROOT      = pathlib.Path(__file__).resolve().parent.parent
+LOG_ROOT  = ROOT / "logs"
+LOG_ROOT.mkdir(exist_ok=True)
+LOG_DIR   = LOG_ROOT / "floorplan"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
-        logging.FileHandler("/home/yl996/fp_api.log"),
+        logging.FileHandler(LOG_ROOT / "fp_api.log"), 
         logging.StreamHandler(sys.stdout),
     ],
 )
 
-ROOT    = pathlib.Path(__file__).resolve().parent.parent
-BACKEND = ROOT / "scripts" / "FreePDK45" / "backend"
-LOG_DIR = ROOT / "logs" / "floorplan"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-
-IMP_CSV = ROOT / "config" / "imp_global.csv"
-PLC_CSV = ROOT / "config" / "placement.csv"
+BACKEND  = ROOT / "scripts" / "FreePDK45" / "backend"
+IMP_CSV  = ROOT / "config" / "imp_global.csv"
+PLC_CSV  = ROOT / "config" / "placement.csv"
 
 CSV_MAP = {
     "design_flow_effort":  "design_flow_effort",
@@ -196,6 +184,19 @@ def floorplan_run(req: FPReq):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=int(os.getenv("FLOORPLAN_PORT", 13335)),
+        help="listen port (env FLOORPLAN_PORT overrides; default 13335)",
+    )
+    args = parser.parse_args()
+
     import uvicorn
-    uvicorn.run("floorplan_server:app",
-                host="0.0.0.0", port=3335, reload=False)
+    uvicorn.run(
+        "floorplan_server:app",
+        host="0.0.0.0",
+        port=args.port,
+        reload=False,
+    )
