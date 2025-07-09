@@ -1,18 +1,131 @@
 # Python
 __pycache__/
 *.py[cod]
-*.log*
-*.cmd*
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# Innovus/Synopsys 中间目录
-logs/
-pnr_out/
-pnr_logs/
-pnr_reports/
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
 
-# 临时合成/实现结果
-designs/*/*/synthesis/*/results/*.log
-
-# 操作系统 & 编辑器文件
+# IDE
+.vscode/
+.idea/
 *.swp
+*.swo
+*~
+
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+nohup.log
+uvicorn.log
+pl_api.log
+implementation*.log
+
+# EDA tool outputs
+*.enc
+*.enc.dat/
+*.cmd
+*.cmd*
+innovus.log*
+*.spef.gz
+*.ddc
+*.sdc
+*.v.bin*
+*.db.da.gz
+*.congmap.gz
+*.fp.gz
+*.fp.spr.gz
+*.place.gz
+*.route.gz
+*.route.congmap.gz
+*.pg.gz
+*.metric.gz
+*.marker.gz
+*.symtbl.gz
+*.tcz
+*.globals
+*.prop
+*.dbinfo
+*.aae.settings
+*.apa
+*.flexmv
+*.v.bin
+*.v.bin_*
+*.html
+*.html.make_static_html.csh
+*.html_cgi.html
+*.cgi
+*.csh
+*.ini
+*.json
+*.state
+*.map
+*.dat/
+*.bin
+*.bin_*
+*.gz
+*.spr.gz
+
+# Design implementation files
+designs/*/FreePDK45/implementation/*/pnr_save/
+designs/*/FreePDK45/implementation/*/pnr_out/
+designs/*/FreePDK45/implementation/*/pnr_reports/
+designs/*/FreePDK45/implementation/*/innovus.cmd*
+designs/*/FreePDK45/implementation/*/innovus.log*
+designs/*/FreePDK45/implementation/*/mp_data/
+designs/*/FreePDK45/implementation/*/_Finished_
+designs/*/FreePDK45/implementation/*/_Place_Finished_
+designs/*/FreePDK45/implementation/*/streamOut.map
+
+# Synthesis files
+designs/*/FreePDK45/synthesis/*/WORK_autoread/
+designs/*/FreePDK45/synthesis/*/reports/
+designs/*/FreePDK45/synthesis/*/results/
+designs/*/FreePDK45/synthesis/*/.DC_log_snapshot_*/
+designs/*/FreePDK45/synthesis/*/default.html*
+
+# Deliverables
+deliverables/
+
+# Temporary files
+-H
+-d
+=2.10
+3.
+
+# Cadence
+.cadence/
+
+# Python SDK (if not needed for open source)
+python-sdk/

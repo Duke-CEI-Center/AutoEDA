@@ -35,7 +35,7 @@ _launch server/cts_server.py            "$PORT_CTS"
 _launch server/route_server.py          "$PORT_ROUTE"
 _launch server/save_server.py           "$PORT_SAVE"
 
-echo "✅  MCP servers restarted on ports:"
+echo "MCP servers restarted on ports:"
 printf "   setup=%s  compile=%s  floor=%s  power=%s\n" \
        "$PORT_SETUP" "$PORT_COMPILE" "$PORT_FLOORPLAN" "$PORT_POWERPLAN"
 printf "   place=%s  cts=%s  route=%s  save=%s\n" \

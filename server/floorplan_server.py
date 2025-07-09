@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from typing import Optional
-import subprocess, pathlib, datetime, os, csv, logging, sys, glob, gzip, argparse   # ★ argparse
+import subprocess, pathlib, datetime, os, csv, logging, sys, glob, gzip, argparse   
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -53,17 +53,12 @@ class FPResp(BaseModel):
     report:   str
 
 def read_csv_row(path: pathlib.Path, idx: int):
-    """从 CSV 中读取第 idx 行，返回一个字典。"""
     rows = list(csv.DictReader(path.open()))
     if idx >= len(rows):
         raise IndexError(f"{path.name}: row {idx} out of range (total {len(rows)})")
     return rows[idx]
 
 def run(cmd: str, logfile: pathlib.Path, cwd: pathlib.Path, env_extra: dict):
-    """
-    在 cwd 下用额外环境变量 env_extra 执行 cmd，将 stdout/stderr 写入 logfile。
-    如果命令返回非零，就抛出 RuntimeError。
-    """
     env = os.environ.copy()
     env.update(env_extra)
     with logfile.open("w") as lf, subprocess.Popen(
@@ -117,11 +112,16 @@ def floorplan_run(req: FPReq):
     env.update({CSV_MAP[k]: v for k, v in read_csv_row(IMP_CSV, req.g_idx).items() if k in CSV_MAP})
     env.update({CSV_MAP[k]: v for k, v in read_csv_row(PLC_CSV, req.p_idx).items() if k in CSV_MAP})
 
-    local_config = impl_dir / "config.tcl"
+    design_config = ROOT / "designs" / req.design / "config.tcl"
+    local_config  = impl_dir / "config.tcl"
     if not local_config.exists():
-        subprocess.run(["cp", str(ROOT / "config.tcl"), str(local_config)], check=True)
-
-    config_tcl    = local_config
+        if design_config.exists():
+            subprocess.run(["cp", str(design_config), str(local_config)], check=True)
+        else:
+            raise RuntimeError(
+                f"can not find config.tcl: neither {design_config} nor {ROOT/'config.tcl'} exist"
+            )
+    config_tcl = local_config
     tech_tcl      = ROOT / "scripts" / req.tech / "tech.tcl"
     setup_tcl     = BACKEND / "1_setup.tcl"
     floorplan_tcl = BACKEND / "2_floorplan.tcl"

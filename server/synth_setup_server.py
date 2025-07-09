@@ -45,13 +45,13 @@ def synth_setup(req: SetupReq):
     log_file = LOG_DIR / f"{req.design}_setup_{ts}.log"
 
     cmd  = (
-        f"SYN_ONLY=1 {RUN_SH} "
+        f"SYN_ONLY=1 /usr/bin/python3 -u scripts/_helper/synthesis_config_row_no_dbg.py "
         f"--design {req.design} "
         f"--version-idx {req.version_idx} "
         f"--tech {req.tech}"
     )
     if req.force:
-        cmd += " -f"
+        cmd += " --force-overwrite"
 
     try:
         run_shell(cmd, ROOT, log_file)

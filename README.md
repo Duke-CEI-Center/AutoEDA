@@ -1,263 +1,546 @@
-# Digital Design Implementation Flow
+# MCP EDA - Model Context Protocol for Electronic Design Automation
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-green.svg)](https://fastapi.tiangolo.com/)
 
-This repository contains scripts and configurations for running a complete digital design implementation flow using Synopsys Design Compiler for synthesis and Cadence Innovus for physical implementation.
+A comprehensive **Model Context Protocol (MCP)** based Electronic Design Automation (EDA) system that provides intelligent automation for digital design implementation flows. This system integrates multiple EDA tools through a unified MCP interface, enabling natural language-driven design automation.
+
+## Features
+
+- **AI-Powered Automation**: Natural language interface for EDA operations using GPT-4
+- **Multi-Tool Integration**: Seamless integration of Synopsys Design Compiler and Cadence Innovus
+- **Complete Design Flow**: End-to-end digital design implementation from RTL to GDSII
+- **RESTful API**: Standardized HTTP API for all EDA operations
+- **Real-time Monitoring**: Live status tracking and detailed logging
+- **Modular Architecture**: Independent microservices for each design stage
+- **Configuration Management**: CSV-based parameter management for design optimization
+
+## System Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   User Query    │───▶│  MCP Agent      │───▶│  MCP Servers    │
+│  (Natural Lang) │    │  Client (8000)  │    │  (13333-13440)  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                │                       │
+                                ▼                       ▼
+                       ┌─────────────────┐    ┌─────────────────┐
+                       │   OpenAI GPT-4  │    │   EDA Tools     │
+                       │   (Tool Select) │    │  (DC/Innovus)   │
+                       └─────────────────┘    └─────────────────┘
+```
+
+### MCP Server Architecture
+
+| Service | Port | Endpoint | Description |
+|---------|------|----------|-------------|
+| **MCP Agent Client** | 8000 | `/agent` | Main interface for natural language processing |
+| **Synthesis Setup** | 13333 | `/setup/run` | RTL synthesis setup and configuration |
+| **Synthesis Compile** | 13334 | `/compile/run` | RTL-to-gate synthesis compilation |
+| **Floorplan** | 13335 | `/floorplan/run` | Chip floorplanning and I/O placement |
+| **Power Planning** | 13336 | `/power/run` | Power distribution network generation |
+| **Placement** | 13337 | `/place/run` | Standard cell placement optimization |
+| **Clock Tree Synthesis** | 13338 | `/cts/run` | Clock distribution network synthesis |
+| **Routing** | 13339 | `/route/run` | Signal routing and optimization |
+| **Save Design** | 13440 | `/save/run` | Final design saving and output generation |
 
 ## Prerequisites
 
-- Synopsys Design Compiler
-- Cadence Innovus
-- Python 3.x
-- FreePDK45 technology library
+### Software Requirements
 
-## Repository Structure
+- **Python 3.9+**
+- **Synopsys Design Compiler** (for synthesis)
+- **Cadence Innovus** (for physical implementation)
+- **FreePDK45** technology library
+- **OpenAI API Key** (for GPT-4 integration)
 
-The repository is organized as follows:
+### System Requirements
 
-- `designs/`: Contains design source files and implementation results
-  - `des/`: Example design directory containing RTL sources and implementation outputs
-    - `rtl/`: RTL sources
-    - `synthesis/`: Synthesis results
-    - `implementation/`: Physical implementation results
+- **OS**: Linux (tested on Ubuntu 20.04+)
+- **Memory**: 8GB RAM minimum (16GB+ recommended)
+- **Storage**: 10GB free space for design files and logs
+- **Network**: Local network access for inter-service communication
 
-- `libraries/`: Technology library files
-  - `FreePDK45/`: FreePDK45 technology node files.
+## Installation
 
-- `config/`: Configuration files for different main stages of the flow
-  - `synthesis.csv`: Design Compiler synthesis settings
-  - `imp_global.csv`: Global implementation settings
-  - `placement.csv`: Placement optimization settings
-  - `cts.csv`: Clock tree synthesis settings
+### Option 1: Docker Deployment (Recommended)
 
-- `scripts/`: Flow control scripts
-  - `run_synthesis_example.sh`: Script to run synthesis
-  - `run_implementation_example.sh`: Script to run physical implementation
-  - `_helper/`: Python helper scripts for configuration management
-  - `FreePDK45/`: Technology-specific TCL scripts for tool execution
-    - `tech.tcl`: Technology setup and constraints
-    - `frontend/`: Synthesis scripts
-      - `1_setup.tcl`: Design setup and constraints
-      - `2_synthesis.tcl`: Synthesis commands and optimization
-    - `backend/`: Physical implementation scripts
-      - `1_setup.tcl`: Design setup and initialization
-      - `2_floorplan.tcl`: Floorplanning commands
-      - `3_powerplan.tcl`: Power grid generation
-      - `4_place.tcl`: Placement optimization
-      - `5_cts.tcl`: Clock tree synthesis
-      - `6_add_filler.tcl`: Filler cell insertion
-      - `7_route.tcl`: Routing and optimization
-      - `8_save_design.tcl`: Final design saving
-
-## Flow Overview
-
-The implementation flow consists of two main stages:
-1. **Synthesis** using Synopsys Design Compiler (dc_shell)
-2. **Physical Implementation** using Cadence Innovus
-
-Each stage has multiple sub-stages implemented through TCL scripts. The flow is controlled by Python wrapper scripts that parse configurations from CSV files and execute the TCL scripts.
-
-## Running the Flow
-
-All bash/python scripts should be executed from the root directory of the repository.
-
-### Synthesis
-
-To run synthesis, use the `run_synthesis_example.sh` script:
+Due to licensing restrictions of commercial EDA tools, we use a **hybrid Docker approach**:
 
 ```bash
-./scripts/run_synthesis_example.sh
+# Clone the repository
+git clone https://github.com/AndyLu666/MCP-EDA-Server.git
+cd MCP-EDA-Server
+
+# Copy environment template
+cp docker/env.example .env
+
+# Edit .env file with your configuration
+# - Set your OpenAI API key
+# - Configure EDA tools host
+# - Set license file paths
+
+# Deploy using Docker
+chmod +x docker/deploy.sh
+./docker/deploy.sh deploy
 ```
 
-The script takes the following arguments:
-- `--design`: Design name (default: "des")
-- `--version-idx`: Index of synthesis configuration to use (see `config/synthesis.csv`)
-- `--tech`: Technology library (default: "FreePDK45")
+**Note**: EDA tools (Design Compiler, Innovus) must be installed on the host system with valid licenses. The Docker containers communicate with these tools via network.
 
-### Physical Implementation
+### Option 2: Local Installation
 
-To run physical implementation, use the `run_implementation_example.sh` script:
+#### 1. Clone the Repository
 
 ```bash
-./scripts/run_implementation_example.sh
+git clone https://github.com/AndyLu666/MCP-EDA-Server.git
+cd MCP-EDA-Server
 ```
 
-The script takes the following arguments:
-- `-d`: Design name (default: "des")
-- `-s`: Synthesis version (e.g., "cpV1_clkP1_drcV1")
-- `-t`: Technology library (default: "FreePDK45")
-- `-g`: Global implementation version index (see `config/imp_global.csv`)
-- `-p`: Placement version index (see `config/placement.csv`)
-- `-c`: CTS version index (see `config/cts.csv`)
+#### 2. Set Up Python Environment
 
-## Configuration Parameters Reference
+```bash
+# Create virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-This section outlines the key parameters available in each stage of the digital design implementation flow.
+# Install dependencies
+pip install -r requirements.txt
+```
 
-### Synthesis Flow (Design Compiler)
+#### 3. Configure Environment Variables
 
-#### Setup Stage (`1_setup.tcl`)
+Create a `.env` file in the project root:
 
-**Purpose**: Initialize environment, set design parameters, and prepare for synthesis.
+```bash
+# OpenAI API Configuration
+OPENAI_API_KEY=your_openai_api_key_here
 
-**Key Parameters**:
-| Parameter | Description | TCL Command |
-|-----------|-------------|-------------|
-| `compile_seqmap_propagate_constants` | Controls optimization of constant registers | `set compile_seqmap_propagate_constants true/false` |
-| `power_cg_auto_identify` | Enables automatic clock gate identification | `set power_cg_auto_identify true/false` |
-| `hdlin_check_no_latch` | Controls latch checking in RTL | `set hdlin_check_no_latch true/false` |
-| `hdlin_vrlg_std` | Verilog standard version | `set hdlin_vrlg_std 2001/2005` |
+# MCP Server Configuration
+MCP_SERVER_HOST=http://localhost
 
-#### Synthesis Stage (`2_synthesis.tcl`)
+# Optional: Custom ports (defaults shown)
+SETUP_PORT=13333
+COMPILE_PORT=13334
+FLOORPLAN_PORT=13335
+POWER_PORT=13336
+PLACE_PORT=13337
+CTS_PORT=13338
+ROUTE_PORT=13339
+SAVE_PORT=13440
+```
 
-**Purpose**: Perform RTL-to-gate-level synthesis with timing, area, and power optimizations.
+#### 4. Verify EDA Tools Installation
 
-**Key Parameters**:
-| Parameter | Description | TCL Command |
-|-----------|-------------|-------------|
-| `clk_period` | Target clock period for synthesis (ns) | `create_clock -period $env(clk_period)` |
-| `DRC_max_fanout` | Maximum allowable fanout | `set_max_fanout $env(DRC_max_fanout) $TOP_NAME` |
-| `DRC_max_transition` | Maximum allowable transition time (ns) | `set_max_transition $env(DRC_max_transition) $TOP_NAME` |
-| `DRC_max_capacitance` | Maximum allowable capacitance (pF) | `set_max_capacitance $env(DRC_max_capacitance) $TOP_NAME` |
-| `compile_cmd` | Compilation command ('compile' or 'compile_ultra') | Various compile commands |
-| `map_effort` | Mapping effort level | `compile -map_effort $env(map_effort)` |
-| `power_effort` | Power optimization effort level | `compile -power_effort $env(power_effort)` |
-| `area_effort` | Area optimization effort level | `compile -area_effort $env(area_effort)` |
-| `set_dyn_opt` | Dynamic optimization setting | Part of optimization strategy |
-| `set_lea_opt` | Leakage optimization setting | Part of optimization strategy |
+```bash
+# Check Design Compiler
+which dc_shell
 
-### Physical Implementation Flow (Innovus)
+# Check Innovus
+which innovus
 
-#### Modular Physical Implementation Approach
+# Verify FreePDK45 library
+ls libraries/FreePDK45/
+```
 
-The physical implementation flow can be broken down into distinct stages that can be called iteratively:
-1. **Setup**: Initialize the design environment and import netlists
-2. **Floorplan**: Define the chip boundaries and I/O pin locations
-3. **Power Planning**: Create power distribution network
-4. **Placement**: Place standard cells
-5. **Clock Tree Synthesis (CTS)**: Build the clock distribution network
-6. **Filler Cell Insertion**: Add filler cells
-7. **Routing**: Connect the cells with wires
-8. **Save Design**: Save final design and generate output files
+## Quick Start
 
-#### Setup Stage (`1_setup.tcl`)
+### 1. Start MCP Agent Client
 
-**Purpose**: Initialize environment, import design, set up libraries and analysis views.
+```bash
+# Terminal 1: Start the main agent
+conda activate eda310  # or your conda environment
+uvicorn mcp_agent_client:app --reload --host 0.0.0.0 --port 8000
+```
 
-**Key Parameters**:
-| Parameter | Description | TCL Command |
-|-----------|-------------|-------------|
-| `design_flow_effort` | Flow effort level ('express'/'standard') | `setDesignMode -flowEffort $env(design_flow_effort)` |
-| `design_power_effort` | Power optimization effort level | `setDesignMode -powerEffort $env(design_power_effort)` |
+### 2. Start MCP Servers
 
-#### Floorplan Stage (`2_floorplan.tcl`)
+```bash
+# Terminal 2: Start all MCP servers
+./restart_servers.sh
 
-**Purpose**: Create the floorplan, define chip boundaries, and place I/O pins.
+# Or start individually:
+cd server
+python3 synth_setup_server.py --port 13333 &
+python3 synth_compile_server.py --port 13334 &
+python3 floorplan_server.py --port 13335 &
+python3 powerplan_server.py --port 13336 &
+python3 placement_server.py --port 13337 &
+python3 cts_server.py --port 13338 &
+python3 route_server.py --port 13339 &
+python3 save_server.py --port 13440 &
+```
 
-**Key Parameters**:
-| Parameter | Description | TCL Command |
-|-----------|-------------|-------------|
-| `ASPECT_RATIO` | Die aspect ratio | `floorPlan -site FreePDK45_38x28_10R_NP_162NW_34O -r ${ASPECT_RATIO} ${TARGET_UTIL}` |
-| `target_util` | Target utilization | `floorPlan -site FreePDK45_38x28_10R_NP_162NW_34O -r ${ASPECT_RATIO} ${TARGET_UTIL}` |
+### 3. Run Your First Design
 
-#### Power Planning Stage (`3_powerplan.tcl`)
+```bash
+# Test with the example design
+curl -X POST http://localhost:8000/agent \
+  -H "Content-Type: application/json" \
+  -d '{"user_query":"Run synth_setup for design=\"des\" and return the log path."}'
+```
 
-**Purpose**: Create power distribution network.
+## 📖 Usage Guide
 
-**Key Parameters**:
-| Parameter | Description | TCL Command |
-|-----------|-------------|-------------|
-| Stripe width | Width of power stripes | `addStripe -nets {VDD VSS} -width 1.8` |
-| Stripe spacing | Spacing between stripes | `addStripe -nets {VDD VSS} -spacing 1.8` |
-| Metal layers | Metal layers for power distribution | `addStripe -layer M4 -direction vertical/horizontal` |
+### Natural Language Interface
 
-#### Placement Stage (`4_place.tcl`)
+The MCP Agent Client understands natural language queries and automatically selects the appropriate EDA tool:
 
-**Purpose**: Place standard cells and perform pre-CTS optimization.
+```bash
+# Synthesis
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synth_setup for design=\"my_design\" and return the log path."}'
 
-**Key Parameters**:
-| Parameter | Description | TCL Command |
-|-----------|-------------|-------------|
-| `place_global_timing_effort` | Global timing-driven placement effort | `setPlaceMode -place_global_timing_effort $env(place_global_timing_effort)` |
-| `place_global_cong_effort` | Global congestion-driven placement effort | `setPlaceMode -place_global_cong_effort $env(place_global_cong_effort)` |
-| `place_detail_wire_length_opt_effort` | Wire length optimization effort | `setPlaceMode -place_detail_wire_length_opt_effort $env(place_detail_wire_length_opt_effort)` |
-| `place_global_max_density` | Maximum density constraint | `setPlaceMode -place_global_max_density $env(place_global_max_density)` |
-| `place_activity_power_driven` | Power-driven placement flag | `setPlaceMode -activity_power_driven $env(place_activity_power_driven)` |
-| `prects_opt_max_density` | Maximum density for pre-CTS optimization | `setOptMode -maxDensity $env(prects_opt_max_density)` |
-| `prects_opt_power_effort` | Power optimization effort | `setOptMode -powerEffort $env(prects_opt_power_effort)` |
-| `prects_opt_reclaim_area` | Area reclaim flag | `setOptMode -reclaimArea $env(prects_opt_reclaim_area)` |
-| `prects_fix_fanout_load` | Fix fanout load flag | `setOptMode -fixFanoutLoad $env(prects_fix_fanout_load)` |
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synth_compile for design=\"my_design\" and return the log path."}'
 
-#### Clock Tree Synthesis Stage (`5_cts.tcl`)
+# Physical Implementation
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run floorplan for design=\"my_design\", top_module=\"my_module\" and return the path to floorplan.enc.dat."}'
 
-**Purpose**: Build and optimize the clock distribution network.
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run placement for design=\"my_design\", top_module=\"my_module\" and return the path to placement.enc.dat."}'
 
-**Key Parameters**:
-| Parameter | Description | TCL Command |
-|-----------|-------------|-------------|
-| Buffer cells | Clock buffer cell types | `set_ccopt_property buffer_cells $CLKBUF_CELLS` |
-| Clock gating cells | Clock gating cell types | `set_ccopt_property clock_gating_cells $CLKGT_CELLS` |
-| `cts_cell_density` | Cell density for CTS | `set_ccopt_property cell_density $env(cts_cell_density)` |
-| `cts_clock_gate_buffering_location` | Location for clock gate buffers | `set_ccopt_property clock_gate_buffering_location $env(cts_clock_gate_buffering_location)` |
-| `cts_clone_clock_gates` | Clock gate cloning flag | `set_ccopt_property clone_clock_gates $env(cts_clone_clock_gates)` |
-| `postcts_opt_max_density` | Maximum density for post-CTS optimization | `setOptMode -maxDensity $env(postcts_opt_max_density)` |
-| `postcts_opt_power_effort` | Power optimization effort | `setOptMode -powerEffort $env(postcts_opt_power_effort)` |
-| `postcts_opt_reclaim_area` | Area reclaim flag | `setOptMode -reclaimArea $env(postcts_opt_reclaim_area)` |
-| `postcts_fix_fanout_load` | Fix fanout load flag | `setOptMode -fixFanoutLoad $env(postcts_fix_fanout_load)` |
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run routing for design=\"my_design\", top_module=\"my_module\" and return the path to route_opt.enc.dat."}'
 
-#### Filler Cell Insertion (`6_add_filler.tcl`)
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run save for design=\"my_design\", top_module=\"my_module\" and return the archive path."}'
+```
 
-**Purpose**: Add filler cells to improve power distribution and DRC compliance. *This is currently not implemented.*
+### Complete Design Flow Example
 
-**Key Parameters**:
-| Parameter | Description | TCL Command |
-|-----------|-------------|-------------|
-| Filler cell types | Types of cells used for filling | `addFiller -cell $FILL_CELLS -prefix FILLER` |
-| Prefix | Prefix for filler cell names | `addFiller -cell $FILL_CELLS -prefix FILLER` |
+```bash
+# 1. Synthesis Setup
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synth_setup for design=\"des\" and return the log path."}'
 
-#### Routing Stage (`7_route.tcl`)
+# 2. Synthesis Compile
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synth_compile for design=\"des\" and return the log path."}'
 
-**Purpose**: Perform global and detailed routing with optimization.
+# 3. Floorplan
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run floorplan for design=\"des\", top_module=\"des3\" and return the syn_ver and the path to floorplan.enc.dat."}'
 
-**Key Parameters**:
-| Parameter | Description | TCL Command |
-|-----------|-------------|-------------|
-| `routeWithTimingDriven` | Routing timing-driven mode flag | `setNanoRouteMode -routeWithTimingDriven false/true` |
-| `routeDesignFixClockNets` | Fix clock nets during routing | `setNanoRouteMode -routeDesignFixClockNets true/false` |
-| `SIAware` | Signal integrity awareness | `setDelayCalMode -SIAware True/False` |
-| DRC limit | Limit for DRC checking | `verify_drc -limit <value>` |
+# 4. Power Planning
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run powerplan for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the path to powerplan.enc.dat."}'
 
-#### Save Design Stage (`8_save_design.tcl`)
+# 5. Placement
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run placement for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the path to placement.enc.dat."}'
 
-**Purpose**: Save final design and generate output files.
+# 6. Clock Tree Synthesis
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run CTS for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the path to cts.enc.dat."}'
 
-## Configuration Files
+# 7. Routing
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run routing for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the path to route_opt.enc.dat."}'
 
-The flow uses several CSV configuration files located in the `config/` directory to control tool settings:
+# 8. Save Design
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run save for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the archive path."}'
+```
 
-### synthesis.csv
-Controls Design Compiler synthesis settings:
-- Clock period
-- DRC constraints (max fanout, transition, capacitance)
-- Compilation effort levels (power, area, mapping)
-- Optimization settings
+## Project Structure
 
-### imp_global.csv
-Controls global Innovus implementation settings:
-- Design flow effort (express/standard)
-- Power optimization effort
-- Target utilization
+```
+mcp-eda-example/
+├── designs/                    # Design source files and results
+│   ├── des/                   # Example design
+│   │   ├── rtl/              # RTL source files
+│   │   ├── FreePDK45/        # Technology-specific results
+│   │   │   ├── synthesis/    # Synthesis outputs
+│   │   │   └── implementation/ # Physical implementation
+│   │   └── config.tcl           # Design configuration
+│   ├── b14/                  # Additional designs
+│   └── leon2/
+├── server/                    # MCP server implementations
+│   ├── synth_setup_server.py    # Synthesis setup service
+│   ├── synth_compile_server.py  # Synthesis compile service
+│   ├── floorplan_server.py      # Floorplanning service
+│   ├── powerplan_server.py      # Power planning service
+│   ├── placement_server.py      # Placement service
+│   ├── cts_server.py           # Clock tree synthesis service
+│   ├── route_server.py         # Routing service
+│   └── save_server.py          # Design save service
+├── scripts/                   # EDA tool scripts
+│   ├── FreePDK45/           # Technology-specific scripts
+│   │   ├── frontend/        # Synthesis scripts
+│   │   └── backend/         # Physical implementation scripts
+│   └── _helper/             # Python helper scripts
+├── config/                    # Configuration files
+│   ├── synthesis.csv           # Synthesis parameters
+│   ├── imp_global.csv          # Implementation parameters
+│   ├── placement.csv           # Placement parameters
+│   └── cts.csv                 # CTS parameters
+├── libraries/                 # Technology libraries
+│   └── FreePDK45/           # FreePDK45 library files
+├── logs/                      # Execution logs
+├── deliverables/              # Final design outputs
+├── mcp_agent_client.py          # Main MCP agent client
+├── restart_servers.sh           # Server startup script
+├── docker-compose.yml           # Docker Compose configuration
+├── docker/                      # Docker configuration files
+│   ├── Dockerfile.agent         # MCP Agent Client Dockerfile
+│   ├── Dockerfile.servers       # MCP Servers Dockerfile
+│   ├── health_check.py          # Health check script
+│   ├── deploy.sh                # Deployment script
+│   └── env.example              # Environment template
+├── requirements.txt             # Python dependencies
+└── README.md                    # This file
+```
 
-### placement.csv
-Controls Innovus placement settings:
-- Global timing and congestion effort
-- Wire length optimization
-- Density constraints
-- Power-driven placement
-- Pre-CTS optimization settings
+## Configuration
 
-### cts.csv
-Controls clock tree synthesis settings:
-- Cell density
-- Clock gate buffering location
-- Clock gate cloning
-- Post-CTS optimization settings
+### Design Configuration (`designs/<design>/config.tcl`)
+
+```tcl
+# Top-level module name
+set TOP_NAME "your_module"
+
+# File format (verilog/vhdl)
+set FILE_FORMAT "verilog"
+
+# Clock port name
+set CLOCK_NAME "clk"
+
+# Clock period in nanoseconds
+set clk_period 1.0
+```
+
+### Synthesis Configuration (`config/synthesis.csv`)
+
+| Parameter | Description | Default Value |
+|-----------|-------------|---------------|
+| `clk_period` | Target clock period (ns) | 1.0 |
+| `DRC_max_fanout` | Maximum fanout | 10 |
+| `DRC_max_transition` | Maximum transition time (ns) | 0.5 |
+| `DRC_max_capacitance` | Maximum capacitance (pF) | 5.0 |
+| `compile_cmd` | Compilation command | `compile_ultra` |
+| `map_effort` | Mapping effort | `high` |
+| `power_effort` | Power optimization effort | `medium` |
+| `area_effort` | Area optimization effort | `medium` |
+
+### Implementation Configuration (`config/imp_global.csv`)
+
+| Parameter | Description | Default Value |
+|-----------|-------------|---------------|
+| `ASPECT_RATIO` | Die aspect ratio | 1.0 |
+| `target_util` | Target utilization | 0.7 |
+| `design_flow_effort` | Flow effort level | `standard` |
+| `design_power_effort` | Power optimization effort | `medium` |
+
+## API Reference
+
+### MCP Agent Client API
+
+#### POST `/agent`
+
+Main endpoint for natural language EDA operations.
+
+**Request Body:**
+```json
+{
+  "user_query": "Run synth_setup for design=\"des\" and return the log path."
+}
+```
+
+**Response:**
+```json
+{
+  "tool_called": "synth_setup",
+  "tool_input": {
+    "design": "des",
+    "tech": "FreePDK45",
+    "version_idx": 0,
+    "force": true
+  },
+  "tool_output": {
+    "status": "ok",
+    "log_path": "/path/to/log/file",
+    "reports": {
+      "check_design.rpt": "report content"
+    }
+  }
+}
+```
+
+### Individual MCP Server APIs
+
+#### Synthesis Setup Server (Port 13333)
+
+**POST `/setup/run`**
+
+```json
+{
+  "design": "des",
+  "tech": "FreePDK45",
+  "version_idx": 0,
+  "force": true
+}
+```
+
+#### Floorplan Server (Port 13335)
+
+**POST `/floorplan/run`**
+
+```json
+{
+  "design": "des",
+  "top_module": "des3",
+  "tech": "FreePDK45",
+  "syn_ver": "cpV1_clkP1_drcV1",
+  "g_idx": 0,
+  "p_idx": 0,
+  "force": true
+}
+```
+
+#### Placement Server (Port 13337)
+
+**POST `/place/run`**
+
+```json
+{
+  "design": "des",
+  "top_module": "des3",
+  "tech": "FreePDK45",
+  "impl_ver": "cpV1_clkP1_drcV1__g0_p0",
+  "g_idx": 0,
+  "p_idx": 0,
+  "restore_enc": "/path/to/powerplan.enc.dat",
+  "force": true
+}
+```
+
+## Monitoring and Debugging
+
+### Log Files
+
+All operations generate detailed logs in the `logs/` directory:
+
+```
+logs/
+├── setup/           # Synthesis setup logs
+├── compile/         # Synthesis compile logs
+├── floorplan/       # Floorplanning logs
+├── powerplan/       # Power planning logs
+├── placement/       # Placement logs
+├── cts/            # Clock tree synthesis logs
+├── route/          # Routing logs
+└── save/           # Design save logs
+```
+
+### Status Checking
+
+```bash
+# Check if all servers are running
+netstat -tlnp | grep -E "(1333[3-9]|13440|8000)"
+
+# Check server processes
+ps aux | grep -E "(synth_setup|floorplan|placement|cts|route)"
+
+# Monitor logs in real-time
+tail -f logs/setup/des_setup_*.log
+```
+
+### Common Issues and Solutions
+
+#### 1. Port Already in Use
+```bash
+# Kill existing processes
+pkill -f "synth_setup_server.py"
+pkill -f "floorplan_server.py"
+# ... repeat for other servers
+```
+
+#### 2. EDA Tool Not Found
+```bash
+# Check tool installation
+which dc_shell
+which innovus
+
+# Set up environment variables
+export SNPSLMD_LICENSE_FILE=/path/to/synopsys/license
+export CDS_LIC_FILE=/path/to/cadence/license
+```
+
+#### 3. Library Path Issues
+```bash
+# Verify FreePDK45 library
+ls -la libraries/FreePDK45/
+
+# Check library references in scripts
+grep -r "FreePDK45" scripts/
+```
+
+## Testing
+
+### Run Example Design
+
+```bash
+# Complete flow test
+./run_pipeline.sh
+
+# Individual stage test
+python3 scripts/_helper/synthesis_config_row_no_dbg.py \
+  --design des --version-idx 0 --tech FreePDK45
+```
+
+### Test Different Designs
+
+```bash
+# Test VHDL design (b14)
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synth_setup for design=\"b14\" and return the log path."}'
+
+# Test another design (leon2)
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synth_setup for design=\"leon2\" and return the log path."}'
+```
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+### Development Setup
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
+
+### Code Style
+
+- Use Python 3.9+ features
+- Follow PEP 8 style guidelines
+- Add type hints
+- Include docstrings for all functions
+
+
+## Acknowledgments
+
+- **Synopsys** for Design Compiler
+- **Cadence** for Innovus
+- **OpenAI** for GPT-4 API
+- **FreePDK45** for open-source technology library
+- **FastAPI** for the web framework
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/AndyLu666/MCP-EDA-Server/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/AndyLu666/MCP-EDA-Server/discussions)
+- **Documentation**: [Wiki](https://github.com/AndyLu666/MCP-EDA-Server/wiki)
+
+## Version History
+
+- **v1.0.0** - Initial release with basic MCP EDA functionality
+- **v1.1.0** - Added VHDL support and improved error handling
+- **v1.2.0** - Enhanced monitoring and logging capabilities
+
+---
+
+**Made with for the EDA community**
 
