@@ -48,6 +48,7 @@ class CtsReq(BaseModel):
     tech:        str = "FreePDK45"
     impl_ver:    str
     c_idx:       int = 0
+    g_idx:       int = 0
     force:       bool = False
     restore_enc: str
     top_module:  Optional[str] = None
@@ -119,7 +120,7 @@ def cts_run(req: CtsReq):
         top = parsed or req.design
 
     env = {"BASE_DIR": str(ROOT)}
-    env.update(read_csv_row(IMP_CSV, 0))
+    env.update(read_csv_row(IMP_CSV, req.g_idx))
     env.update(read_csv_row(CTS_CSV, req.c_idx))
     env.update(MANUAL_ENV)
     env.setdefault("TOP_NAME",    top)

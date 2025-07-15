@@ -36,6 +36,8 @@ class PlReq(BaseModel):
     restore_enc: str
     force:       bool = False
     top_module:  Optional[str] = None
+    g_idx:       int = 0
+    p_idx:       int = 0
 
 class PlResp(BaseModel):
     status:     str
@@ -83,8 +85,8 @@ def place_run(req: PlReq):
     top = req.top_module
     
     env = {"BASE_DIR": str(ROOT)}
-    env.update(read_csv_row(IMP_CSV, 0))
-    env.update(read_csv_row(PLC_CSV, 0))
+    env.update(read_csv_row(IMP_CSV, req.g_idx))
+    env.update(read_csv_row(PLC_CSV, req.p_idx))
     env.setdefault("TOP_NAME",    top)
     env.setdefault("FILE_FORMAT", "verilog")
 
