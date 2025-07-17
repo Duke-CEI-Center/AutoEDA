@@ -1,0 +1,10 @@
+{
+  "method": "baseline1",
+  "case_id": "case_0",
+  "prompt": "You are an expert in EDA (Electronic Design Automation) tools, specifically Cadence Innovus.\n\nGenerate complete, executable TCL code for the floorplan step with the following requirements:\n- Design name: des\n- Top module: des3\n- Technology: FreePDK45\n- Implementation version: cpV1\n- Synthesis version: cpV1_clkP1_drcV1\n- Grid index: 0\n- Process index: 0\n\nRequirements:\n1. Create a complete floorplan TCL script for Cadence Innovus\n2. Include proper pin assignment for input/output ports\n3. Include proper save commands\n4. Use correct TCL syntax and Innovus commands\n5. The script should be ready to execute in Innovus\n\nGenerate ONLY the TCL code without any explanations or markdown formatting.",
+  "tcl_code": "# Set design and technology\nset_design des\nset_technology FreePDK45\n\n# Set implementation and synthesis versions\nset_implementation_version cpV1\nset_synthesis_version cpV1_clkP1_drcV1\n\n# Set grid and process index\nset_grid_index 0\nset_process_index 0\n\n# Create floorplan\ncreate_floorplan -name des_fp\n\n# Set top module\nset_top_module des3\n\n# Add input/output ports\nadd_ports -direction input -ports {port1 port2}\nadd_ports -direction output -ports {port3 port4}\n\n# Save floorplan\nsave_floorplan -overwrite\n\n# Exit\nexit",
+  "success": true,
+  "execution_time": 1.901068925857544,
+  "notes": "Real LLM generation without template",
+  "timestamp": "2025-07-17 13:59:14"
+}
