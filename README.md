@@ -666,7 +666,7 @@ We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) f
 
 **Made with for the EDA community**
 
-Author: Yiyi Lu, Jingyu Pan, Junyao Pan
+Author: Yiyi Lu, Jingyu Pan, Junyao Zhang
 
 Email: czluyiyi@gmail.com
 
