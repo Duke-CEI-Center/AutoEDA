@@ -111,12 +111,7 @@ def powerplan(req: PwrReq):
         top = parsed if parsed else req.design
 
     env = {"BASE_DIR": str(ROOT)}
-    # 先读取csv配置
     imp_config = read_csv_row(IMP_CSV, req.g_idx)
-    # 可读性高的赋值方式（如需单独字段可在此添加）
-    # env["target_util"] = imp_config["target_util"]
-    # ...如有需要可继续添加
-    # 最后整体update
     env.update(imp_config)
     env.setdefault("TOP_NAME", top)
     env.setdefault("FILE_FORMAT", "verilog")

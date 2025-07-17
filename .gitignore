@@ -51,6 +51,14 @@ nohup.log
 uvicorn.log
 pl_api.log
 implementation*.log
+fp_api.log
+synth_api.log
+compile_api.log
+power_api.log
+placement_api.log
+cts_api.log
+route_api.log
+save_api.log
 
 # EDA tool outputs
 *.enc
@@ -123,9 +131,83 @@ deliverables/
 -d
 =2.10
 3.
+save_temp.tcl
 
 # Cadence
 .cadence/
 
 # Python SDK (if not needed for open source)
 python-sdk/
+
+# Experiment framework
+experiment/results/
+experiment/evaluation_results/
+experiment/generate/
+experiment/evaluate/
+
+# Docker
+.env
+docker-compose.override.yml
+
+# Test outputs
+tests/__pycache__/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# MCP specific
+*.mcp
+mcp_*.log
+mcp_server.log
+
+# Configuration overrides
+config.local.tcl
+config.override.tcl
+
+# Backup files
+*.bak
+*.backup
+*.tmp
+*.temp
+
+# Jupyter notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# Documentation builds
+docs/_build/
+site/
+
+# Node.js (if any frontend components)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Archive files
+*.tar
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# Lock files (keep requirements.txt but ignore lock files)
+Pipfile.lock
+poetry.lock
+yarn.lock
+package-lock.json
+
+# Local development
+.local/
+local/
