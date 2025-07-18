@@ -6,7 +6,8 @@ from pydantic import BaseModel
 
 ROOT    = pathlib.Path(__file__).resolve().parent.parent
 RUN_SH  = ROOT / "scripts" / "run_synthesis_example.sh"
-LOG_DIR = ROOT / "logs" / "compile"
+# Use environment variable for log path, fallback to local logs directory
+LOG_DIR = pathlib.Path(os.getenv("LOG_ROOT", str(ROOT / "logs"))) / "compile"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 class CompileReq(BaseModel):
@@ -22,6 +23,8 @@ class CompileResp(BaseModel):
 
 def run_shell(cmd: str, logfile: pathlib.Path):
     """在项目根目录执行 `cmd`（bash），stdout+stderr→logfile。"""
+    # Pass current environment variables to subprocess
+    env = os.environ.copy()
     with logfile.open("w") as lf:
         proc = subprocess.Popen(
             cmd,
@@ -31,7 +34,7 @@ def run_shell(cmd: str, logfile: pathlib.Path):
             universal_newlines=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
-            env=os.environ.copy(),
+            env=env,
         )
         for line in proc.stdout:
             lf.write(line)
