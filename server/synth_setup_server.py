@@ -6,7 +6,8 @@ from pydantic import BaseModel
 
 ROOT    = pathlib.Path(__file__).resolve().parent.parent
 RUN_SH  = ROOT / "scripts" / "run_synthesis_example.sh"
-LOG_DIR = ROOT / "logs" / "setup"
+# Use environment variable for log path, fallback to local logs directory
+LOG_DIR = pathlib.Path(os.getenv("LOG_ROOT", str(ROOT / "logs"))) / "setup"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 class SetupReq(BaseModel):
@@ -21,6 +22,8 @@ class SetupResp(BaseModel):
     reports:  dict
 
 def run_shell(cmd: str, cwd: pathlib.Path, log_file: pathlib.Path):
+    # Pass current environment variables to subprocess
+    env = os.environ.copy()
     with log_file.open("w") as lf:
         p = subprocess.Popen(
             cmd,
@@ -30,6 +33,7 @@ def run_shell(cmd: str, cwd: pathlib.Path, log_file: pathlib.Path):
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             executable="/bin/bash",
+            env=env,
         )
         for line in p.stdout:
             lf.write(line)
