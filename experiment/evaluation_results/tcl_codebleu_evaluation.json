@@ -1,0 +1,472 @@
+{
+  "evaluation_info": {
+    "name": "TCL CodeBLEU Evaluation",
+    "description": "Evaluation of TCL generation quality using CodeBLEU metrics",
+    "total_cases": 1,
+    "timestamp": "2025-07-18 16:30:42",
+    "evaluation_method": "CodeBLEU with TCL support",
+    "evaluator_version": "Enhanced with TCL CodeBLEU implementation"
+  },
+  "case_results": {
+    "case_0": {
+      "case_id": "case_0",
+      "methods": {
+        "baseline1": {
+          "generation_success": true,
+          "execution_time": 2.6005775928497314,
+          "tcl_quality": {
+            "overall": "0.008",
+            "codebleu": "0.008",
+            "syntax_match": "0.000",
+            "dataflow_match": "0.000",
+            "ast_match": "0.000",
+            "ngram_match": "0.019",
+            "analysis": {
+              "command_count": 11,
+              "eda_commands": {
+                "floorplan": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "powerplan": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "placement": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "cts": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "route": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                }
+              },
+              "syntax_errors": 0,
+              "complexity": "low",
+              "total_lines": 30,
+              "comment_lines": 10,
+              "variables": [
+                "tech",
+                "process_index",
+                "design",
+                "syn_version",
+                "impl_version",
+                "grid_index",
+                "top_module"
+              ]
+            },
+            "summary": {
+              "overall_score": 0.007755494376256406,
+              "syntax_score": 0.0,
+              "dataflow_score": 0.0,
+              "total_lines": 30,
+              "code_lines": 11,
+              "comment_lines": 10,
+              "syntax_errors": 0,
+              "variable_count": 7
+            }
+          },
+          "notes": "Real LLM generation without template",
+          "timestamp": "2025-07-18 16:29:27",
+          "tool_type": "floorplan"
+        },
+        "baseline2": {
+          "generation_success": true,
+          "execution_time": 8.784027814865112,
+          "tcl_quality": {
+            "overall": "0.001",
+            "codebleu": "0.001",
+            "syntax_match": "0.000",
+            "dataflow_match": "0.000",
+            "ast_match": "0.000",
+            "ngram_match": "0.001",
+            "analysis": {
+              "command_count": 83,
+              "eda_commands": {
+                "floorplan": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "powerplan": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "placement": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "cts": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "route": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                }
+              },
+              "syntax_errors": 0,
+              "complexity": "high",
+              "total_lines": 123,
+              "comment_lines": 1,
+              "variables": []
+            },
+            "summary": {
+              "overall_score": 0.0005854897507237477,
+              "syntax_score": 0.0,
+              "dataflow_score": 0.0,
+              "total_lines": 123,
+              "code_lines": 83,
+              "comment_lines": 1,
+              "syntax_errors": 0,
+              "variable_count": 0
+            }
+          },
+          "notes": "Real LLM generation with official template",
+          "timestamp": "2025-07-18 16:29:37",
+          "tool_type": "floorplan"
+        },
+        "ours": {
+          "generation_success": true,
+          "execution_time": 33.46322846412659,
+          "tcl_quality": {
+            "overall": "0.334",
+            "codebleu": "0.334",
+            "syntax_match": "0.611",
+            "dataflow_match": "0.000",
+            "ast_match": "0.000",
+            "ngram_match": "0.191",
+            "analysis": {
+              "command_count": 44,
+              "eda_commands": {
+                "floorplan": {
+                  "found_commands": [
+                    "setDrawView",
+                    "floorPlan",
+                    "setPinAssignMode",
+                    "editPin",
+                    "planDesign",
+                    "checkFPlan",
+                    "setDesignMode"
+                  ],
+                  "command_count": 7,
+                  "completeness": 1.0
+                },
+                "powerplan": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "placement": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "cts": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                },
+                "route": {
+                  "found_commands": [],
+                  "command_count": 0,
+                  "completeness": 0.0
+                }
+              },
+              "syntax_errors": 0,
+              "complexity": "medium",
+              "total_lines": 60,
+              "comment_lines": 13,
+              "variables": [
+                "cap_tbl_file",
+                "OPENRAM_MACRO_LIB_DIR",
+                "typical_lib",
+                "openram_lib",
+                "slow_lib",
+                "fast_lib",
+                "CTE"
+              ]
+            },
+            "summary": {
+              "overall_score": 0.33435821970526325,
+              "syntax_score": 0.6111111111111112,
+              "dataflow_score": 0.0,
+              "total_lines": 60,
+              "code_lines": 44,
+              "comment_lines": 13,
+              "syntax_errors": 0,
+              "variable_count": 7
+            }
+          },
+          "notes": "MCP agent execution successful",
+          "timestamp": "2025-07-18 16:30:10",
+          "tool_type": "floorplan"
+        }
+      }
+    }
+  },
+  "statistics": {
+    "baseline1": {
+      "success_rate": 1.0,
+      "avg_codebleu": 0.008,
+      "avg_syntax": 0.0,
+      "avg_dataflow": 0.0,
+      "avg_ast": 0.0,
+      "avg_ngram": 0.019,
+      "avg_time": 2.6005775928497314,
+      "total_cases": 1,
+      "successful_cases": 1
+    },
+    "baseline2": {
+      "success_rate": 1.0,
+      "avg_codebleu": 0.001,
+      "avg_syntax": 0.0,
+      "avg_dataflow": 0.0,
+      "avg_ast": 0.0,
+      "avg_ngram": 0.001,
+      "avg_time": 8.784027814865112,
+      "total_cases": 1,
+      "successful_cases": 1
+    },
+    "ours": {
+      "success_rate": 1.0,
+      "avg_codebleu": 0.334,
+      "avg_syntax": 0.611,
+      "avg_dataflow": 0.0,
+      "avg_ast": 0.0,
+      "avg_ngram": 0.191,
+      "avg_time": 33.46322846412659,
+      "total_cases": 1,
+      "successful_cases": 1
+    }
+  },
+  "comparison": {
+    "method_rankings": {
+      "1": {
+        "method": "ours",
+        "avg_codebleu": 0.334,
+        "avg_syntax": 0.611,
+        "avg_dataflow": 0.0,
+        "success_rate": 1.0,
+        "total_cases": 1,
+        "successful_cases": 1
+      },
+      "2": {
+        "method": "baseline1",
+        "avg_codebleu": 0.008,
+        "avg_syntax": 0.0,
+        "avg_dataflow": 0.0,
+        "success_rate": 1.0,
+        "total_cases": 1,
+        "successful_cases": 1
+      },
+      "3": {
+        "method": "baseline2",
+        "avg_codebleu": 0.001,
+        "avg_syntax": 0.0,
+        "avg_dataflow": 0.0,
+        "success_rate": 1.0,
+        "total_cases": 1,
+        "successful_cases": 1
+      }
+    },
+    "quality_analysis": {
+      "baseline1": {
+        "avg_codebleu": 0.008,
+        "avg_syntax": 0.0,
+        "avg_dataflow": 0.0,
+        "success_rate": 1.0,
+        "total_cases": 1,
+        "successful_cases": 1
+      },
+      "baseline2": {
+        "avg_codebleu": 0.001,
+        "avg_syntax": 0.0,
+        "avg_dataflow": 0.0,
+        "success_rate": 1.0,
+        "total_cases": 1,
+        "successful_cases": 1
+      },
+      "ours": {
+        "avg_codebleu": 0.334,
+        "avg_syntax": 0.611,
+        "avg_dataflow": 0.0,
+        "success_rate": 1.0,
+        "total_cases": 1,
+        "successful_cases": 1
+      }
+    },
+    "insights": [
+      "Best CodeBLEU score: ours (0.334)"
+    ],
+    "codebleu_analysis": {
+      "best_codebleu": 0.334,
+      "best_method": "ours",
+      "score_distribution": {
+        "baseline1": {
+          "codebleu_range": "0.008",
+          "syntax_range": "0.000",
+          "dataflow_range": "0.000"
+        },
+        "baseline2": {
+          "codebleu_range": "0.001",
+          "syntax_range": "0.000",
+          "dataflow_range": "0.000"
+        },
+        "ours": {
+          "codebleu_range": "0.334",
+          "syntax_range": "0.611",
+          "dataflow_range": "0.000"
+        }
+      }
+    }
+  },
+  "detailed_analysis": {
+    "code_quality_insights": [
+      "Best success rate: baseline1 (100.0%)",
+      "baseline1 average CodeBLEU: 0.008",
+      "baseline2 average CodeBLEU: 0.001",
+      "ours average CodeBLEU: 0.334"
+    ],
+    "method_performance": {
+      "baseline1": {
+        "total_commands": 11,
+        "total_syntax_errors": 0,
+        "complexity_levels": {
+          "low": 1,
+          "medium": 0,
+          "high": 0
+        },
+        "eda_command_usage": {
+          "floorplan": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "powerplan": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "placement": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "cts": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "route": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          }
+        },
+        "avg_code_lines": 30.0,
+        "avg_comment_lines": 10.0
+      },
+      "baseline2": {
+        "total_commands": 83,
+        "total_syntax_errors": 0,
+        "complexity_levels": {
+          "low": 0,
+          "medium": 0,
+          "high": 1
+        },
+        "eda_command_usage": {
+          "floorplan": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "powerplan": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "placement": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "cts": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "route": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          }
+        },
+        "avg_code_lines": 123.0,
+        "avg_comment_lines": 1.0
+      },
+      "ours": {
+        "total_commands": 44,
+        "total_syntax_errors": 0,
+        "complexity_levels": {
+          "low": 0,
+          "medium": 1,
+          "high": 0
+        },
+        "eda_command_usage": {
+          "floorplan": {
+            "total_commands": 7,
+            "completeness": 1.0,
+            "found_commands": [
+              "setDrawView",
+              "floorPlan",
+              "setPinAssignMode",
+              "editPin",
+              "planDesign",
+              "checkFPlan",
+              "setDesignMode"
+            ]
+          },
+          "powerplan": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "placement": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "cts": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          },
+          "route": {
+            "total_commands": 0,
+            "completeness": 0.0,
+            "found_commands": []
+          }
+        },
+        "avg_code_lines": 60.0,
+        "avg_comment_lines": 13.0
+      }
+    },
+    "eda_command_analysis": {},
+    "syntax_analysis": {},
+    "complexity_distribution": {}
+  }
+}
