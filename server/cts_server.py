@@ -20,7 +20,8 @@ os.environ["PATH"] = (
 )
 
 ROOT    = pathlib.Path(__file__).resolve().parent.parent
-LOG_ROOT = ROOT / "logs"         
+# Use environment variable for log path, fallback to local logs directory
+LOG_ROOT = pathlib.Path(os.getenv("LOG_ROOT", str(ROOT / "logs")))
 LOG_ROOT.mkdir(exist_ok=True)
 LOG_DIR = LOG_ROOT / "cts"           
 LOG_DIR.mkdir(parents=True, exist_ok=True)
