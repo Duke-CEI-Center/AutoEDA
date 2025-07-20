@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from typing import Optional
-import subprocess, pathlib, datetime, os, csv, logging, sys, glob, gzip, argparse   
+import subprocess, pathlib, datetime, os, logging, sys, glob, gzip, argparse   
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -28,36 +28,25 @@ logging.basicConfig(
 )
 
 BACKEND  = ROOT / "scripts" / "FreePDK45" / "backend"
-IMP_CSV  = ROOT / "config" / "imp_global.csv"
-PLC_CSV  = ROOT / "config" / "placement.csv"
-
-CSV_MAP = {
-    "design_flow_effort":  "design_flow_effort",
-    "design_power_effort": "design_power_effort",
-    "ASPECT_RATIO":        "ASPECT_RATIO",
-    "target_util":         "target_util",
-}
 
 class FPReq(BaseModel):
     design:      str
     tech:        str = "FreePDK45"
     syn_ver:     str
-    g_idx:       int = 0
-    p_idx:       int = 0
     force:       bool = False
     top_module:  Optional[str] = None
-    restore_enc: Optional[str] = None  
+    restore_enc: Optional[str] = None
+    
+    # User input parameters (previously from CSV)
+    design_flow_effort:  str = "standard"  # express, standard
+    design_power_effort: str = "none"      # none, medium, high
+    ASPECT_RATIO:        float = 1.0       # die aspect ratio
+    target_util:         float = 0.7       # target utilization
 
 class FPResp(BaseModel):
     status:   str
     log_path: str
     report:   str
-
-def read_csv_row(path: pathlib.Path, idx: int):
-    rows = list(csv.DictReader(path.open()))
-    if idx >= len(rows):
-        raise IndexError(f"{path.name}: row {idx} out of range (total {len(rows)})")
-    return rows[idx]
 
 def run(cmd: str, logfile: pathlib.Path, cwd: pathlib.Path, env_extra: dict):
     env = os.environ.copy()
@@ -87,7 +76,7 @@ def floorplan_run(req: FPReq):
     if not syn_res.exists():
         return FPResp(status="error: synthesis results not found", log_path="", report="")
 
-    impl_ver = f"{req.syn_ver}__g{req.g_idx}_p{req.p_idx}"
+    impl_ver = f"{req.syn_ver}__g0_p0"  # Simplified version naming
     impl_dir = des_root / "implementation" / impl_ver
     if impl_dir.exists() and req.force:
         subprocess.run(["rm", "-rf", str(impl_dir)], check=True)
@@ -109,9 +98,12 @@ def floorplan_run(req: FPReq):
         "NETLIST_DIR": str(syn_res),
         "TOP_NAME":    top_name,
         "FILE_FORMAT": "verilog",
+        # Use user input parameters directly
+        "design_flow_effort":  req.design_flow_effort,
+        "design_power_effort": req.design_power_effort,
+        "ASPECT_RATIO":        str(req.ASPECT_RATIO),
+        "target_util":         str(req.target_util),
     }
-    env.update({CSV_MAP[k]: v for k, v in read_csv_row(IMP_CSV, req.g_idx).items() if k in CSV_MAP})
-    env.update({CSV_MAP[k]: v for k, v in read_csv_row(PLC_CSV, req.p_idx).items() if k in CSV_MAP})
 
     design_config = ROOT / "designs" / req.design / "config.tcl"
     local_config  = impl_dir / "config.tcl"
