@@ -2,7 +2,7 @@
 
 
 from typing import Optional, Dict
-import subprocess, pathlib, datetime, os, logging, sys, csv, argparse
+import subprocess, pathlib, datetime, os, logging, sys, argparse
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -26,9 +26,6 @@ logging.basicConfig(
 )
 
 BACKEND_DIR_TMPL = ROOT / "scripts" / "{tech}" / "backend"
-IMP_CSV = ROOT / "config" / "imp_global.csv"
-PLC_CSV = ROOT / "config" / "placement.csv"
-CTS_CSV = ROOT / "config" / "cts.csv"
 
 ROUTE_RPTS = [
     "route_summary.rpt",
@@ -42,12 +39,35 @@ class RtReq(BaseModel):
     design:      str
     tech:        str = "FreePDK45"
     impl_ver:    str
-    g_idx:       int = 0
-    p_idx:       int = 0
-    c_idx:       int = 0
     restore_enc: str
     force:       bool = False
     top_module:  Optional[str] = None
+    
+    # User input parameters (previously from CSV)
+    # Global parameters (from imp_global.csv)
+    design_flow_effort:  str = "standard"  # express, standard
+    design_power_effort: str = "none"      # none, medium, high
+    target_util:         float = 0.7       # target utilization
+    
+    # Placement parameters (from placement.csv)
+    place_global_timing_effort:      str = "medium"   # low, medium, high
+    place_global_cong_effort:        str = "medium"   # low, medium, high
+    place_detail_wire_length_opt_effort: str = "medium"  # low, medium, high
+    place_global_max_density:        float = 0.9      # max density
+    place_activity_power_driven:     bool = False     # power driven placement
+    prects_opt_max_density:          float = 0.8      # pre-CTS optimization density
+    prects_opt_power_effort:         str = "low"      # none, low, medium, high
+    prects_opt_reclaim_area:         bool = False     # reclaim area during optimization
+    prects_fix_fanout_load:          bool = False     # fix fanout load violations
+    
+    # CTS parameters (from cts.csv)
+    cts_cell_density:              float = 0.5      # CTS cell density
+    cts_clock_gate_buffering_location: str = "below"  # below, above
+    cts_clone_clock_gates:         bool = True      # clone clock gates
+    postcts_opt_max_density:       float = 0.8      # post-CTS optimization density
+    postcts_opt_power_effort:      str = "low"      # none, low, medium, high
+    postcts_opt_reclaim_area:      bool = False     # reclaim area during optimization
+    postcts_fix_fanout_load:       bool = False     # fix fanout load violations
 
 class RtResp(BaseModel):
     status:    str
@@ -60,11 +80,13 @@ def safe_unlink(path: pathlib.Path):
     except FileNotFoundError:
         pass
 
-def read_csv_row(path: pathlib.Path, idx: int) -> dict:
-    rows = list(csv.DictReader(path.open()))
-    if idx >= len(rows):
-        raise IndexError("%s row %d OOR" % (path.name, idx))
-    return rows[idx]
+def parse_top_from_config(cfg: pathlib.Path) -> str:
+    if not cfg.exists():
+        return ""
+    for line in cfg.read_text().splitlines():
+        if line.startswith("set TOP_NAME"):
+            return line.split('"')[1]
+    return ""
 
 def run(cmd: str, log_file: pathlib.Path, cwd: pathlib.Path, env_extra: dict):
     env = os.environ.copy(); env.update(env_extra)
@@ -99,10 +121,34 @@ def route_run(req: RtReq):
 
     top = req.top_module or parse_top_from_config(des_root.parent / "config.tcl") or req.design
 
+    # Set environment variables from user input parameters (replacing CSV reading)
     env = {"BASE_DIR": str(ROOT), "TOP_NAME": top, "FILE_FORMAT": "verilog"}
-    env.update(read_csv_row(IMP_CSV, req.g_idx))
-    env.update(read_csv_row(PLC_CSV, req.p_idx))
-    env.update(read_csv_row(CTS_CSV, req.c_idx))
+    
+    # Global parameters (mimicking the original CSV structure)
+    env["version"] = "custom"  # Add version for compatibility
+    env["design_flow_effort"] = req.design_flow_effort
+    env["design_power_effort"] = req.design_power_effort
+    env["target_util"] = str(req.target_util)
+    
+    # Placement parameters (mimicking the original CSV structure)
+    env["place_global_timing_effort"] = req.place_global_timing_effort
+    env["place_global_cong_effort"] = req.place_global_cong_effort
+    env["place_detail_wire_length_opt_effort"] = req.place_detail_wire_length_opt_effort
+    env["place_global_max_density"] = str(req.place_global_max_density)
+    env["place_activity_power_driven"] = str(req.place_activity_power_driven).lower()
+    env["prects_opt_max_density"] = str(req.prects_opt_max_density)
+    env["prects_opt_power_effort"] = req.prects_opt_power_effort
+    env["prects_opt_reclaim_area"] = str(req.prects_opt_reclaim_area).lower()
+    env["prects_fix_fanout_load"] = str(req.prects_fix_fanout_load).lower()
+    
+    # CTS parameters (mimicking the original CSV structure)
+    env["cts_cell_density"] = str(req.cts_cell_density)
+    env["cts_clock_gate_buffering_location"] = req.cts_clock_gate_buffering_location
+    env["cts_clone_clock_gates"] = str(req.cts_clone_clock_gates).lower()
+    env["postcts_opt_max_density"] = str(req.postcts_opt_max_density)
+    env["postcts_opt_power_effort"] = req.postcts_opt_power_effort
+    env["postcts_opt_reclaim_area"] = str(req.postcts_opt_reclaim_area).lower()
+    env["postcts_fix_fanout_load"] = str(req.postcts_fix_fanout_load).lower()
 
     backend_dir = pathlib.Path(str(BACKEND_DIR_TMPL).format(tech=req.tech))
     route_tcl   = backend_dir / "7_route.tcl"
