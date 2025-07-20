@@ -9,7 +9,6 @@ import logging
 import sys
 import gzip
 import glob
-import csv
 import argparse                    
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -37,7 +36,6 @@ logging.basicConfig(
 )
 
 BACKEND = ROOT / "scripts" / "FreePDK45" / "backend"
-IMP_CSV = ROOT / "config" / "imp_global.csv"
 
 class PwrReq(BaseModel):
     design:      str
@@ -46,18 +44,17 @@ class PwrReq(BaseModel):
     restore_enc: str      
     force:       bool = False
     top_module:  Optional[str] = None
-    g_idx:      int = 0
+    
+    # User input parameters (previously from CSV)
+    # Global parameters (from imp_global.csv)
+    design_flow_effort:  str = "standard"  # express, standard
+    design_power_effort: str = "none"      # none, medium, high
+    target_util:         float = 0.7       # target utilization
 
 class PwrResp(BaseModel):
     status:    str
     log_path:  str
     report:    str
-
-def read_csv_row(path: pathlib.Path, idx: int) -> dict:
-    rows = list(csv.DictReader(path.open()))
-    if idx >= len(rows):
-        raise IndexError(f"{path.name}: row {idx} out of range (total {len(rows)})")
-    return rows[idx]
 
 def parse_top_from_config(cfg: pathlib.Path) -> str:
     if not cfg.exists():
@@ -111,9 +108,15 @@ def powerplan(req: PwrReq):
         parsed = parse_top_from_config(cfg_path)
         top = parsed if parsed else req.design
 
+    # Set environment variables from user input parameters (replacing CSV reading)
     env = {"BASE_DIR": str(ROOT)}
-    imp_config = read_csv_row(IMP_CSV, req.g_idx)
-    env.update(imp_config)
+    
+    # Global parameters (mimicking the original CSV structure)
+    env["version"] = "custom"  # Add version for compatibility
+    env["design_flow_effort"] = req.design_flow_effort
+    env["design_power_effort"] = req.design_power_effort
+    env["target_util"] = str(req.target_util)
+    
     env.setdefault("TOP_NAME", top)
     env.setdefault("FILE_FORMAT", "verilog")
 
