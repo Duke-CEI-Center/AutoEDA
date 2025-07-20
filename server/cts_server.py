@@ -9,7 +9,6 @@ import logging
 import sys
 import glob
 import gzip
-import csv
 import argparse                        
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -36,8 +35,6 @@ logging.basicConfig(
 )
 
 BACKEND = ROOT / "scripts" / "FreePDK45" / "backend"
-IMP_CSV = ROOT / "config" / "imp_global.csv"
-CTS_CSV = ROOT / "config" / "cts.csv"
 
 MANUAL_ENV = {
     "CLKBUF_CELLS": "CLKBUF_X1 CLKBUF_X2 CLKBUF_X3 CLKBUF_X4 CLKBUF_X8",
@@ -48,22 +45,29 @@ class CtsReq(BaseModel):
     design:      str
     tech:        str = "FreePDK45"
     impl_ver:    str
-    c_idx:       int = 0
-    g_idx:       int = 0
     force:       bool = False
     restore_enc: str
     top_module:  Optional[str] = None
+    
+    # User input parameters (previously from CSV)
+    # Global parameters (from imp_global.csv)
+    design_flow_effort:  str = "standard"  # express, standard
+    design_power_effort: str = "none"      # none, medium, high
+    target_util:         float = 0.7       # target utilization
+    
+    # CTS parameters (from cts.csv)
+    cts_cell_density:              float = 0.5      # CTS cell density
+    cts_clock_gate_buffering_location: str = "below"  # below, above
+    cts_clone_clock_gates:         bool = True      # clone clock gates
+    postcts_opt_max_density:       float = 0.8      # post-CTS optimization density
+    postcts_opt_power_effort:      str = "low"      # none, low, medium, high
+    postcts_opt_reclaim_area:      bool = False     # reclaim area during optimization
+    postcts_fix_fanout_load:       bool = False     # fix fanout load violations
 
 class CtsResp(BaseModel):
     status:    str
     log_path:  str
     report:    str
-
-def read_csv_row(path: pathlib.Path, idx: int) -> dict:
-    rows = list(csv.DictReader(path.open()))
-    if idx >= len(rows):
-        raise IndexError(f"{path.name}: row {idx} out of range")
-    return rows[idx]
 
 def parse_top_from_config(cfg: pathlib.Path) -> str:
     if not cfg.exists():
@@ -120,11 +124,26 @@ def cts_run(req: CtsReq):
         parsed = parse_top_from_config(cfg_path)
         top = parsed or req.design
 
+    # Set environment variables from user input parameters (replacing CSV reading)
     env = {"BASE_DIR": str(ROOT)}
-    env.update(read_csv_row(IMP_CSV, req.g_idx))
-    env.update(read_csv_row(CTS_CSV, req.c_idx))
+    
+    # Global parameters (mimicking the original CSV structure)
+    env["version"] = "custom"  # Add version for compatibility
+    env["design_flow_effort"] = req.design_flow_effort
+    env["design_power_effort"] = req.design_power_effort
+    env["target_util"] = str(req.target_util)
+    
+    # CTS parameters (mimicking the original CSV structure)
+    env["cts_cell_density"] = str(req.cts_cell_density)
+    env["cts_clock_gate_buffering_location"] = req.cts_clock_gate_buffering_location
+    env["cts_clone_clock_gates"] = str(req.cts_clone_clock_gates).lower()
+    env["postcts_opt_max_density"] = str(req.postcts_opt_max_density)
+    env["postcts_opt_power_effort"] = req.postcts_opt_power_effort
+    env["postcts_opt_reclaim_area"] = str(req.postcts_opt_reclaim_area).lower()
+    env["postcts_fix_fanout_load"] = str(req.postcts_fix_fanout_load).lower()
+    
     env.update(MANUAL_ENV)
-    env.setdefault("TOP_NAME",    top)
+    env.setdefault("TOP_NAME", top)
     env.setdefault("FILE_FORMAT", "verilog")
 
     cts_tcl    = BACKEND / "5_cts.tcl"
@@ -142,7 +161,7 @@ def cts_run(req: CtsReq):
     )
 
     ts       = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = ROOT / "logs" / "cts" / f"{req.design}_cts_{ts}.log"
+    log_file = LOG_DIR / f"{req.design}_cts_{ts}.log"
 
     try:
         run(innovus_cmd, log_file, impl_dir, env)
