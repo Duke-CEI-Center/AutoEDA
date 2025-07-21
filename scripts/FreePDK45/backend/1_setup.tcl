@@ -1,3 +1,9 @@
+#------------------------------------------------------------------------------
+# Save the parameters trasferred from the server
+#------------------------------------------------------------------------------
+set FLOW_EFFORT {{flowEffort}}
+set POWER_EFFORT {{powerEffort}}
+
 #-------------------------------------------------------------------------------
 # Setting Design name and effort level for various stages
 #-------------------------------------------------------------------------------
@@ -68,7 +74,7 @@ set init_pwr_net {VDD}
 set init_gnd_net {VSS}
 
 init_design -setup worst -hold best
-setDesignMode -flowEffort $env(design_flow_effort) -powerEffort $env(design_power_effort) -process 45
+setDesignMode -flowEffort $FLOW_EFFORT -powerEffort $POWER_EFFORT -process 45
 
 report_analysis_views > pnr_reports/analysis_views.rpt
 

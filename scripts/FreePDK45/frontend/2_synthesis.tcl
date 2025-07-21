@@ -1,4 +1,20 @@
 #------------------------------------------------------------------------------
+# Save the parameters trasferred from the server
+#------------------------------------------------------------------------------
+set PERIOD {{period}}
+set FANOUT_LIMIT {{fanout_limit}}
+set TRANSITION_LIMIT {{transition_limit}}
+set CAPACITANCE_LIMIT {{capacitance_limit}}     
+set HIGH_FANOUT_NET_THRESHOLD {{high_fanout_net_threshold}}
+set HIGH_FANOUT_NET_PIN_CAPACITANCE {{high_fanout_net_pin_capacitance}}
+set COMPILE_CMD {{compile_cmd}}
+set POWER_EFFORT {{power_effort}}
+set AREA_EFFORT {{area_effort}}   
+set MAP_EFFORT {{map_effort}}
+set DYNAMIC_OPTIMIZATION {{dynamic_optimization}}
+set LEAKAGE_OPTIMIZATION {{leakage_optimization}}
+
+#------------------------------------------------------------------------------
 # Setup the libraries
 #------------------------------------------------------------------------------
 
@@ -77,7 +93,7 @@ link
 # Source clocks
 # -----------------------------------------------------------------------------
 
-create_clock -name $CLOCK_NAME -period $env(clk_period) [get_ports $CLOCK_NAME ]
+create_clock -name $CLOCK_NAME -period $PERIOD [get_ports $CLOCK_NAME ]
 
 # -----------------------------------------------------------------------------
 # Generated clocks
@@ -86,7 +102,7 @@ create_clock -name $CLOCK_NAME -period $env(clk_period) [get_ports $CLOCK_NAME ]
 ## Create clock startpoints in DC to enable hierarchy reporting by clock group
 if {[info exists EXTRA_CLOCK_NAMES]} {
     foreach clk_ $EXTRA_CLOCK_NAMES {
-        create_clock -name $clk_ -period $env(clk_period) [get_ports $clk_]
+        create_clock -name $clk_ -period $PERIOD [get_ports $clk_]
     }
 }
 
@@ -105,23 +121,23 @@ check_timing > ${REPORTS_DIR}/check_timing.rpt
 #------------------------------------------------------------------------------
 
 
-set_max_fanout      {{ fanout limit }}         $TOP_NAME
-set_max_transition  {{ transition limit }}     $TOP_NAME
-set_max_capacitance $env(DRC_max_capacitance)    $TOP_NAME
-set high_fanout_net_threshold $env(DRC_high_fanout_net_threshold)
-set high_fanout_net_pin_capacitance $env(DRC_high_fanout_pin_capacitance)
+set_max_fanout      $FANOUT_LIMIT         $TOP_NAME
+set_max_transition  $TRANSITION_LIMIT     $TOP_NAME
+set_max_capacitance $CAPACITANCE_LIMIT    $TOP_NAME
+set high_fanout_net_threshold $HIGH_FANOUT_NET_THRESHOLD
+set high_fanout_net_pin_capacitance $HIGH_FANOUT_NET_PIN_CAPACITANCE
 
 #-----------------------------------------------------------------------------
 # Compile the design
 #-----------------------------------------------------------------------------
 
 
-set_dynamic_optimization $env(set_dyn_opt)
-set_leakage_optimization $env(set_lea_opt)
+set_dynamic_optimization $DYNAMIC_OPTIMIZATION
+set_leakage_optimization $LEAKAGE_OPTIMIZATION
 
 set compile_cmd ""
-if {$env(compile_cmd) eq "compile"} {
-    set compile_cmd "compile -map_effort $env(map_effort) -power_effort $env(power_effort) -area_effort $env(area_effort)"
+if {$COMPILE_CMD eq "compile"} {
+    set compile_cmd "compile -map_effort $MAP_EFFORT -power_effort $POWER_EFFORT -area_effort $AREA_EFFORT"
 } else {
     set compile_cmd "compile_ultra"
 }

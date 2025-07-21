@@ -1,3 +1,17 @@
+#------------------------------------------------------------------------------
+# Save the parameters trasferred from the server
+#------------------------------------------------------------------------------
+set PLACE_GLOBAL_TIMING_EFFORT {{place_global_timing_effort}}
+set PLACE_GLOBAL_CONG_EFFORT {{place_global_cong_effort}}
+set PLACE_DETAIL_WIRE_LENGTH_OPT_EFFORT {{place_detail_wire_length_opt_effort}}
+set PLACE_GLOBAL_MAX_DENSITY {{place_global_max_density}}
+set ACTIVITY_POWER_DRIVEN {{activity_power_driven}}
+set MAX_DENSITY {{maxDensity}}
+set POWER_EFFORT {{powerEffort}}
+set RECLAIM_AREA {{reclaimArea}}
+set FIX_FANOUT_LOAD {{fixFanoutLoad}}
+
+
 #-------------------------------------------------------------------------------
 # Placement
 #-------------------------------------------------------------------------------
@@ -19,11 +33,11 @@ proc do_power_analysis {report_folder} {
 
 set check_place_out pnr_reports/check_place.out
 
-setPlaceMode -place_global_timing_effort $env(place_global_timing_effort) \
-    -place_global_cong_effort $env(place_global_cong_effort) \
-    -place_detail_wire_length_opt_effort $env(place_detail_wire_length_opt_effort) \
-    -place_global_max_density $env(place_global_max_density) \
-    -activity_power_driven $env(place_activity_power_driven)
+setPlaceMode -place_global_timing_effort $PLACE_GLOBAL_TIMING_EFFORT \
+    -place_global_cong_effort $PLACE_GLOBAL_CONG_EFFORT \
+    -place_detail_wire_length_opt_effort $PLACE_DETAIL_WIRE_LENGTH_OPT_EFFORT \
+    -place_global_max_density $PLACE_GLOBAL_MAX_DENSITY \
+    -activity_power_driven $ACTIVITY_POWER_DRIVEN
 placeDesign
 refinePlace
 #place_opt_design -incremental
@@ -40,10 +54,10 @@ checkPlace $check_place_out
 # Pre-CTS timing optimization
 #-------------------------------------------------------------------------------
 
-setOptMode -maxDensity $env(prects_opt_max_density) \
-    -powerEffort $env(prects_opt_power_effort) \
-    -reclaimArea $env(prects_opt_reclaim_area) \
-    -fixFanoutLoad $env(prects_fix_fanout_load)
+setOptMode -maxDensity $MAX_DENSITY \
+    -powerEffort $POWER_EFFORT \
+    -reclaimArea $RECLAIM_AREA \
+    -fixFanoutLoad $FIX_FANOUT_LOAD
 optDesign -preCTS -outDir pnr_reports/place_opt
 # set _REPORTS_PATH $REPORTS_PATH
 report_timing -max_paths 100 > pnr_reports/place_opt_timing.rpt.gz

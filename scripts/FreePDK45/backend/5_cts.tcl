@@ -1,3 +1,14 @@
+#------------------------------------------------------------------------------
+# Save the parameters trasferred from the server
+#------------------------------------------------------------------------------
+set CELL_DENSITY {{cell_density}}
+set CLOCK_GATE_BUFFERING_LOCATION {{clock_gate_buffering_location}}
+set CLONE_CLOCK_GATES {{clone_clock_gates}}
+set MAX_DENSITY {{maxDensity}}
+set POWER_EFFORT {{powerEffort}}
+set RECLAIM_AREA {{reclaim_area}}
+set FIX_FANOUT_LOAD {{fixFanoutLoad}}
+
 #-------------------------------------------------------------------------------
 # Clock tree synthesis
 #-------------------------------------------------------------------------------
@@ -8,9 +19,9 @@ set_ccopt_property buffer_cells $env(CLKBUF_CELLS)
 set_ccopt_property clock_gating_cells $env(CLKGT_CELLS)
 # set_ccopt_property inverter_cells $INV_CELLS
 
-set_ccopt_property cell_density $env(cts_cell_density)
-set_ccopt_property clock_gate_buffering_location $env(cts_clock_gate_buffering_location)
-set_ccopt_property clone_clock_gates $env(cts_clone_clock_gates)
+set_ccopt_property cell_density $CELL_DENSITY
+set_ccopt_property clock_gate_buffering_location $CLOCK_GATE_BUFFERING_LOCATION
+set_ccopt_property clone_clock_gates $CLONE_CLOCK_GATES
 
 setNanoRouteMode -routeWithTimingDriven false -routeDesignFixClockNets true
 # set_ccopt_mode -cts_opt_type cluster
@@ -21,10 +32,10 @@ timeDesign -postCTS -outDir pnr_reports/cts_time
 #-------------------------------------------------------------------------------
 # Post-CTS timing optimization
 #-------------------------------------------------------------------------------
-setOptMode -maxDensity $env(postcts_opt_max_density) \
-    -powerEffort $env(postcts_opt_power_effort) \
-    -reclaimArea $env(postcts_opt_reclaim_area) \
-    -fixFanoutLoad $env(postcts_fix_fanout_load)
+setOptMode -maxDensity $MAX_DENSITY \
+    -powerEffort $POWER_EFFORT \
+    -reclaimArea $RECLAIM_AREA \
+    -fixFanoutLoad $FIX_FANOUT_LOAD
 optDesign -postCTS -outDir pnr_reports/cts_opt
 
 set inp   [all_inputs -no_clocks]

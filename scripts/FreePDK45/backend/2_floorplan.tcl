@@ -1,9 +1,14 @@
+#------------------------------------------------------------------------------
+# Save the parameters trasferred from the server
+#------------------------------------------------------------------------------
+set ROW_DENSITY {{rowDensity}}
+
+#------------------------------------------------------------------------------
 # Floorplan parameters
 set ASPECT_RATIO 1
-set TARGET_UTIL $env(target_util)
 
 setDrawView fplan
-floorPlan -site FreePDK45_38x28_10R_NP_162NW_34O -r ${ASPECT_RATIO} ${TARGET_UTIL}
+floorPlan -site FreePDK45_38x28_10R_NP_162NW_34O -r ${ASPECT_RATIO} ${ROW_DENSITY}
 
 
 #pinAlignment -newLayer M6 \
