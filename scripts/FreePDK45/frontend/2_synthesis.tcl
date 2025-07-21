@@ -105,8 +105,8 @@ check_timing > ${REPORTS_DIR}/check_timing.rpt
 #------------------------------------------------------------------------------
 
 
-set_max_fanout      $env(DRC_max_fanout)         $TOP_NAME
-set_max_transition  $env(DRC_max_transition)     $TOP_NAME
+set_max_fanout      {{ fanout limit }}         $TOP_NAME
+set_max_transition  {{ transition limit }}     $TOP_NAME
 set_max_capacitance $env(DRC_max_capacitance)    $TOP_NAME
 set high_fanout_net_threshold $env(DRC_high_fanout_net_threshold)
 set high_fanout_net_pin_capacitance $env(DRC_high_fanout_pin_capacitance)
