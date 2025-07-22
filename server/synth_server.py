@@ -5,6 +5,11 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import pandas as pd
 import re
+from jinja2 import Template
+
+# Load environment variables from the .env file
+from dotenv import load_dotenv
+load_dotenv()
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LOG_DIR = pathlib.Path(os.getenv("LOG_ROOT", str(ROOT / "logs"))) / "synthesis"
@@ -15,10 +20,42 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 # ============================================================================
 
 class SynthReq(BaseModel):
+    version_idx: int = 0 ## Temporary, will be removed later
     design: str
     tech: str = "FreePDK45"
-    version_idx: int = 0
+    top_name: str = "" 
+    period: float = 1.0 
+    fanout_limit: int = 10  
+    transition_limit: float = 0.2 
+    capacitance_limit: float = 4.5
+    high_fanout_net_threshold: int = 64
+    high_fanout_net_pin_capacitance: float = 0.15
+    compile_cmd: str = "compile_ultra"
+    power_effort: str = "medium"
+    area_effort: str = "high"
+    map_effort: str = "medium"
+    dynamic_optimization: bool = True
+    leakage_optimization: bool = False
     force: bool = False
+
+# params = {
+#         "design": req.design,
+#         "tech": req.tech,
+#         "TOP_NAME": top_name,
+#         "period": getattr(req, 'period', 1.0),  # Default to 1.0 if not provided
+#         "fanout_limit": getattr(req, 'fanout_limit', 10),  
+#         "transition_limit": getattr(req, 'transition_limit', 0.2),
+#         "capacitance_limit": getattr(req, 'capacitance_limit', 4.5),
+#         "high_fanout_net_threshold": getattr(req, 'high_fanout_net_threshold', 64),
+#         "high_fanout_net_pin_capacitance": getattr(req, 'high_fanout_net_pin_capacitance', 0.15),
+#         "compile_cmd": getattr(req, 'compile_cmd', "compile_ultra"),
+#         "power_effort": getattr(req, 'power_effort', "medium"),
+#         "area_effort": getattr(req, 'area_effort', "high"),
+#         "map_effort": getattr(req, 'map_effort', "medium"),
+#         "dynamic_optimization": getattr(req, 'dynamic_optimization', True),
+#         "leakage_optimization": getattr(req, 'leakage_optimization', False),
+#         "datetime": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+#     }
 
 class SynthResp(BaseModel):
     status: str
@@ -47,60 +84,18 @@ def parse_top_from_config(config_path: pathlib.Path) -> str:
 def generate_setup_tcl(req: SynthReq, result_dir: pathlib.Path) -> pathlib.Path:
     """Generate synthesis setup TCL script from configuration"""
     
-    # Read synthesis configuration
-    config_path = ROOT / "config" / "synthesis.csv"
-    config_pd = pd.read_csv(config_path, index_col='version')
-    
-    # Get parameters for this version
-    syn_version = config_pd.index[req.version_idx]
-    
-    # Extract all environment variables from config
-    env_vars = {}
-    for col in config_pd.columns:
-        env_vars[col] = str(config_pd.iloc[req.version_idx][col])
-    
-    # Create the setup TCL content
-    tcl_content = f"""#===============================================================================
-# Generated Synthesis Setup TCL Script
-# Design: {req.design}
-# Tech: {req.tech}
-# Version: {syn_version}
-# Generated at: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-#===============================================================================
+    # Parse TOP_NAME from config.tcl
+    design_config = ROOT / "designs" / req.design / "config.tcl"
+    req.top_name = parse_top_from_config(design_config) or req.design
 
-# Set synthesis environment variables
-"""
-    
-    # Add all environment variables from config
-    for var_name, var_value in env_vars.items():
-        tcl_content += f"set env({var_name}) \"{var_value}\"\n"
-    
-    tcl_content += f"""
-# Set design variables
-set env(design) "{req.design}"
-set env(tech) "{req.tech}"
-set env(syn_version) "{syn_version}"
-set env(BASE_DIR) "{ROOT}"
+    # Load the synthesis setup template
+    template_path = ROOT / "scripts" / "FreePDK45" / "frontend" / "1_setup.tcl"
+    if not template_path.exists():
+        raise FileNotFoundError(f"Synthesis setup template not found: {template_path}")
+    tcl_template = template_path.read_text()
 
-# Create synthesis directory structure
-set synthesis_dir "designs/{req.design}/{req.tech}/synthesis/{syn_version}"
-
-# Create directories
-file mkdir $synthesis_dir
-file mkdir $synthesis_dir/results
-file mkdir $synthesis_dir/reports
-file mkdir $synthesis_dir/logs
-file mkdir $synthesis_dir/data
-file mkdir $synthesis_dir/WORK
-
-puts "Synthesis setup completed successfully"
-puts "Created synthesis directory: $synthesis_dir"
-puts "Environment variables configured for version: {syn_version}"
-
-exec touch _Finished_
-
-exit
-"""
+    # Render the template
+    tcl_content = Template(tcl_template).render(**vars(req))
     
     tcl_path = result_dir / "setup.tcl"
     tcl_path.write_text(tcl_content)
@@ -135,7 +130,34 @@ def execute_setup_phase(req: SynthReq, log_file: pathlib.Path, result_dir: pathl
             process.wait()
 
         if process.returncode != 0:
-            return False, f"error: setup executor failed with code {process.returncode}", setup_tcl_path
+            print(f"Conda failed: trying with venv...")
+
+            # Fallback to using venv if Conda fails    # temporary !!!!
+            # Command using venv
+            venv_path = "venv"  
+            cmd_venv = [
+                "bash", "-c",
+                f"source {venv_path}/bin/activate && python {executor_path} -mode setup -design {req.design} -technode {req.tech} -tcl {setup_tcl_path} -version_idx {req.version_idx}" + (" -force" if req.force else "")
+            ]
+            
+            with log_file.open("w") as lf:
+                lf.write("=== Synthesis Setup Phase ===\n")
+                lf.write(f"Command: {' '.join(cmd_venv)}\n\n")
+
+                # Execute the setup using venv        
+                process_venv = subprocess.Popen(
+                    cmd_venv,
+                    cwd=str(ROOT),
+                    stdout=lf,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True
+                )
+                process_venv.wait()
+
+            if process_venv.returncode != 0:
+                return False, f"error: setup executor failed with code {process_venv.returncode}", setup_tcl_path
+            
+            # return False, f"error: setup executor failed with code {process.returncode}", setup_tcl_path 
 
         # Check for setup results (from original logic)
         synth_root = ROOT / "designs" / req.design / req.tech / "synthesis"
@@ -162,72 +184,18 @@ def execute_setup_phase(req: SynthReq, log_file: pathlib.Path, result_dir: pathl
 def generate_compile_tcl(req: SynthReq, result_dir: pathlib.Path, synthesis_dir: pathlib.Path) -> pathlib.Path:
     """Generate synthesis compile TCL script from templates"""
     
-    # Read synthesis configuration
-    config_path = ROOT / "config" / "synthesis.csv"
-    config_pd = pd.read_csv(config_path, index_col='version')
-    
-    # Get parameters for this version
-    syn_version = config_pd.index[req.version_idx]
-    config_row = config_pd.iloc[req.version_idx]
-    
     # Parse TOP_NAME from config.tcl
     design_config = ROOT / "designs" / req.design / "config.tcl"
-    top_name = parse_top_from_config(design_config) or req.design
-    
-    # Read the synthesis template
-    with open(f"{ROOT}/scripts/{req.tech}/frontend/2_synthesis.tcl", "r") as f:
-        synthesis_content = f.read()
-    
-    # Create the compile TCL content
-    tcl_content = f"""#===============================================================================
-# Generated Synthesis Compile TCL Script
-# Design: {req.design}
-# Tech: {req.tech}
-# Version: {syn_version}
-# Generated at: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-#===============================================================================
+    req.top_name = parse_top_from_config(design_config) or req.design
 
-# Set synthesis environment variables
-"""
-    
-    # Add all environment variables from config
-    for var_name, var_value in config_row.items():
-        tcl_content += f"set env({var_name}) \"{var_value}\"\n"
-    
-    tcl_content += f"""
-# Set design variables
-set TOP_NAME \"{top_name}\"
-set FILE_FORMAT \"verilog\"
-set CLOCK_NAME \"clk\"
-set RTL_DIR \"../../../rtl\"
+    # Load the synthesis setup template
+    template_path = ROOT / "scripts" / "FreePDK45" / "frontend" / "2_synthesis.tcl"
+    if not template_path.exists():
+        raise FileNotFoundError(f"Synthesis setup template not found: {template_path}")
+    tcl_template = template_path.read_text()
 
-# Set directory paths
-set REPORTS_DIR \"reports\"
-set RESULTS_DIR \"results\"
-
-# Set output file names
-set FINAL_VERILOG_OUTPUT_FILE \"{top_name}.v\"
-set FINAL_SDC_OUTPUT_FILE \"{top_name}.sdc\"
-set FINAL_PARSITICS_OUTPUT_FILE \"{top_name}.spef\"
-
-# Set base directory
-set env(BASE_DIR) \"{ROOT}\"
-
-# Create output directories
-file mkdir $REPORTS_DIR
-file mkdir $RESULTS_DIR
-file mkdir data
-file mkdir WORK
-
-# Source design and tech configuration
-source config.tcl
-source tech.tcl
-
-# Synthesis content
-{synthesis_content}
-
-puts \"Synthesis compilation completed successfully\"
-"""
+    # Render the template
+    tcl_content = Template(tcl_template).render(**vars(req))
     
     tcl_path = result_dir / "compile.tcl"
     tcl_path.write_text(tcl_content)
@@ -276,7 +244,34 @@ def execute_compile_phase(req: SynthReq, log_file: pathlib.Path, result_dir: pat
             process.wait()
 
         if process.returncode != 0:
-            return False, f"error: compile executor failed with code {process.returncode}", compile_tcl_path, {}
+            print(f"Conda failed: trying with venv...")
+
+            # Fallback to using venv if Conda fails    # temporary !!!!
+            # Command using venv
+            venv_path = "venv"  
+            cmd_venv = [
+                "bash", "-c",
+                f"source {venv_path}/bin/activate && python {executor_path} -mode compile -design {req.design} -technode {req.tech} -tcl {compile_tcl_path} -synthesis_dir {synthesis_dir} -version_idx {req.version_idx}" + (" -force" if req.force else "")
+            ]
+            
+            # Execute the compilation using executor
+            with log_file.open("a") as lf:
+                lf.write("\n=== Synthesis Compile Phase ===\n")
+                lf.write(f"Command: {' '.join(cmd_venv)}\n\n")
+                
+                process_venv = subprocess.Popen(
+                    cmd_venv,
+                    cwd=str(ROOT),
+                    stdout=lf,
+                    stderr=subprocess.STDOUT,
+                    universal_newlines=True
+                )
+                process_venv.wait()
+
+            if process_venv.returncode != 0:
+                return False, f"error: compile executor failed with code {process.returncode}", compile_tcl_path, {}
+            
+            # return False, f"error: compile executor failed with code {process.returncode}", compile_tcl_path, {}
 
         # Collect synthesis reports (from original compile server logic)
         reports_dir = synthesis_dir / "reports"
