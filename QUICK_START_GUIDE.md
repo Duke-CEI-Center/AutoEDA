@@ -19,10 +19,25 @@ Before starting, ensure you have the following installed:
 # Clone the repository
 git clone https://github.com/AndyLu666/MCP-EDA-Server.git
 cd MCP-EDA-Server
+```
 
+If you are using python virtual environment:  
+
+```bash
 # Create and activate virtual environment
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install -r requirements.txt
+```
+
+If you are using conda environment:  
+
+```bash
+# Create and activate conda environment
+conda create -n your_env_name python=3.11
+conda activate your_env_name
 
 # Install dependencies
 pip install -r requirements.txt
@@ -58,9 +73,11 @@ ls libraries/FreePDK45/
 ### 2.1 Start MCP Agent Client (HTTP API)
 
 ```bash
-# Terminal 1: Start the main agent client
-conda activate eda310  # or your conda environment
-uvicorn mcp_agent_client:app --reload --host 0.0.0.0 --port 8000
+# Terminal 1: Start the main agent
+# Activate virtual environment or conda environment
+source venv/bin/activate  # On Windows: venv\Scripts\activate  
+                          # or "conda activate your_env_name"  
+uvicorn mcp_agent_client:app --reload --host 0.0.0.0 --port 8000  
 ```
 
 ### 2.2 Start MCP Servers
