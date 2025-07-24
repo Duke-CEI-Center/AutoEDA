@@ -69,6 +69,12 @@ class EnhancedParameterExtractor:
                 r'fill.*?([0-9.]+)',
                 r'occupancy.*?([0-9.]+)'
             ],
+            "version_idx": [
+                r'version.*?index.*?([0-9]+)',
+                r'config.*?version.*?([0-9]+)',
+                r'synthesis.*?version.*?([0-9]+)',
+                r'version.*?([0-9]+)'
+            ],
             "clk_period": [
                 r'clock.*?period.*?([0-9.]+)\s*ns',
                 r'period.*?([0-9.]+)\s*ns'
@@ -115,7 +121,10 @@ class EnhancedParameterExtractor:
                 match = re.search(pattern, query_lower)
                 if match:
                     try:
-                        extracted[param] = float(match.group(1))
+                        if param == "version_idx":
+                            extracted[param] = int(match.group(1))
+                        else:
+                            extracted[param] = float(match.group(1))
                         break
                     except (ValueError, IndexError):
                         continue
@@ -139,6 +148,20 @@ class EnhancedParameterExtractor:
                         extracted["clk_period"] = value
                     break
         
+        # Handle boolean force parameter
+        force_patterns = [
+            r'force',
+            r'overwrite',
+            r'force.*?overwrite',
+            r'force.*?re.*?run',
+            r'ignore.*?existing'
+        ]
+        
+        for pattern in force_patterns:
+            if re.search(pattern, query_lower):
+                extracted["force"] = True
+                break
+        
         # 4. Relative change processing
         if previous_params:
             for change_type, (pattern, multiplier) in self.relative_patterns.items():
@@ -146,6 +169,12 @@ class EnhancedParameterExtractor:
                     for param in ["target_util", "clk_period", "ASPECT_RATIO"]:
                         if param in previous_params:
                             extracted[param] = previous_params[param] * multiplier
+                    # Handle version_idx separately (integer increment/decrement)
+                    if "version_idx" in previous_params:
+                        if "increase" in change_type:
+                            extracted["version_idx"] = previous_params["version_idx"] + 1
+                        elif "decrease" in change_type:
+                            extracted["version_idx"] = max(0, previous_params["version_idx"] - 1)
                     break
         
         # 5. Context reference processing
@@ -169,7 +198,7 @@ class EnhancedParameterExtractor:
         
         # 6. Auto-inherit base parameters (if not specified in query and available in session)
         if previous_params:
-            base_inherited_params = ["design", "top_module", "syn_ver", "impl_ver"]
+            base_inherited_params = ["design", "tech", "version_idx", "top_module", "syn_ver", "impl_ver", "force"]
             for param in base_inherited_params:
                 if param not in extracted and param in previous_params:
                     extracted[param] = previous_params[param]
@@ -291,8 +320,7 @@ async def execute_multi_stage_flow(flow_name: str, params: Dict[str, Any], strat
     # Define flow stages for each flow type
     flow_definitions = {
         "synth": [
-            ("synth_setup", {"design": params["design"], "top_module": params["top_module"]}),
-            ("synth_compile", {"design": params["design"], "top_module": params["top_module"]})
+            ("synth", {"design": params["design"], "tech": params.get("tech", "FreePDK45"), "version_idx": params.get("version_idx", 0), "force": params.get("force", False)})
         ],
         "pnr": [
             ("floorplan", {"design": params["design"], "top_module": params["top_module"], "syn_ver": params.get("syn_ver", "cpV1_clkP1_drcV1")}),
@@ -302,8 +330,7 @@ async def execute_multi_stage_flow(flow_name: str, params: Dict[str, Any], strat
             ("route", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")})
         ],
         "full_flow": [
-            ("synth_setup", {"design": params["design"], "top_module": params["top_module"]}),
-            ("synth_compile", {"design": params["design"], "top_module": params["top_module"]}),
+            ("synth", {"design": params["design"], "tech": params.get("tech", "FreePDK45"), "version_idx": params.get("version_idx", 0), "force": params.get("force", False)}),
             ("floorplan", {"design": params["design"], "top_module": params["top_module"], "syn_ver": params.get("syn_ver", "cpV1_clkP1_drcV1")}),
             ("powerplan", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
             ("placement", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
@@ -402,8 +429,7 @@ async def execute_multi_stage_flow(flow_name: str, params: Dict[str, Any], strat
 
 # Required parameters for each tool
 REQUIRED_PARAMS = {
-    "synth_setup": ["design", "top_module"],
-    "synth_compile": ["design", "top_module"],
+    "synth": ["design"],
     "floorplan": ["design", "top_module", "syn_ver"],
     "powerplan": ["design", "top_module", "impl_ver"],
     "placement": ["design", "top_module", "impl_ver"],
@@ -414,8 +440,7 @@ REQUIRED_PARAMS = {
 
 # EDA tool server endpoints
 TOOLS = {
-    "synth_setup": {"port": 13333, "path": "/setup/run"},
-    "synth_compile": {"port": 13334, "path": "/compile/run"},
+    "synth": {"port": 13333, "path": "/run"},
     "floorplan": {"port": 13335, "path": "/floorplan/run"},
     "powerplan": {"port": 13336, "path": "/power/run"},
     "placement": {"port": 13337, "path": "/place/run"},
@@ -441,9 +466,7 @@ You are an intelligent EDA tool selector. Analyze the user query and select the 
 IMPORTANT: Provide all responses in English only, regardless of the input language.
 
 Available tools:
-- synth_setup: Design synthesis setup
-- synth_compile: Design synthesis compilation  
-- synth: Complete synthesis flow (synth_setup + synth_compile)
+- synth: Complete RTL-to-gate synthesis (setup + compile)
 - floorplan: Physical design floorplanning
 - powerplan: Power planning
 - placement: Cell placement
@@ -455,9 +478,12 @@ Available tools:
 
 Required parameters:
 - design: Design name
-- top_module: Top module name
+- tech: Technology library (optional, default: FreePDK45)
+- version_idx: Synthesis configuration version index (optional, default: 0)
+- top_module: Top module name (required for physical design stages)
 - syn_ver: Synthesis version (optional, default: cpV1_clkP1_drcV1)
 - impl_ver: Implementation version (optional, default: cpV1_clkP1_drcV1__g0_p0)
+- force: Force overwrite existing results (optional, default: false)
 
 Stage-specific requirements (for multi-stage flows):
 If user mentions specific requirements for stages like "floorplan requirements: area optimization", 
@@ -591,7 +617,7 @@ User request: {instruction.user_query}
             final_params["restore_enc"] = restore_enc
         else:
             # EDA flow order prompt
-            flow_order = ["syn_setup", "syn_compile", "floorplan", "powerplan", "placement", "cts", "route", "save"]
+            flow_order = ["synth", "floorplan", "powerplan", "placement", "cts", "route", "save"]
             current_index = flow_order.index(tool_name)
             required_stages = " → ".join(flow_order[:current_index])
             
