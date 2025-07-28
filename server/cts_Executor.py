@@ -64,7 +64,7 @@ def run_cts_from_tcl(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, force:
         result.wait()
         
         if result.returncode != 0:
-            print(f"❌ Innovus failed with return code: {result.returncode}")
+            print(f"Innovus failed with return code: {result.returncode}")
             return False
         
         # Check for completion markers
@@ -74,12 +74,19 @@ def run_cts_from_tcl(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, force:
         if done_file.exists():
             print(f"✓ CTS completion marker found: {done_file}")
         else:
-            print(f"⚠️  CTS completion marker not found: {done_file}")
+            print(f"CTS completion marker not found: {done_file}")
         
         if cts_enc.exists():
             print(f"✓ CTS design saved: {cts_enc}")
         else:
-            print(f"⚠️  CTS design save not found: {cts_enc}")
+            print(f"CTS design save not found: {cts_enc}")
+        
+        # Check for GDS file (use glob pattern to find *_cts.gds.gz)
+        gds_files = list((workspace_dir / "pnr_out").glob("*_cts.gds.gz"))
+        if gds_files:
+            print(f"✓ GDS file found: {gds_files[0].name}")
+        else:
+            print(f"Warning: GDS file (*_cts.gds.gz) not found in pnr_out/")
         
         # List generated files
         print("=== Generated Files ===")
@@ -89,9 +96,9 @@ def run_cts_from_tcl(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, force:
             for report_file in sorted(reports_dir.glob("*")):
                 size = report_file.stat().st_size if report_file.is_file() else "N/A"
                 if report_file.is_file():
-                    print(f"  📊 {report_file.name} ({size} bytes)")
+                    print(f" {report_file.name} ({size} bytes)")
                 else:
-                    print(f"  📁 {report_file.name}/")
+                    print(f" {report_file.name}/")
         
         output_dir = workspace_dir / "pnr_out"
         if output_dir.exists():
@@ -99,9 +106,9 @@ def run_cts_from_tcl(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, force:
             for output_file in sorted(output_dir.glob("*")):
                 size = output_file.stat().st_size if output_file.is_file() else "N/A"
                 if output_file.is_file():
-                    print(f"  📄 {output_file.name} ({size} bytes)")
+                    print(f" {output_file.name} ({size} bytes)")
                 else:
-                    print(f"  📁 {output_file.name}/")
+                    print(f" {output_file.name}/")
         
         save_dir = workspace_dir / "pnr_save"
         if save_dir.exists():
@@ -109,20 +116,20 @@ def run_cts_from_tcl(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, force:
             for save_file in sorted(save_dir.glob("*")):
                 size = save_file.stat().st_size if save_file.is_file() else "N/A"
                 if save_file.is_file():
-                    print(f"  💾 {save_file.name} ({size} bytes)")
+                    print(f" {save_file.name} ({size} bytes)")
                 else:
-                    print(f"  📁 {save_file.name}/")
+                    print(f" {save_file.name}/")
         
         success = done_file.exists() or cts_enc.exists()
         if success:
-            print("✅ CTS Completed Successfully")
+            print("CTS Completed Successfully")
         else:
-            print("❌ CTS may not have completed successfully")
+            print("CTS may not have completed successfully")
         
         return success
         
     except Exception as e:
-        print(f"❌ Error during CTS execution: {str(e)}")
+        print(f"Error during CTS execution: {str(e)}")
         return False
     
     finally:
@@ -141,27 +148,27 @@ def main():
     args = parser.parse_args()
     
     if args.mode != "cts":
-        print(f"❌ Error: Unsupported mode '{args.mode}'. Expected 'cts'.")
+        print(f"Error: Unsupported mode '{args.mode}'. Expected 'cts'.")
         sys.exit(1)
     
     tcl_file = pathlib.Path(args.tcl)
     workspace_dir = pathlib.Path(args.workspace)
     
     if not tcl_file.exists():
-        print(f"❌ Error: TCL file not found: {tcl_file}")
+        print(f"Error: TCL file not found: {tcl_file}")
         sys.exit(1)
     
     if not workspace_dir.exists():
-        print(f"❌ Error: Workspace directory not found: {workspace_dir}")
+        print(f"Error: Workspace directory not found: {workspace_dir}")
         sys.exit(1)
     
     success = run_cts_from_tcl(tcl_file, workspace_dir, args.force)
     
     if not success:
-        print("❌ CTS execution failed")
+        print("CTS execution failed")
         sys.exit(1)
     
-    print("✅ CTS Executor completed successfully")
+    print("CTS Executor completed successfully")
 
 if __name__ == "__main__":
     main() 
