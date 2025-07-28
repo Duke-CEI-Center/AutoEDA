@@ -1,56 +1,56 @@
 #!/usr/bin/env python3
 
-import subprocess, pathlib, datetime, os, argparse, tarfile
+import subprocess, pathlib, datetime, os, argparse
 from fastapi import FastAPI
 from pydantic import BaseModel
 import re
 from typing import Optional, Dict
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-LOG_DIR = pathlib.Path(os.getenv("LOG_ROOT", str(ROOT / "logs"))) / "unified_cts"
+LOG_DIR = pathlib.Path(os.getenv("LOG_ROOT", str(ROOT / "logs"))) / "unified_route_save"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-class UnifiedCtsReq(BaseModel):
+class UnifiedRouteSaveReq(BaseModel):
     design: str
     tech: str = "FreePDK45"
     impl_ver: str
-    restore_enc: str  # placement.enc file from previous stage
+    restore_enc: str  # CTS enc file to restore from
     force: bool = False
     top_module: Optional[str] = None
-    archive: bool = True  # Whether to create tarball of final artifacts
+    archive: bool = True  # Create tarball archive
     
-    # Global design parameters
+    # Global parameters (from imp_global.csv)
     design_flow_effort: str = "standard"  # express, standard
-    design_power_effort: str = "none"     # none, medium, high
-    target_util: float = 0.7              # target utilization
-    
-    # Placement parameters (needed for route stage)
-    place_global_timing_effort: str = "medium"   # low, medium, high
-    place_global_cong_effort: str = "medium"     # low, medium, high
-    place_detail_wire_length_opt_effort: str = "medium"  # low, medium, high
-    place_global_max_density: float = 0.9        # max density
-    place_activity_power_driven: bool = False    # power driven placement
-    prects_opt_max_density: float = 0.8          # pre-CTS optimization density
-    prects_opt_power_effort: str = "low"         # none, low, medium, high
-    prects_opt_reclaim_area: bool = False        # reclaim area during optimization
-    prects_fix_fanout_load: bool = False         # fix fanout load violations
-    
-    # CTS parameters
-    cts_cell_density: float = 0.5                # CTS cell density
-    cts_clock_gate_buffering_location: str = "below"  # below, above
-    cts_clone_clock_gates: bool = True            # clone clock gates
-    postcts_opt_max_density: float = 0.8         # post-CTS optimization density
-    postcts_opt_power_effort: str = "low"        # none, low, medium, high
-    postcts_opt_reclaim_area: bool = False       # reclaim area during optimization
-    postcts_fix_fanout_load: bool = False        # fix fanout load violations
+    design_power_effort: str = "none"      # none, medium, high
+    target_util: float = 0.7       # target utilization
 
-class UnifiedCtsResp(BaseModel):
+    # Placement parameters (from placement.csv)
+    place_global_timing_effort: str = "medium"   # low, medium, high
+    place_global_cong_effort: str = "medium"   # low, medium, high
+    place_detail_wire_length_opt_effort: str = "medium"  # low, medium, high
+    place_global_max_density: float = 0.9      # max density
+    place_activity_power_driven: bool = False     # power driven placement
+    prects_opt_max_density: float = 0.8      # pre-CTS optimization density
+    prects_opt_power_effort: str = "low"      # none, low, medium, high
+    prects_opt_reclaim_area: bool = False     # reclaim area during optimization
+    prects_fix_fanout_load: bool = False     # fix fanout load violations
+
+    # CTS parameters (from cts.csv)
+    cts_cell_density: float = 0.5      # CTS cell density
+    cts_clock_gate_buffering_location: str = "below"  # below, above
+    cts_clone_clock_gates: bool = True      # clone clock gates
+    postcts_opt_max_density: float = 0.8      # post-CTS optimization density
+    postcts_opt_power_effort: str = "low"      # none, low, medium, high
+    postcts_opt_reclaim_area: bool = False     # reclaim area during optimization
+    postcts_fix_fanout_load: bool = False     # fix fanout load violations
+
+class UnifiedRouteSaveResp(BaseModel):
     status: str
     log_path: str
     reports: dict
-    tcl_path: str
-    artifacts: Dict[str, str] = {}
+    artifacts: Dict[str, str]
     tarball: Optional[str] = None
+    tcl_path: str
 
 def parse_top_from_config(config_path: pathlib.Path) -> str:
     """Parse TOP_NAME from config.tcl"""
@@ -62,8 +62,8 @@ def parse_top_from_config(config_path: pathlib.Path) -> str:
         return m.group(1)
     return None
 
-def generate_complete_unified_cts_tcl(req: UnifiedCtsReq, result_dir: pathlib.Path) -> pathlib.Path:
-    """Generate complete unified CTS TCL script combining CTS, Route, and Save"""
+def generate_complete_unified_route_save_tcl(req: UnifiedRouteSaveReq, result_dir: pathlib.Path) -> pathlib.Path:
+    """Generate complete unified route+save TCL script combining 7_route.tcl and 8_save_design.tcl"""
     
     # Parse TOP_NAME from config.tcl
     design_config = ROOT / "designs" / req.design / "config.tcl"
@@ -80,15 +80,14 @@ def generate_complete_unified_cts_tcl(req: UnifiedCtsReq, result_dir: pathlib.Pa
     if tech_tcl_path.exists():
         tech_content = tech_tcl_path.read_text()
     
-    # Read all backend TCL scripts in sequence: 5_cts, 7_route, 8_save_design
+    # Read backend TCL scripts in sequence: 7_route.tcl, 8_save_design.tcl
     backend_dir = ROOT / "scripts" / req.tech / "backend"
     if not backend_dir.exists():
         raise FileNotFoundError(f"Backend directory not found: {backend_dir}")
     
     # Get backend scripts in order
     backend_scripts = [
-        backend_dir / "5_cts.tcl",
-        backend_dir / "7_route.tcl", 
+        backend_dir / "7_route.tcl",
         backend_dir / "8_save_design.tcl"
     ]
     
@@ -113,6 +112,10 @@ def generate_complete_unified_cts_tcl(req: UnifiedCtsReq, result_dir: pathlib.Pa
         "$TOP_NAME": top_name,
         "${env(TOP_NAME)}": top_name,
         "$env(TOP_NAME)": top_name,
+        "${top_module}": top_name,
+        "$top_module": top_name,
+        "${env(top_module)}": top_name,
+        "$env(top_module)": top_name,
         
         # Base directory
         "${BASE_DIR}": str(ROOT),
@@ -123,18 +126,18 @@ def generate_complete_unified_cts_tcl(req: UnifiedCtsReq, result_dir: pathlib.Pa
         # Global design parameters
         "${design_flow_effort}": req.design_flow_effort,
         "$design_flow_effort": req.design_flow_effort,
-        "${env(design_flow_effort)}": req.design_flow_effort,
-        "$env(design_flow_effort)": req.design_flow_effort,
         "${design_power_effort}": req.design_power_effort,
         "$design_power_effort": req.design_power_effort,
-        "${env(design_power_effort)}": req.design_power_effort,
-        "$env(design_power_effort)": req.design_power_effort,
         "${target_util}": str(req.target_util),
         "$target_util": str(req.target_util),
+        "${env(design_flow_effort)}": req.design_flow_effort,
+        "$env(design_flow_effort)": req.design_flow_effort,
+        "${env(design_power_effort)}": req.design_power_effort,
+        "$env(design_power_effort)": req.design_power_effort,
         "${env(target_util)}": str(req.target_util),
         "$env(target_util)": str(req.target_util),
         
-        # Placement parameters (needed for route)
+        # Environment variables for placement parameters
         "${env(place_global_timing_effort)}": req.place_global_timing_effort,
         "$env(place_global_timing_effort)": req.place_global_timing_effort,
         "${env(place_global_cong_effort)}": req.place_global_cong_effort,
@@ -154,7 +157,7 @@ def generate_complete_unified_cts_tcl(req: UnifiedCtsReq, result_dir: pathlib.Pa
         "${env(prects_fix_fanout_load)}": str(req.prects_fix_fanout_load).lower(),
         "$env(prects_fix_fanout_load)": str(req.prects_fix_fanout_load).lower(),
         
-        # CTS parameters
+        # Environment variables for CTS parameters
         "${env(cts_cell_density)}": str(req.cts_cell_density),
         "$env(cts_cell_density)": str(req.cts_cell_density),
         "${env(cts_clock_gate_buffering_location)}": req.cts_clock_gate_buffering_location,
@@ -177,9 +180,37 @@ def generate_complete_unified_cts_tcl(req: UnifiedCtsReq, result_dir: pathlib.Pa
         tech_content = tech_content.replace(placeholder, value)
         combined_backend_content = combined_backend_content.replace(placeholder, value)
     
+    # Build environment variables from request parameters
+    env_vars = {
+        "BASE_DIR": str(ROOT),
+        "TOP_NAME": top_name,
+        "top_module": top_name,
+        "FILE_FORMAT": "verilog",
+        "version": "custom",
+        "design_flow_effort": req.design_flow_effort,
+        "design_power_effort": req.design_power_effort,
+        "target_util": str(req.target_util),
+        "place_global_timing_effort": req.place_global_timing_effort,
+        "place_global_cong_effort": req.place_global_cong_effort,
+        "place_detail_wire_length_opt_effort": req.place_detail_wire_length_opt_effort,
+        "place_global_max_density": str(req.place_global_max_density),
+        "place_activity_power_driven": str(req.place_activity_power_driven).lower(),
+        "prects_opt_max_density": str(req.prects_opt_max_density),
+        "prects_opt_power_effort": req.prects_opt_power_effort,
+        "prects_opt_reclaim_area": str(req.prects_opt_reclaim_area).lower(),
+        "prects_fix_fanout_load": str(req.prects_fix_fanout_load).lower(),
+        "cts_cell_density": str(req.cts_cell_density),
+        "cts_clock_gate_buffering_location": req.cts_clock_gate_buffering_location,
+        "cts_clone_clock_gates": str(req.cts_clone_clock_gates).lower(),
+        "postcts_opt_max_density": str(req.postcts_opt_max_density),
+        "postcts_opt_power_effort": req.postcts_opt_power_effort,
+        "postcts_opt_reclaim_area": str(req.postcts_opt_reclaim_area).lower(),
+        "postcts_fix_fanout_load": str(req.postcts_fix_fanout_load).lower(),
+    }
+    
     # Combine all content into a single TCL file with explicit environment variable settings
     tcl_content = f"""#===============================================================================
-# Complete Unified CTS TCL Script (CTS + Route + Save)
+# Complete Unified Route+Save TCL Script (Routing + Final Save)
 # Generated by MCP EDA Server
 # Design: {req.design}
 # Tech: {req.tech}
@@ -190,36 +221,19 @@ def generate_complete_unified_cts_tcl(req: UnifiedCtsReq, result_dir: pathlib.Pa
 #-------------------------------------------------------------------------------
 # Set environment variables explicitly
 #-------------------------------------------------------------------------------
-set env(BASE_DIR) "{ROOT}"
-set env(TOP_NAME) "{top_name}"
-set env(FILE_FORMAT) "verilog"
-set env(version) "custom"
-set env(design_flow_effort) "{req.design_flow_effort}"
-set env(design_power_effort) "{req.design_power_effort}"
-set env(target_util) "{req.target_util}"
-set env(place_global_timing_effort) "{req.place_global_timing_effort}"
-set env(place_global_cong_effort) "{req.place_global_cong_effort}"
-set env(place_detail_wire_length_opt_effort) "{req.place_detail_wire_length_opt_effort}"
-set env(place_global_max_density) "{req.place_global_max_density}"
-set env(place_activity_power_driven) "{str(req.place_activity_power_driven).lower()}"
-set env(prects_opt_max_density) "{req.prects_opt_max_density}"
-set env(prects_opt_power_effort) "{req.prects_opt_power_effort}"
-set env(prects_opt_reclaim_area) "{str(req.prects_opt_reclaim_area).lower()}"
-set env(prects_fix_fanout_load) "{str(req.prects_fix_fanout_load).lower()}"
-set env(cts_cell_density) "{req.cts_cell_density}"
-set env(cts_clock_gate_buffering_location) "{req.cts_clock_gate_buffering_location}"
-set env(cts_clone_clock_gates) "{str(req.cts_clone_clock_gates).lower()}"
-set env(postcts_opt_max_density) "{req.postcts_opt_max_density}"
-set env(postcts_opt_power_effort) "{req.postcts_opt_power_effort}"
-set env(postcts_opt_reclaim_area) "{str(req.postcts_opt_reclaim_area).lower()}"
-set env(postcts_fix_fanout_load) "{str(req.postcts_fix_fanout_load).lower()}"
-set env(CLKBUF_CELLS) "CLKBUF_X1 CLKBUF_X2 CLKBUF_X3 CLKBUF_X4 CLKBUF_X8"
-set env(CLKGT_CELLS) "CLKGT_X1 CLKGT_X2"
+"""
+    
+    # Add environment variables
+    for key, value in env_vars.items():
+        tcl_content += f'set env({key}) "{value}"\n'
+
+    tcl_content += f"""
 
 #-------------------------------------------------------------------------------
 # Global Variables  
 #-------------------------------------------------------------------------------
 set start_time [clock seconds]
+set top_module "{top_name}"
 
 # Set PDK and library paths
 set PDK_DIR $env(BASE_DIR)/libraries/{req.tech}
@@ -235,17 +249,17 @@ set PDK_DIR $env(BASE_DIR)/libraries/{req.tech}
 {tech_content}
 
 #-------------------------------------------------------------------------------
-# Restore Design from placement stage
+# Restore Design from CTS
 #-------------------------------------------------------------------------------
 restoreDesign "{pathlib.Path(req.restore_enc).resolve()}" {top_name}
 
 #-------------------------------------------------------------------------------
-# Backend Scripts (5_cts.tcl + 7_route.tcl + 8_save_design.tcl)
+# Backend Scripts (7_route.tcl + 8_save_design.tcl)
 #-------------------------------------------------------------------------------
 {combined_backend_content}
 
 #-------------------------------------------------------------------------------
-# Unified CTS+Route+Save completed
+# Final completion marker
 #-------------------------------------------------------------------------------
 exec touch _Done_
 exit
@@ -255,39 +269,42 @@ exit
     for placeholder, value in template_variables.items():
         tcl_content = tcl_content.replace(placeholder, value)
     
-    tcl_path = result_dir / "complete_unified_cts.tcl"
+    tcl_path = result_dir / "complete_unified_route_save.tcl"
     tcl_path.write_text(tcl_content)
     return tcl_path
 
-def setup_unified_cts_workspace(req: UnifiedCtsReq, log_file: pathlib.Path) -> tuple[bool, str, pathlib.Path]:
-    """Setup unified CTS workspace directory structure"""
+def setup_unified_route_save_workspace(req: UnifiedRouteSaveReq, log_file: pathlib.Path) -> tuple[bool, str, pathlib.Path]:
+    """Setup unified route+save workspace directory structure"""
     
     try:
         # Create implementation version directory
         design_dir = ROOT / "designs" / req.design
         impl_dir = design_dir / req.tech / "implementation" / req.impl_ver
         
-        # Check if directories exist
         if not impl_dir.exists():
             return False, f"Implementation directory not found: {impl_dir}", impl_dir
         
-        if req.force:
-            # Force overwrite - remove existing output directories
-            import shutil
-            for subdir in ["pnr_save", "pnr_out", "pnr_reports"]:
-                target_dir = impl_dir / subdir
-                if target_dir.exists():
-                    for file in target_dir.glob("cts*"):
-                        file.unlink()
-                    for file in target_dir.glob("route*"):
-                        file.unlink()
-                    for file in target_dir.glob("*_pnr.*"):
-                        file.unlink()
+        # Check if restore file exists
+        restore_path = pathlib.Path(req.restore_enc)
+        if not restore_path.exists():
+            return False, f"Restore ENC file not found: {restore_path}", impl_dir
         
-        # Create all necessary subdirectories
+        # Ensure required directories exist
         (impl_dir / "pnr_save").mkdir(exist_ok=True)
         (impl_dir / "pnr_out").mkdir(exist_ok=True)
         (impl_dir / "pnr_reports").mkdir(exist_ok=True)
+        
+        # Handle force cleanup
+        if req.force:
+            import shutil
+            for subdir in ["pnr_reports", "pnr_out"]:
+                target_dir = impl_dir / subdir
+                if target_dir.exists():
+                    # Remove route/save specific files
+                    for pattern in ["*route*", "*_pnr.*", "*final*", "*.gds*", "*.spef*"]:
+                        for file_path in target_dir.glob(pattern):
+                            if file_path.is_file():
+                                file_path.unlink()
         
         # Copy config.tcl to implementation directory
         cfg_src = ROOT / "designs" / req.design / "config.tcl"
@@ -297,10 +314,11 @@ def setup_unified_cts_workspace(req: UnifiedCtsReq, log_file: pathlib.Path) -> t
             shutil.copy2(cfg_src, cfg_dst)
         
         with log_file.open("w") as lf:
-            lf.write("=== Unified CTS Workspace Setup ===\n")
+            lf.write("=== Unified Route+Save Workspace Setup ===\n")
             lf.write(f"Design: {req.design}\n")
             lf.write(f"Tech: {req.tech}\n")
             lf.write(f"Implementation Version: {req.impl_ver}\n")
+            lf.write(f"Restore ENC: {req.restore_enc}\n")
             lf.write(f"Implementation Directory: {impl_dir}\n")
             lf.write("Workspace setup completed successfully.\n")
 
@@ -309,12 +327,12 @@ def setup_unified_cts_workspace(req: UnifiedCtsReq, log_file: pathlib.Path) -> t
     except Exception as e:
         return False, f"error: {e}", None
 
-def call_unified_cts_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, req: UnifiedCtsReq, log_file: pathlib.Path) -> tuple[bool, str, dict]:
-    """Call the unified CTS executor to run EDA tools"""
+def call_unified_route_save_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, req: UnifiedRouteSaveReq, log_file: pathlib.Path) -> tuple[bool, str, dict]:
+    """Call the unified route+save executor to run EDA tools"""
     
     try:
         # Build executor command
-        executor_path = ROOT / "server" / "unified_cts_Executor.py"
+        executor_path = ROOT / "server" / "unified_route_save_Executor.py"
         cmd = [
             "python", str(executor_path),
             "-design", req.design,
@@ -334,6 +352,7 @@ def call_unified_cts_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Pat
         eda_paths = [
             "/opt/cadence/innovus221/tools/bin",
             "/opt/cadence/genus172/bin",
+            "/opt/cadence/innovus191/bin"
         ]
         current_path = env.get('PATH', '')
         for eda_path in eda_paths:
@@ -341,9 +360,9 @@ def call_unified_cts_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Pat
                 env['PATH'] = f"{eda_path}:{current_path}"
                 current_path = env['PATH']
         
-        # Execute the unified CTS executor
+        # Execute the unified route+save executor
         with log_file.open("a") as lf:
-            lf.write(f"\n=== Calling Unified CTS Executor ===\n")
+            lf.write(f"\n=== Calling Unified Route+Save Executor ===\n")
             lf.write(f"Command: {' '.join(cmd)}\n")
             lf.write(f"Working Directory: {workspace_dir}\n")
             lf.write(f"Executor started at: {datetime.datetime.now()}\n\n")
@@ -354,7 +373,7 @@ def call_unified_cts_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Pat
             env=env,
             capture_output=True,
             text=True,
-            timeout=7200  # 2 hour timeout for CTS+Route+Save
+            timeout=7200  # 2 hour timeout (route+save can take longer)
         )
         
         # Log the execution results
@@ -368,21 +387,20 @@ def call_unified_cts_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Pat
         if result.returncode != 0:
             return False, f"executor failed with code {result.returncode}", {}
         
-        # Collect reports
+        # Collect reports and artifacts
         reports = {}
         rpt_dir = workspace_dir / "pnr_reports"
         
-        # Try to read various report files
-        report_files = [
-            ("cts_summary.rpt", "cts_summary.rpt"),
-            ("cts_opt_timing.rpt.gz", "cts_opt_timing.rpt.gz"),
+        # Route reports
+        route_report_files = [
             ("route_summary.rpt", "route_summary.rpt"),
-            ("route_timing.rpt.gz", "route_timing.rpt.gz"),
+            ("congestion.rpt", "congestion.rpt"),
             ("postRoute_drc_max1M.rpt", "postRoute_drc_max1M.rpt"),
             ("postOpt_drc_max1M.rpt", "postOpt_drc_max1M.rpt"),
+            ("route_timing.rpt.gz", "route_timing.rpt.gz")
         ]
         
-        for base_name, file_name in report_files:
+        for base_name, file_name in route_report_files:
             rpt_path = rpt_dir / file_name
             if rpt_path.exists():
                 try:
@@ -397,7 +415,16 @@ def call_unified_cts_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Pat
             else:
                 reports[base_name] = "Report not found"
         
-        return True, "unified CTS+Route+Save completed successfully", reports
+        # Check for GDS file (use glob pattern to find *_pnr.gds.gz)
+        gds_files = list((workspace_dir / "pnr_out").glob("*_pnr.gds.gz"))
+        if gds_files:
+            with log_file.open("a") as lf:
+                lf.write(f"✓ GDS file found: {gds_files[0].name}\n")
+        else:
+            with log_file.open("a") as lf:
+                lf.write(f"⚠ Warning: GDS file (*_pnr.gds.gz) not found in pnr_out/\n")
+        
+        return True, "unified route+save completed successfully", reports
 
     except subprocess.TimeoutExpired:
         return False, "executor timeout (2 hours)", {}
@@ -407,10 +434,10 @@ def call_unified_cts_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Pat
 def collect_artifacts(workspace_dir: pathlib.Path) -> Dict[str, str]:
     """Collect generated artifacts from pnr_out directory"""
     out_dir = workspace_dir / "pnr_out"
-    artifacts = {}
+    artifacts: Dict[str, str] = {}
     
-    # Define artifact patterns similar to save_server
-    artifact_patterns = [
+    # Artifact patterns based on save server
+    art_patterns = [
         ("gds", ["*.gds", "*.gds.gz"]),
         ("def", ["*.def"]),
         ("lef", ["*.lef"]),
@@ -418,112 +445,101 @@ def collect_artifacts(workspace_dir: pathlib.Path) -> Dict[str, str]:
         ("verilog", ["*.v", "*.verilog"]),
     ]
     
-    for key, patterns in artifact_patterns:
-        found = "not found"
-        for pattern in patterns:
-            hits = list(out_dir.glob(pattern))
+    for key, patterns in art_patterns:
+        hit = "not found"
+        for pat in patterns:
+            hits = list(out_dir.glob(pat))
             if hits:
-                found = str(hits[0].relative_to(ROOT))
+                hit = str(hits[0])
                 break
-        artifacts[key] = found
+        artifacts[key] = hit
     
     return artifacts
 
-def create_tarball(req: UnifiedCtsReq, artifacts: Dict[str, str], ts: str) -> Optional[str]:
+def create_tarball(req: UnifiedRouteSaveReq, artifacts: Dict[str, str], ts: str) -> Optional[str]:
     """Create tarball archive of artifacts"""
-    if not req.archive:
-        return None
-        
     try:
         deliver_dir = ROOT / "deliverables"
         deliver_dir.mkdir(exist_ok=True)
-        tar_path = deliver_dir / f"{req.design}_{req.impl_ver}_unified_cts_{ts}.tgz"
+        tar_path = deliver_dir / f"{req.design}_{req.impl_ver}_route_save_{ts}.tgz"
         
+        import tarfile
         with tarfile.open(str(tar_path), "w:gz") as tar:
-            for artifact_path in artifacts.values():
-                if artifact_path != "not found":
-                    full_path = ROOT / artifact_path
-                    if full_path.exists():
-                        tar.add(str(full_path), arcname=full_path.name)
+            for fp in artifacts.values():
+                if fp != "not found" and pathlib.Path(fp).exists():
+                    tar.add(fp, arcname=pathlib.Path(fp).name)
         
-        return str(tar_path.relative_to(ROOT))
+        return str(tar_path)
         
     except Exception as e:
-        return f"Error creating tarball: {e}"
+        return None
 
-app = FastAPI(title="MCP · Unified CTS Service (CTS + Route + Save)")
+app = FastAPI(title="MCP · Unified Route+Save Service (Routing + Final Save)")
 
-@app.post("/run", response_model=UnifiedCtsResp)
-def run_unified_cts(req: UnifiedCtsReq):
-    """Main unified CTS endpoint: TCL generation + executor call"""
+@app.post("/run", response_model=UnifiedRouteSaveResp)
+def run_unified_route_save(req: UnifiedRouteSaveReq):
+    """Main unified route+save endpoint: TCL generation + executor call"""
     
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    log_file = LOG_DIR / f"{req.design}_unified_cts_{ts}.log"
+    log_file = LOG_DIR / f"{req.design}_unified_route_save_{ts}.log"
     result_dir = ROOT / "result" / req.design / req.tech
     result_dir.mkdir(parents=True, exist_ok=True)
     
     try:
         # Phase 1: Setup workspace
-        workspace_success, workspace_status, workspace_dir = setup_unified_cts_workspace(req, log_file)
+        workspace_success, workspace_status, workspace_dir = setup_unified_route_save_workspace(req, log_file)
         if not workspace_success:
-            return UnifiedCtsResp(
+            return UnifiedRouteSaveResp(
                 status=workspace_status,
                 log_path=str(log_file),
                 reports={"error": workspace_status},
+                artifacts={},
                 tcl_path=""
             )
         
-        # Phase 2: Check restore file exists
-        restore_path = pathlib.Path(req.restore_enc)
-        if not restore_path.exists():
-            return UnifiedCtsResp(
-                status="error: restore_enc file not found",
-                log_path=str(log_file),
-                reports={"error": f"restore_enc file not found: {req.restore_enc}"},
-                tcl_path=""
-            )
+        # Phase 2: Generate complete unified route+save TCL file
+        tcl_file = generate_complete_unified_route_save_tcl(req, result_dir)
         
-        # Phase 3: Generate complete unified CTS TCL file
-        tcl_file = generate_complete_unified_cts_tcl(req, result_dir)
-        
-        # Phase 4: Call executor to run unified CTS+Route+Save
-        exec_success, exec_status, reports = call_unified_cts_executor(tcl_file, workspace_dir, req, log_file)
+        # Phase 3: Call executor to run unified route+save
+        exec_success, exec_status, reports = call_unified_route_save_executor(tcl_file, workspace_dir, req, log_file)
         
         if not exec_success:
-            return UnifiedCtsResp(
+            return UnifiedRouteSaveResp(
                 status=exec_status,
                 log_path=str(log_file),
                 reports={"error": exec_status},
+                artifacts={},
                 tcl_path=str(tcl_file)
             )
 
-        # Phase 5: Collect artifacts
+        # Phase 4: Collect artifacts
         artifacts = collect_artifacts(workspace_dir)
         
-        # Phase 6: Create tarball if requested
-        tarball_path = create_tarball(req, artifacts, ts)
-        
+        # Phase 5: Create tarball if requested
+        tar_path = None
+        if req.archive:
+            tar_path = create_tarball(req, artifacts, ts)
+
         # Success
-        final_reports = {"workspace": workspace_status, "execution": exec_status}
+        final_reports = {"workspace": workspace_status, "route_save": exec_status}
         final_reports.update(reports)
         
-        return UnifiedCtsResp(
+        return UnifiedRouteSaveResp(
             status="ok",
             log_path=str(log_file),
             reports=final_reports,
-            tcl_path=str(tcl_file),
             artifacts=artifacts,
-            tarball=tarball_path
+            tarball=tar_path,
+            tcl_path=str(tcl_file)
         )
 
     except Exception as e:
-        return UnifiedCtsResp(
+        return UnifiedRouteSaveResp(
             status=f"error: {e}",
             log_path=str(log_file),
             reports={"error": str(e)},
-            tcl_path="",
             artifacts={},
-            tarball=None
+            tcl_path=""
         )
 
 if __name__ == "__main__":
@@ -531,14 +547,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--port",
         type=int,
-        default=int(os.getenv("UNIFIED_CTS_PORT", 13341)),
-        help="listen port (env UNIFIED_CTS_PORT overrides; default 13341)",
+        default=int(os.getenv("UNIFIED_ROUTE_SAVE_PORT", 13341)),
+        help="listen port (env UNIFIED_ROUTE_SAVE_PORT overrides; default 13341)",
     )
     args = parser.parse_args()
 
     import uvicorn
     uvicorn.run(
-        "unified_cts_server:app",
+        "unified_route_save_server:app",
         host="0.0.0.0",
         port=args.port,
         reload=False,
