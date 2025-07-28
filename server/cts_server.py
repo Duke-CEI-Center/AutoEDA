@@ -99,6 +99,10 @@ def generate_complete_cts_tcl(req: CtsReq, result_dir: pathlib.Path) -> pathlib.
         "$TOP_NAME": top_name,
         "${env(TOP_NAME)}": top_name,
         "$env(TOP_NAME)": top_name,
+        "${top_module}": top_name,
+        "$top_module": top_name,
+        "${env(top_module)}": top_name,
+        "$env(top_module)": top_name,
         "${BASE_DIR}": str(ROOT),
         "$BASE_DIR": str(ROOT),
         "${env(BASE_DIR)}": str(ROOT),
@@ -156,6 +160,7 @@ def generate_complete_cts_tcl(req: CtsReq, result_dir: pathlib.Path) -> pathlib.
     env_vars = {
         "BASE_DIR": str(ROOT),
         "TOP_NAME": top_name,
+        "top_module": top_name,
         "FILE_FORMAT": "verilog",
         "version": "custom",
         "design_flow_effort": req.design_flow_effort,
@@ -196,6 +201,7 @@ def generate_complete_cts_tcl(req: CtsReq, result_dir: pathlib.Path) -> pathlib.
 # Global Variables  
 #-------------------------------------------------------------------------------
 set start_time [clock seconds]
+set top_module "{top_name}"
 
 # Set PDK and library paths
 set PDK_DIR $env(BASE_DIR)/libraries/{req.tech}
