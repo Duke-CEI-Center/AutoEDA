@@ -1,22 +1,32 @@
 #!/usr/bin/env python3
+"""
+Usage: python3 synth_Executor.py -mode synthesis -design <design_name> -technode <technology_node> -tcl <tcl_file> -workspace <workspace_dir>
+"""
 
 import argparse
-import pathlib
+from pathlib import Path
 import time
 import subprocess
 import sys
 import os
 
+# Load environment variables from .env file at project root
+from dotenv import load_dotenv
+
 # Add project root to Python path
-PROJECT_ROOT = pathlib.Path(__file__).resolve().parent.parent
-sys.path.append(str(PROJECT_ROOT))
+ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(dotenv_path=ROOT / ".env")
+# sys.path.append(str(ROOT))
 
 def setup_eda_environment():
-    """Setup EDA tools environment"""
-    eda_paths = [
-        "/opt/synopsys/syn/V-2023.12-SP2/bin",
-        "/tools/cadence/innovus191/bin",
-    ]
+    """Setup EDA tools environment from .env file"""
+    
+    # Read EDA paths from environment variables
+    synopsys_path = os.getenv("EDA_SYNOPSYS_PATH", "/opt/synopsys/syn/V-2023.12-SP2/bin")
+    cadence_path = os.getenv("EDA_CADENCE_PATH", "/tools/cadence/innovus191/bin")
+    
+    # Build list of EDA paths, filtering out empty ones
+    eda_paths = [synopsys_path, cadence_path]
     
     current_path = os.environ.get("PATH", "")
     new_path = ":".join(eda_paths) + ":" + current_path
@@ -24,14 +34,13 @@ def setup_eda_environment():
     
     print(f"EDA environment setup completed")
     print(f"Added to PATH: {':'.join(eda_paths)}")
-
-def run_synthesis_from_tcl(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, force: bool = False):
+ 
+def run_synthesis_from_tcl(tcl_file: Path, workspace_dir: Path):
     """Execute synthesis using a complete TCL file"""
     
     print(f"=== Synthesis Executor ===")
     print(f"TCL File: {tcl_file}")
     print(f"Workspace: {workspace_dir}")
-    print(f"Force: {force}")
     
     if not tcl_file.exists():
         raise FileNotFoundError(f"TCL file not found: {tcl_file}")
@@ -73,9 +82,9 @@ def run_synthesis_from_tcl(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, 
             raise RuntimeError(f"dc_shell failed with return code {process.returncode}")
         
         # Check for completion marker
-        done_file = workspace_dir / "_Done_"
+        done_file = workspace_dir / "_Finished_"
         if not done_file.exists():
-            raise RuntimeError("Synthesis did not complete successfully (_Done_ file not found)")
+            raise RuntimeError("Synthesis did not complete successfully (_Finished_ file not found)")
         
         end_time = time.time()
         elapsed = end_time - start_time
@@ -117,14 +126,12 @@ def main():
                        help="Complete TCL file to execute")
     parser.add_argument("-workspace", type=str, required=True,
                        help="Workspace directory for execution")
-    parser.add_argument("-force", action="store_true",
-                       help="Force overwrite existing results")
     
     args = parser.parse_args()
     
     # Convert paths
-    tcl_file = pathlib.Path(args.tcl)
-    workspace_dir = pathlib.Path(args.workspace)
+    tcl_file = Path(args.tcl)
+    workspace_dir = Path(args.workspace)
     
     print(f"MCP EDA Executor starting...")
     print(f"Mode: {args.mode}")
@@ -134,7 +141,7 @@ def main():
     success = False
     
     if args.mode == "synthesis":
-        success = run_synthesis_from_tcl(tcl_file, workspace_dir, args.force)
+        success = run_synthesis_from_tcl(tcl_file, workspace_dir)
     else:
         print(f"Error: Unsupported mode '{args.mode}'")
         print("Supported modes: synthesis")

@@ -1,34 +1,38 @@
 #!/usr/bin/env python3
+# curl -X POST http://localhost:15333/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}' | python -m json.tool
 
-import subprocess, pathlib, datetime, os, argparse
+import subprocess, datetime, os, argparse
+from pathlib import Path
 from fastapi import FastAPI
 from pydantic import BaseModel
-import re
+from jinja2 import Template
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent
-LOG_DIR = pathlib.Path(os.getenv("LOG_ROOT", str(ROOT / "logs"))) / "synthesis"
+# Load environment variables from .env file at project root
+from dotenv import load_dotenv
+
+# Add project root to Python path
+ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(dotenv_path=ROOT / ".env")
+
+LOG_DIR = Path(os.getenv("LOG_ROOT", str(ROOT / "logs"))) / "synthesis"
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 class SynthReq(BaseModel):
-    design: str
-    tech: str = "FreePDK45"
-    version_idx: int = 0  # Keep for compatibility, but not used for CSV lookup
-    force: bool = False
-    
-    # Synthesis configuration parameters (replacing CSV reading)
-    syn_version: str = "cpV1_clkP1_drcV1"
-    clk_period: float = 1.0
-    DRC_max_fanout: int = 10
-    DRC_max_transition: float = 0.5
-    DRC_max_capacitance: int = 5
-    DRC_high_fanout_net_threshold: int = 10
-    DRC_high_fanout_pin_capacitance: float = 0.01
-    compile_cmd: str = "compile"
-    power_effort: str = "high"
-    area_effort: str = "high"
-    map_effort: str = "high"
-    set_dyn_opt: bool = True
-    set_lea_opt: bool = True
+    syn_version: str = None  # identifier for the synthesis run
+    design: str  # design_name
+    tech: str = "FreePDK45"  # library_name
+    period: float = 1.0  #  ≥ 0
+    fanout_value: float = 10.0  # ≥ 0
+    transition_value: float = 0.2  # ≥ 0
+    capacitance_value: float = 4.5  # ≥ 0
+    compile_cmd: str = "compile"  
+    power_effort: str = "none"  # none, low, medium, high
+    area_effort: str = "none"  # none, low, medium, high
+    map_effort: str = "low"  # low, medium, high
+    dynamic_optimization: str = "false"  # true, false
+    leakage_optimization: str = "false"  # true, false
+    force: bool = True # overwrite existing results
+    skip_execution: bool = False  # control execution skipping
 
 class SynthResp(BaseModel):
     status: str
@@ -36,24 +40,11 @@ class SynthResp(BaseModel):
     reports: dict
     tcl_path: str
 
-def parse_top_from_config(config_path: pathlib.Path) -> str:
-    """Parse TOP_NAME from config.tcl"""
-    if not config_path.exists():
-        return None
-    content = config_path.read_text()
-    m = re.search(r'set\s+TOP_NAME\s+"([^"]+)"', content)
-    if m:
-        return m.group(1)
-    return None
-
-def generate_complete_synthesis_tcl(req: SynthReq, result_dir: pathlib.Path) -> pathlib.Path:
+def generate_complete_synthesis_tcl(req: SynthReq, result_dir: Path) -> Path:
     """Generate complete synthesis TCL script with all configurations filled"""
     
-    # Parse TOP_NAME from config.tcl
     design_config = ROOT / "designs" / req.design / "config.tcl"
-    top_name = parse_top_from_config(design_config) or req.design
     
-    # Read all frontend TCL scripts
     frontend_dir = ROOT / "scripts" / req.tech / "frontend"
     if not frontend_dir.exists():
         raise FileNotFoundError(f"Frontend directory not found: {frontend_dir}")
@@ -74,32 +65,10 @@ def generate_complete_synthesis_tcl(req: SynthReq, result_dir: pathlib.Path) -> 
             combined_frontend_content += script_content + "\n\n"
     
     # Replace the template's completion marker with our own (in the last script)
-    combined_frontend_content = combined_frontend_content.replace(
-        "exec touch _Finished_\n\nexit",
-        "# Synthesis completed\nexec touch _Done_\n\nexit"
-    )
-    
-    # Define template variables for replacement
-    template_variables = {
-        "${TOP_NAME}": top_name,
-        "$TOP_NAME": top_name,
-        "${FILE_FORMAT}": "verilog",
-        "$FILE_FORMAT": "verilog",
-        "${CLOCK_NAME}": "clk",
-        "$CLOCK_NAME": "clk",
-        "${RTL_DIR}": "../../../rtl",
-        "$RTL_DIR": "../../../rtl",
-        "${REPORTS_DIR}": "reports",
-        "$REPORTS_DIR": "reports",
-        "${RESULTS_DIR}": "results",
-        "$RESULTS_DIR": "results",
-        "${FINAL_VERILOG_OUTPUT_FILE}": f"{top_name}.mapped.v",
-        "$FINAL_VERILOG_OUTPUT_FILE": f"{top_name}.mapped.v",
-        "${FINAL_SDC_OUTPUT_FILE}": f"{top_name}.mapped.sdc",
-        "$FINAL_SDC_OUTPUT_FILE": f"{top_name}.mapped.sdc",
-        "${FINAL_PARSITICS_OUTPUT_FILE}": f"{top_name}.spef.gz",
-        "$FINAL_PARSITICS_OUTPUT_FILE": f"{top_name}.spef.gz",
-    }
+    # combined_frontend_content = combined_frontend_content.replace(
+    #     "exec touch _Finished_\n\nexit",
+    #     "# Synthesis completed\nexec touch _Done_\n\nexit"
+    # )
     
     # Read tech.tcl content
     tech_tcl_path = ROOT / "scripts" / req.tech / "tech.tcl"
@@ -109,10 +78,6 @@ def generate_complete_synthesis_tcl(req: SynthReq, result_dir: pathlib.Path) -> 
     with open(tech_tcl_path, "r") as f:
         tech_content = f.read()
     
-    # Replace template variables in tech config
-    for placeholder, value in template_variables.items():
-        tech_content = tech_content.replace(placeholder, value)
-    
     # Read design config.tcl content  
     if not design_config.exists():
         raise FileNotFoundError(f"Design config not found: {design_config}")
@@ -120,30 +85,9 @@ def generate_complete_synthesis_tcl(req: SynthReq, result_dir: pathlib.Path) -> 
     with open(design_config, "r") as f:
         design_config_content = f.read()
     
-    # Replace template variables in design config
-    for placeholder, value in template_variables.items():
-        design_config_content = design_config_content.replace(placeholder, value)
-    
     # Replace template variables in frontend content
-    for placeholder, value in template_variables.items():
-        combined_frontend_content = combined_frontend_content.replace(placeholder, value)
-    
-    # Build environment variables from request parameters
-    env_vars = {
-        "clk_period": str(req.clk_period),
-        "DRC_max_fanout": str(req.DRC_max_fanout),
-        "DRC_max_transition": str(req.DRC_max_transition),
-        "DRC_max_capacitance": str(req.DRC_max_capacitance),
-        "DRC_high_fanout_net_threshold": str(req.DRC_high_fanout_net_threshold),
-        "DRC_high_fanout_pin_capacitance": str(req.DRC_high_fanout_pin_capacitance),
-        "compile_cmd": req.compile_cmd,
-        "power_effort": req.power_effort,
-        "area_effort": req.area_effort,
-        "map_effort": req.map_effort,
-        "set_dyn_opt": str(req.set_dyn_opt).lower(),
-        "set_lea_opt": str(req.set_lea_opt).lower(),
-    }
-    
+    combined_frontend_content = Template(combined_frontend_content).render(**vars(req))
+
     # Generate complete synthesis TCL content
     tcl_content = f"""#===============================================================================
 # Complete Synthesis TCL Script
@@ -152,16 +96,7 @@ def generate_complete_synthesis_tcl(req: SynthReq, result_dir: pathlib.Path) -> 
 # Tech: {req.tech}
 # Version: {req.syn_version}
 # Generated at: {datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-#===============================================================================
-
-#-------------------------------------------------------------------------------
-# Environment Variables Configuration
-#-------------------------------------------------------------------------------
-"""
-    
-    # Add all environment variables
-    for var_name, var_value in env_vars.items():
-        tcl_content += f"set env({var_name}) \"{var_value}\"\n"
+#==============================================================================="""
     
     tcl_content += f"""
 #-------------------------------------------------------------------------------
@@ -177,17 +112,14 @@ def generate_complete_synthesis_tcl(req: SynthReq, result_dir: pathlib.Path) -> 
 #-------------------------------------------------------------------------------
 # Frontend Scripts (from scripts/{req.tech}/frontend/)
 #-------------------------------------------------------------------------------
-{combined_frontend_content}
+{combined_frontend_content}"""
 
-# Replace the exit in synthesis template with our completion marker
-# (The synthesis template ends with 'exit', so we add our marker before it)
-"""
-    
     tcl_path = result_dir / "complete_synthesis.tcl"
     tcl_path.write_text(tcl_content)
+
     return tcl_path
 
-def setup_synthesis_workspace(req: SynthReq, log_file: pathlib.Path) -> tuple[bool, str, pathlib.Path]:
+def setup_synthesis_workspace(req: SynthReq, log_file: Path) -> tuple[bool, str, Path]:
     """Setup synthesis workspace directory structure"""
     
     try:
@@ -202,7 +134,7 @@ def setup_synthesis_workspace(req: SynthReq, log_file: pathlib.Path) -> tuple[bo
                 with log_file.open("w") as lf:
                     lf.write(f"=== Synthesis Workspace Setup ===\n")
                     lf.write(f"[Warning] {syn_version_dir} already exists! Skipped...\n")
-                return True, "workspace ok (already exists)", syn_version_dir
+                return True, "workspace created (already existed)", syn_version_dir
             else:
                 # Force overwrite - remove existing directory
                 import shutil
@@ -219,12 +151,12 @@ def setup_synthesis_workspace(req: SynthReq, log_file: pathlib.Path) -> tuple[bo
             lf.write(f"Created workspace: {syn_version_dir}\n")
             lf.write("Workspace setup completed successfully.\n")
 
-        return True, "workspace ok", syn_version_dir
+        return True, "workspace created", syn_version_dir
 
     except Exception as e:
         return False, f"error: {e}", None
 
-def call_synthesis_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Path, req: SynthReq, log_file: pathlib.Path) -> tuple[bool, str, dict]:
+def call_synthesis_executor(tcl_file: Path, workspace_dir: Path, req: SynthReq, log_file: Path) -> tuple[bool, str, dict]:
     """Call the synthesis executor to run EDA tools"""
     
     try:
@@ -239,40 +171,10 @@ def call_synthesis_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Path,
             "-workspace", str(workspace_dir)
         ]
         
-        if req.force:
-            cmd.append("-force")
-        
         # Set up environment
         env = os.environ.copy()
         env['BASE_DIR'] = str(ROOT)
         
-        # Add EDA tools to PATH
-        eda_paths = [
-            "/opt/synopsys/syn/V-2023.12-SP2/bin",
-            "/tools/cadence/innovus191/bin",
-        ]
-        current_path = env.get("PATH", "")
-        env["PATH"] = ":".join(eda_paths) + ":" + current_path
-        
-        # Add synthesis configuration to environment
-        env_vars = {
-            "clk_period": str(req.clk_period),
-            "DRC_max_fanout": str(req.DRC_max_fanout),
-            "DRC_max_transition": str(req.DRC_max_transition),
-            "DRC_max_capacitance": str(req.DRC_max_capacitance),
-            "DRC_high_fanout_net_threshold": str(req.DRC_high_fanout_net_threshold),
-            "DRC_high_fanout_pin_capacitance": str(req.DRC_high_fanout_pin_capacitance),
-            "compile_cmd": req.compile_cmd,
-            "power_effort": req.power_effort,
-            "area_effort": req.area_effort,
-            "map_effort": req.map_effort,
-            "set_dyn_opt": str(req.set_dyn_opt).lower(),
-            "set_lea_opt": str(req.set_lea_opt).lower(),
-        }
-        
-        for var_name, var_value in env_vars.items():
-            env[var_name] = var_value
-
         with log_file.open("a") as lf:
             lf.write("\n=== Calling Synthesis Executor ===\n")
             lf.write(f"Executor: {executor_path}\n")
@@ -297,9 +199,9 @@ def call_synthesis_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Path,
             return False, f"error: executor failed with code {process.returncode}", {}
 
         # Check for completion marker
-        done_file = workspace_dir / "_Done_"
+        done_file = workspace_dir / "_Finished_"
         if not done_file.exists():
-            return False, "error: synthesis did not complete successfully (_Done_ file not found)", {}
+            return False, "error: synthesis did not complete successfully (_Finished_ file not found)", {}
 
         # Collect synthesis reports
         reports_dir = workspace_dir / "reports"
@@ -307,7 +209,7 @@ def call_synthesis_executor(tcl_file: pathlib.Path, workspace_dir: pathlib.Path,
         for rpt in ("qor.rpt", "timing.rpt", "area.rpt", "power.rpt"):
             rpt_path = reports_dir / rpt
             if rpt_path.exists():
-                reports[rpt] = rpt_path.read_text()
+                reports[rpt] = str(rpt_path)
             else:
                 reports[rpt] = f"{rpt} not found"
 
@@ -323,6 +225,11 @@ def run_synthesis(req: SynthReq):
     """Main synthesis endpoint: TCL generation + executor call"""
     
     ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    
+    # Set syn_version if not provided by client
+    if req.syn_version is None:
+        req.syn_version = ts
+    
     log_file = LOG_DIR / f"{req.design}_synthesis_{ts}.log"
     result_dir = ROOT / "result" / req.design / req.tech
     result_dir.mkdir(parents=True, exist_ok=True)
@@ -342,22 +249,32 @@ def run_synthesis(req: SynthReq):
         tcl_file = generate_complete_synthesis_tcl(req, result_dir)
         
         # Phase 3: Call executor to run synthesis
-        exec_success, exec_status, reports = call_synthesis_executor(tcl_file, workspace_dir, req, log_file)
-        
-        if not exec_success:
-            return SynthResp(
-                status=exec_status,
-                log_path=str(log_file),
-                reports={"error": exec_status},
-                tcl_path=str(tcl_file)
-            )
-
-        # Success
-        final_reports = {"workspace": workspace_status, "synthesis": exec_status}
-        final_reports.update(reports)
+        if req.skip_execution:
+            # Skip execution, just return TCL generation results
+            final_reports = {
+                "workspace": workspace_status, 
+                "synthesis": "skipped_execution",
+                "note": "TCL generation only - execution skipped"
+            }
+            exec_success = True
+            exec_status = "execution_skipped"
+        else:
+            # Normal execution
+            exec_success, exec_status, reports = call_synthesis_executor(tcl_file, workspace_dir, req, log_file)
+            
+            if not exec_success:
+                return SynthResp(
+                    status=exec_status,
+                    log_path=str(log_file),
+                    reports={"error": exec_status},
+                    tcl_path=str(tcl_file)
+                )
+            
+            final_reports = {"workspace": workspace_status, "synthesis": exec_status}
+            final_reports.update(reports)
         
         return SynthResp(
-            status="ok",
+            status="execution_completed",
             log_path=str(log_file),
             reports=final_reports,
             tcl_path=str(tcl_file)
