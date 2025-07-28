@@ -82,7 +82,7 @@ saveNetlist pnr_out/${env(TOP_NAME)}_place.v
 setExtractRCMode -engine preRoute -effortLevel low
 extractRC
 rcOut -spef pnr_out/RC_place.spef.gz
-
+streamOut pnr_out/${top_module}_place.gds.gz
 saveDesign pnr_save/placement.enc
 
 exec touch _Place_Finished_
