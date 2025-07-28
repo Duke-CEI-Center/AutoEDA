@@ -56,7 +56,7 @@ saveNetlist pnr_out/${env(TOP_NAME)}_cts.v
 setExtractRCMode -engine preRoute
 extractRC
 rcOut -spef pnr_out/RC_cts.spef.gz
-
+streamOut pnr_out/${top_module}_cts.gds.gz
 saveDesign pnr_save/cts.enc
 
 puts "\[Info\] The CTS stage duration is [expr [clock seconds] - $cts_start_time] sec"
