@@ -219,6 +219,7 @@ set env(prects_fix_fanout_load) "{str(req.prects_fix_fanout_load).lower()}"
 #-------------------------------------------------------------------------------
 saveDesign pnr_save/placement.enc
 defOut pnr_out/place.def
+streamOut pnr_out/{top_name}_place.gds.gz
 
 # Unified placement completed
 exec touch _Done_
