@@ -136,6 +136,14 @@ def run_unified_placement_from_tcl(tcl_file: pathlib.Path, workspace_dir: pathli
             workspace_dir / "pnr_out" / "place.def"
         ]
         
+        # Check for GDS file (use glob pattern to find *_place.gds.gz)
+        gds_files = list((workspace_dir / "pnr_out").glob("*_place.gds.gz"))
+        if gds_files:
+            print(f"✓ GDS file found: {gds_files[0].name}")
+        else:
+            print(f"⚠ Warning: GDS file (*_place.gds.gz) not found in pnr_out/")
+            key_files.append(workspace_dir / "pnr_out" / "*_place.gds.gz")  # Add to missing list
+        
         missing_files = [f for f in key_files if not f.exists()]
         if missing_files:
             print(f"\n⚠ Warning: Key output files missing: {[str(f) for f in missing_files]}")
