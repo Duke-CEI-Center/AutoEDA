@@ -3,6 +3,7 @@
 #------------------------------------------------------------------------------
 set FLOW_EFFORT {{flowEffort}}
 set POWER_EFFORT {{powerEffort}}
+set NETLIST_DIR {{syn_res_dir}}
 
 #-------------------------------------------------------------------------------
 # Setting Design name and effort level for various stages

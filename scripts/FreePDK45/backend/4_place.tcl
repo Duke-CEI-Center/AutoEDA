@@ -7,7 +7,7 @@ set PLACE_DETAIL_WIRE_LENGTH_OPT_EFFORT {{place_detail_wire_length_opt_effort}}
 set PLACE_GLOBAL_MAX_DENSITY {{place_global_max_density}}
 set ACTIVITY_POWER_DRIVEN {{activity_power_driven}}
 set MAX_DENSITY {{maxDensity}}
-set POWER_EFFORT {{powerEffort}}
+set POWER_EFFORT {{preCTS_powerEffort}}
 set RECLAIM_AREA {{reclaimArea}}
 set FIX_FANOUT_LOAD {{fixFanoutLoad}}
 
@@ -37,7 +37,7 @@ setPlaceMode -place_global_timing_effort $PLACE_GLOBAL_TIMING_EFFORT \
     -place_global_cong_effort $PLACE_GLOBAL_CONG_EFFORT \
     -place_detail_wire_length_opt_effort $PLACE_DETAIL_WIRE_LENGTH_OPT_EFFORT \
     -place_global_max_density $PLACE_GLOBAL_MAX_DENSITY \
-    -activity_power_driven $ACTIVITY_POWER_DRIVEN
+    -place_global_activity_power_driven $ACTIVITY_POWER_DRIVEN
 placeDesign
 refinePlace
 #place_opt_design -incremental
@@ -76,7 +76,7 @@ summaryReport -outfile pnr_reports/placement_summary.rpt
 # exec gzip $cellFile $netFile &
 
 
-saveNetlist pnr_out/${env(TOP_NAME)}_place.v
+saveNetlist pnr_out/${TOP_NAME}_place.v
 
 # setExtractRCMode -engine preRoute -effortLevel low -coupled true -total_c_th 0.0
 setExtractRCMode -engine preRoute -effortLevel low
@@ -85,4 +85,5 @@ rcOut -spef pnr_out/RC_place.spef.gz
 streamOut pnr_out/${top_module}_place.gds.gz
 saveDesign pnr_save/placement.enc
 
-exec touch _Place_Finished_
+exec touch _Finished_
+exit

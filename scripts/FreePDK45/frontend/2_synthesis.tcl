@@ -2,11 +2,9 @@
 # Save the parameters trasferred from the server
 #------------------------------------------------------------------------------
 set PERIOD {{period}}
-set FANOUT_LIMIT {{fanout_limit}}
-set TRANSITION_LIMIT {{transition_limit}}
-set CAPACITANCE_LIMIT {{capacitance_limit}}     
-set HIGH_FANOUT_NET_THRESHOLD {{high_fanout_net_threshold}}
-set HIGH_FANOUT_NET_PIN_CAPACITANCE {{high_fanout_net_pin_capacitance}}
+set FANOUT_VALUE {{fanout_value}}
+set TRANSITION_VALUE {{transition_value}}
+set CAPACITANCE_VALUE {{capacitance_value}}     
 set COMPILE_CMD {{compile_cmd}}
 set POWER_EFFORT {{power_effort}}
 set AREA_EFFORT {{area_effort}}   
@@ -14,6 +12,7 @@ set MAP_EFFORT {{map_effort}}
 set DYNAMIC_OPTIMIZATION {{dynamic_optimization}}
 set LEAKAGE_OPTIMIZATION {{leakage_optimization}}
 
+set RTL_DIR "../../../rtl"
 #------------------------------------------------------------------------------
 # Setup the libraries
 #------------------------------------------------------------------------------
@@ -45,7 +44,8 @@ check_library
 # Setup for Formality verification
 # -----------------------------------------------------------------------------
 
-set_svf ../data/${TOP_NAME}.synthesis.svf
+file mkdir "data"
+set_svf data/${TOP_NAME}.synthesis.svf
 
 # -----------------------------------------------------------------------------
 # Setup for SAIF name mapping database
@@ -120,12 +120,9 @@ check_timing > ${REPORTS_DIR}/check_timing.rpt
 # Set DRC constraints
 #------------------------------------------------------------------------------
 
-
-set_max_fanout      $FANOUT_LIMIT         $TOP_NAME
-set_max_transition  $TRANSITION_LIMIT     $TOP_NAME
-set_max_capacitance $CAPACITANCE_LIMIT    $TOP_NAME
-set high_fanout_net_threshold $HIGH_FANOUT_NET_THRESHOLD
-set high_fanout_net_pin_capacitance $HIGH_FANOUT_NET_PIN_CAPACITANCE
+set_max_fanout      $FANOUT_VALUE         $TOP_NAME
+set_max_transition  $TRANSITION_VALUE     $TOP_NAME
+set_max_capacitance $CAPACITANCE_VALUE    $TOP_NAME
 
 #-----------------------------------------------------------------------------
 # Compile the design

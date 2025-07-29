@@ -2,10 +2,11 @@
 # Save the parameters trasferred from the server
 #------------------------------------------------------------------------------
 set ROW_DENSITY {{rowDensity}}
+set ASPECT_RATIO {{aspectRatio}}
 
 #------------------------------------------------------------------------------
 # Floorplan parameters
-set ASPECT_RATIO 1
+# set ASPECT_RATIO 1
 
 setDrawView fplan
 floorPlan -site FreePDK45_38x28_10R_NP_162NW_34O -r ${ASPECT_RATIO} ${ROW_DENSITY}
