@@ -197,13 +197,56 @@ class EnhancedParameterExtractor:
                 break
         
         # 6. Auto-inherit base parameters (if not specified in query and available in session)
+        # Note: Only inherit non-critical parameters to avoid cross-design contamination
         if previous_params:
-            base_inherited_params = ["design", "tech", "version_idx", "top_module", "syn_ver", "impl_ver", "force"]
-            for param in base_inherited_params:
+            # Only inherit safe parameters, not design-specific ones like 'design', 'top_module'
+            safe_inherited_params = ["tech", "version_idx", "force"]
+            for param in safe_inherited_params:
                 if param not in extracted and param in previous_params:
                     extracted[param] = previous_params[param]
+            
+            # For syn_ver and impl_ver, only inherit if the design name is explicitly the same
+            design_in_query = self.extract_design_from_query(query)
+            previous_design = previous_params.get("design")
+            
+            if design_in_query and previous_design and design_in_query == previous_design:
+                # Same design, can inherit version parameters
+                version_params = ["syn_ver", "impl_ver"]
+                for param in version_params:
+                    if param not in extracted and param in previous_params:
+                        extracted[param] = previous_params[param]
         
         return extracted
+    
+    def extract_design_from_query(self, query: str) -> Optional[str]:
+        """Extract design name from user query"""
+        query_lower = query.lower()
+        
+        # Common design name patterns
+        design_patterns = [
+            r'design\s+(\w+)',
+            r'run\s+(\w+)',
+            r'execute\s+(\w+)',
+            r'process\s+(\w+)',
+            r'synthesis\s+for\s+(\w+)',
+            r'synthesis\s+(\w+)',
+            r'(\w+)\s+synthesis',
+            r'compile\s+(\w+)',
+            r'(\w+)\s+compile',
+            r'(\w+)\s+design',
+            # Direct design name patterns
+            r'\b(des|b14|aes|riscv|cpu|gpu|soc)\b'
+        ]
+        
+        for pattern in design_patterns:
+            match = re.search(pattern, query_lower)
+            if match:
+                design_name = match.group(1)
+                # Filter out common non-design words
+                if design_name not in ['the', 'and', 'for', 'with', 'using', 'run', 'execute', 'process']:
+                    return design_name
+        
+        return None
 
 # Conflict detector
 class ConflictDetector:
@@ -320,23 +363,18 @@ async def execute_multi_stage_flow(flow_name: str, params: Dict[str, Any], strat
     # Define flow stages for each flow type
     flow_definitions = {
         "synth": [
-            ("synth", {"design": params["design"], "tech": params.get("tech", "FreePDK45"), "version_idx": params.get("version_idx", 0), "force": params.get("force", False)})
+            ("synth", {"design": params.get("design", ""), "tech": params.get("tech", "FreePDK45"), "version_idx": params.get("version_idx", 0), "force": params.get("force", False)})
         ],
         "pnr": [
-            ("floorplan", {"design": params["design"], "top_module": params["top_module"], "syn_ver": params.get("syn_ver", "cpV1_clkP1_drcV1")}),
-            ("powerplan", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
-            ("placement", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
-            ("cts", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
-            ("route", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")})
+            ("unified_placement", {"design": params.get("design", ""), "top_module": params.get("top_module", ""), "syn_ver": params.get("syn_ver", "cpV1_clkP1_drcV1")}),
+            ("cts", {"design": params.get("design", ""), "top_module": params.get("top_module", ""), "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
+            ("unified_route_save", {"design": params.get("design", ""), "top_module": params.get("top_module", ""), "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")})
         ],
         "full_flow": [
-            ("synth", {"design": params["design"], "tech": params.get("tech", "FreePDK45"), "version_idx": params.get("version_idx", 0), "force": params.get("force", False)}),
-            ("floorplan", {"design": params["design"], "top_module": params["top_module"], "syn_ver": params.get("syn_ver", "cpV1_clkP1_drcV1")}),
-            ("powerplan", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
-            ("placement", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
-            ("cts", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
-            ("route", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
-            ("save", {"design": params["design"], "top_module": params["top_module"], "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")})
+            ("synth", {"design": params.get("design", ""), "tech": params.get("tech", "FreePDK45"), "version_idx": params.get("version_idx", 0), "force": params.get("force", False)}),
+            ("unified_placement", {"design": params.get("design", ""), "top_module": params.get("top_module", ""), "syn_ver": params.get("syn_ver", "cpV1_clkP1_drcV1")}),
+            ("cts", {"design": params.get("design", ""), "top_module": params.get("top_module", ""), "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")}),
+            ("unified_route_save", {"design": params.get("design", ""), "top_module": params.get("top_module", ""), "impl_ver": params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")})
         ]
     }
     
@@ -366,27 +404,32 @@ async def execute_multi_stage_flow(flow_name: str, params: Dict[str, Any], strat
                 stage_params.update(stage_req["parameters"])
         
         # Auto-add restore_enc parameter for stages that need previous stage output
-        if stage_name in ["powerplan", "placement", "cts", "route"]:
+        if stage_name in ["cts", "unified_route_save"]:
             impl_ver = stage_params.get("impl_ver", "cpV1_clkP1_drcV1__g0_p0")
             design = stage_params.get("design", "")
             
             if design:  # Only proceed if design is specified
                 # Define which previous stage each stage depends on
                 previous_stage_map = {
-                    "powerplan": "floorplan",
-                    "placement": "powerplan", 
-                    "cts": "placement",
-                    "route": "cts"
+                    "cts": "unified_placement",
+                    "unified_route_save": "cts"
                 }
                 
                 previous_stage = previous_stage_map[stage_name]
-                restore_enc_path = find_exact_enc(design, impl_ver, previous_stage)
+                # For unified stages, look for the composite output file
+                if previous_stage == "unified_placement":
+                    restore_enc_path = find_exact_enc(design, impl_ver, "placement")
+                else:
+                    restore_enc_path = find_exact_enc(design, impl_ver, previous_stage)
                 
                 if restore_enc_path:
                     stage_params["restore_enc"] = restore_enc_path
                 else:
                     # If no restore_enc found, use a default path pattern
-                    default_path = f"designs/{design}/FreePDK45/implementation/{impl_ver}/pnr_save/{previous_stage}.enc.dat"
+                    if previous_stage == "unified_placement":
+                        default_path = f"designs/{design}/FreePDK45/implementation/{impl_ver}/pnr_save/placement.enc.dat"
+                    else:
+                        default_path = f"designs/{design}/FreePDK45/implementation/{impl_ver}/pnr_save/{previous_stage}.enc.dat"
                     stage_params["restore_enc"] = default_path
         
         # Call the stage
@@ -430,23 +473,17 @@ async def execute_multi_stage_flow(flow_name: str, params: Dict[str, Any], strat
 # Required parameters for each tool
 REQUIRED_PARAMS = {
     "synth": ["design"],
-    "floorplan": ["design", "top_module", "syn_ver"],
-    "powerplan": ["design", "top_module", "impl_ver"],
-    "placement": ["design", "top_module", "impl_ver"],
-    "cts": ["design", "top_module", "impl_ver"],
-    "route": ["design", "top_module", "impl_ver"],
-    "save": ["design", "top_module", "impl_ver"]
+    "unified_placement": ["design", "top_module", "syn_ver"],
+    "cts": ["design", "top_module", "impl_ver", "restore_enc"],
+    "unified_route_save": ["design", "top_module", "impl_ver", "restore_enc"]
 }
 
 # EDA tool server endpoints
 TOOLS = {
     "synth": {"port": 13333, "path": "/run"},
-    "floorplan": {"port": 13335, "path": "/floorplan/run"},
-    "powerplan": {"port": 13336, "path": "/power/run"},
-    "placement": {"port": 13337, "path": "/place/run"},
-    "cts": {"port": 13338, "path": "/cts/run"},
-    "route": {"port": 13339, "path": "/route/run"},
-    "save": {"port": 13440, "path": "/save/run"}
+    "unified_placement": {"port": 13340, "path": "/run"},
+    "cts": {"port": 13338, "path": "/run"},
+    "unified_route_save": {"port": 13341, "path": "/run"}
 }
 
 async def intelligent_agent(instruction: Instruction) -> AgentResponse:
@@ -467,13 +504,10 @@ IMPORTANT: Provide all responses in English only, regardless of the input langua
 
 Available tools:
 - synth: Complete RTL-to-gate synthesis (setup + compile)
-- floorplan: Physical design floorplanning
-- powerplan: Power planning
-- placement: Cell placement
-- pnr: Complete P&R flow (floorplan + powerplan + placement + cts + route)
+- unified_placement: Unified placement flow (floorplan + powerplan + placement)
 - cts: Clock tree synthesis
-- route: Routing
-- save: Save design
+- unified_route_save: Unified routing and save flow (routing + save design)
+- pnr: Complete P&R flow (unified_placement + cts + unified_route_save)
 - full_flow: Complete EDA flow (all stages)
 
 Required parameters:
@@ -486,8 +520,8 @@ Required parameters:
 - force: Force overwrite existing results (optional, default: false)
 
 Stage-specific requirements (for multi-stage flows):
-If user mentions specific requirements for stages like "floorplan requirements: area optimization", 
-"powerplan requirements: low power", "placement requirements: timing optimization", extract them.
+If user mentions specific requirements for stages like "unified_placement requirements: area optimization", 
+"cts requirements: low power", "unified_route_save requirements: timing optimization", extract them.
 
 User query: "{instruction.user_query}"
 
@@ -500,11 +534,9 @@ Return JSON response:
         "syn_ver": "extracted_or_default",
         "impl_ver": "extracted_or_default",
         "stage_requirements": {{
-            "floorplan": {{"requirements": "extracted_text", "parameters": {{}}}},
-            "powerplan": {{"requirements": "extracted_text", "parameters": {{}}}},
-            "placement": {{"requirements": "extracted_text", "parameters": {{}}}},
+            "unified_placement": {{"requirements": "extracted_text", "parameters": {{}}}},
             "cts": {{"requirements": "extracted_text", "parameters": {{}}}},
-            "route": {{"requirements": "extracted_text", "parameters": {{}}}}
+            "unified_route_save": {{"requirements": "extracted_text", "parameters": {{}}}}
         }}
     }}
 }}
@@ -520,10 +552,23 @@ Only include stages in stage_requirements that have specific requirements mentio
     
     # Parse tool selection result
     try:
-        tool_data = json.loads(tool_response.choices[0].message.content)
+        raw_response = tool_response.choices[0].message.content
+        # Try direct JSON parsing first
+        try:
+            tool_data = json.loads(raw_response)
+        except json.JSONDecodeError:
+            # If direct parsing fails, try to extract JSON from the response
+            import re
+            json_match = re.search(r'\{.*\}', raw_response, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(0)
+                tool_data = json.loads(json_str)
+            else:
+                raise json.JSONDecodeError("No JSON found in response", raw_response, 0)
+        
         tool_name = tool_data["tool"]
         base_params = tool_data["tool_input"]
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, KeyError) as e:
         raise HTTPException(status_code=400, detail="AI tool selection failed")
     
     # Step 2: Intelligent strategy recommendation
@@ -555,10 +600,23 @@ User request: {instruction.user_query}
     )
     
     try:
-        strategy_data = json.loads(strategy_response.choices[0].message.content)
+        raw_strategy_response = strategy_response.choices[0].message.content
+        # Try direct JSON parsing first
+        try:
+            strategy_data = json.loads(raw_strategy_response)
+        except json.JSONDecodeError:
+            # If direct parsing fails, try to extract JSON from the response
+            import re
+            json_match = re.search(r'\{.*\}', raw_strategy_response, re.DOTALL)
+            if json_match:
+                json_str = json_match.group(0)
+                strategy_data = json.loads(json_str)
+            else:
+                raise json.JSONDecodeError("No JSON found in strategy response", raw_strategy_response, 0)
+        
         strategy = strategy_data["strategy"]
         reasoning = strategy_data["reasoning"]
-    except json.JSONDecodeError:
+    except (json.JSONDecodeError, KeyError):
         strategy = "fast"
         reasoning = "Default to fast strategy for quick verification"
     
@@ -587,28 +645,16 @@ User request: {instruction.user_query}
                 final_params[key[8:]] = value
     
     # Step 6: Check for multi-stage flows and execute if needed
-    multi_stage_flows = ["synth", "pnr", "full_flow"]
-    if tool_name in multi_stage_flows:
-        return await execute_multi_stage_flow(tool_name, final_params, strategy, instruction.session_id)
+    multi_stage_flows = ["pnr", "full_flow"]
     
-    # Step 7: Validate required parameters
-    required = REQUIRED_PARAMS.get(tool_name, [])
-    missing = [param for param in required if param not in final_params]
-    
-    if missing:
-        error_msg = f"Missing required parameters: {', '.join(missing)}. Please provide these parameters."
-        if conflicts:
-            error_msg += f"\nAdditionally detected potential conflicts: {'; '.join(conflicts)}"
-        raise HTTPException(status_code=400, detail=error_msg)
-    
-    # Step 8: Auto-complete file paths (using user-specified exact version)
-    if tool_name in ["powerplan", "placement", "cts", "route"] and "restore_enc" not in final_params:
+    # Step 7: Auto-complete file paths (using user-specified exact version)
+    if tool_name in ["cts", "unified_route_save"] and "restore_enc" not in final_params:
         impl_ver = final_params.get("impl_ver", "")
         if not impl_ver:
             raise HTTPException(status_code=400, detail=f"{tool_name} stage requires impl_ver parameter")
         
         # Determine required previous stage
-        previous_stage = {"powerplan": "floorplan", "placement": "powerplan", "cts": "placement", "route": "cts"}[tool_name]
+        previous_stage = {"cts": "placement", "unified_route_save": "cts"}[tool_name]
         
         # Find user-specified version's previous stage output
         restore_enc = find_exact_enc(final_params["design"], impl_ver, previous_stage)
@@ -617,7 +663,7 @@ User request: {instruction.user_query}
             final_params["restore_enc"] = restore_enc
         else:
             # EDA flow order prompt
-            flow_order = ["synth", "floorplan", "powerplan", "placement", "cts", "route", "save"]
+            flow_order = ["synth", "unified_placement", "cts", "unified_route_save"]
             current_index = flow_order.index(tool_name)
             required_stages = " → ".join(flow_order[:current_index])
             
@@ -627,9 +673,23 @@ User request: {instruction.user_query}
                        f"EDA flow must be executed in order: {required_stages}\n"
                        f"Please run {previous_stage} stage first to generate necessary input files."
             )
+
+    # Step 8: Validate required parameters
+    required = REQUIRED_PARAMS.get(tool_name, [])
+    missing = [param for param in required if param not in final_params]
+    
+    if missing:
+        error_msg = f"Missing required parameters: {', '.join(missing)}. Please provide these parameters."
+        if conflicts:
+            error_msg += f"\nAdditionally detected potential conflicts: {'; '.join(conflicts)}"
+        raise HTTPException(status_code=400, detail=error_msg)
+    
+    # Skip multi-stage flow check as it was already handled above
+    if tool_name in multi_stage_flows:
+        return await execute_multi_stage_flow(tool_name, final_params, strategy, instruction.session_id)
     
     # Step 9: Call EDA tool
-    if tool_name not in TOOLS and tool_name not in ["synth", "pnr", "full_flow"]:
+    if tool_name not in TOOLS:
         raise HTTPException(status_code=400, detail=f"Unknown tool: {tool_name}")
     
     info = TOOLS[tool_name]
