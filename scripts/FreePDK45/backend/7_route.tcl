@@ -81,3 +81,11 @@ rcOut -spef pnr_out/RC.spef.gz
 summaryReport -outfile pnr_reports/route_summary.rpt
 
 saveDesign pnr_save/route_opt.enc
+saveNetlist pnr_out/${TOP_NAME}_pnr.v
+write_lef_abstract pnr_out/${TOP_NAME}_pnr.lef
+write_lef_library pnr_out/${TOP_NAME}_lib.lef
+#do_extract_model -view default pnr_out/${TOP_NAME}_pnr.lib
+
+streamOut pnr_out/${TOP_NAME}_pnr.gds.gz
+
+exec touch _Finished_
