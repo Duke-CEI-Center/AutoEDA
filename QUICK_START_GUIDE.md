@@ -7,9 +7,8 @@ Before starting, ensure you have the following installed:
 - **Python 3.9+**
 - **Synopsys Design Compiler** (for synthesis)
 - **Cadence Innovus** (for physical implementation)
-- **FreePDK45** technology library
+- **FreePDK45** technology library (included)
 - **OpenAI API Key** (for GPT-4 integration)
-- **MCP SDK** (for Model Context Protocol support)
 
 ## Step 1: Environment Setup
 
@@ -17,27 +16,12 @@ Before starting, ensure you have the following installed:
 
 ```bash
 # Clone the repository
-git clone https://github.com/AndyLu666/MCP-EDA-Server.git
-cd MCP-EDA-Server
-```
+git clone https://github.com/your-org/mcp-eda-example.git
+cd mcp-eda-example
 
-If you are using python virtual environment:  
-
-```bash
 # Create and activate virtual environment
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
-pip install -r requirements.txt
-```
-
-If you are using conda environment:  
-
-```bash
-# Create and activate conda environment
-conda create -n your_env_name python=3.11
-conda activate your_env_name
 
 # Install dependencies
 pip install -r requirements.txt
@@ -51,18 +35,26 @@ Create a `.env` file in the project root:
 # OpenAI API Configuration
 OPENAI_API_KEY=your_openai_api_key_here
 
-# MCP Server Configuration
+# Server Configuration (optional)
 MCP_SERVER_HOST=http://localhost
+LOG_ROOT=./logs
+
+# EDA Tool Paths (adjust to your installation)
+SYNOPSYS_ROOT=/opt/synopsys
+CADENCE_ROOT=/opt/cadence
 ```
 
 ### 1.3 Verify EDA Tools
 
 ```bash
 # Check Design Compiler
-which dc_shell
+dc_shell -version
 
 # Check Innovus
-which innovus
+innovus -version
+
+# Check license servers
+lmstat -a
 
 # Verify FreePDK45 library
 ls libraries/FreePDK45/
@@ -70,266 +62,258 @@ ls libraries/FreePDK45/
 
 ## Step 2: Start the Services
 
-### 2.1 Start MCP Agent Client (HTTP API)
+### 2.1 Start All Microservices
 
 ```bash
-# Terminal 1: Start the main agent
-# Activate virtual environment or conda environment
-source venv/bin/activate  # On Windows: venv\Scripts\activate  
-                          # or "conda activate your_env_name"  
-uvicorn mcp_agent_client:app --reload --host 0.0.0.0 --port 8000  
-```
-
-### 2.2 Start MCP Servers
-
-```bash
-# Terminal 2: Start all MCP servers
+# Start all four microservices
 ./restart_servers.sh
 ```
+
+This script starts:
+- **Synthesis Service** (port 13333)
+- **Unified Placement Service** (port 13340) - includes floorplan, powerplan, and placement
+- **CTS Service** (port 13338)
+- **Unified Route & Save Service** (port 13341) - includes routing and final save
 
 **Alternative: Start servers individually**
 
 ```bash
-cd server
-python3 synth_setup_server.py --port 13333 &
-python3 synth_compile_server.py --port 13334 &
-python3 floorplan_server.py --port 13335 &
-python3 powerplan_server.py --port 13336 &
-python3 placement_server.py --port 13337 &
-python3 cts_server.py --port 13338 &
-python3 route_server.py --port 13339 &
-python3 save_server.py --port 13440 &
+# Start each service individually
+python3 server/synth_server.py --port 13333 &
+python3 server/unified_placement_server.py --port 13340 &
+python3 server/cts_server.py --port 13338 &
+python3 server/unified_route_save_server.py --port 13341 &
 ```
 
-### 2.3 Start MCP EDA Server (for Claude Desktop)
+### 2.2 Start AI Agent Client
 
 ```bash
-# Terminal 3: Start MCP server for Claude Desktop integration
-cd server/mcp
-./start_mcp_server.sh
+# Start the intelligent agent (GPT-4 powered)
+python3 mcp_agent_client.py
+
+# Or using uvicorn for production
+uvicorn mcp_agent_client:app --host 0.0.0.0 --port 8000
 ```
 
-### 2.4 Verify Services are Running
+### 2.3 Verify Services are Running
 
 ```bash
 # Check if all ports are listening
-netstat -tlnp | grep -E "(1333[3-9]|13440|8000)"
+netstat -tlnp | grep -E "(8000|13333|13338|13340|13341)"
 
 # Expected output:
-# tcp6       0      0 :::8000     :::*        LISTEN      [PID]/python3
-# tcp6       0      0 :::13333    :::*        LISTEN      [PID]/python3
-# tcp6       0      0 :::13334    :::*        LISTEN      [PID]/python3
-# ... (and so on for all ports)
+# tcp6       0      0 :::8000     :::*        LISTEN      [PID]/python3  (Agent)
+# tcp6       0      0 :::13333    :::*        LISTEN      [PID]/python3  (Synthesis)
+# tcp6       0      0 :::13338    :::*        LISTEN      [PID]/python3  (CTS)
+# tcp6       0      0 :::13340    :::*        LISTEN      [PID]/python3  (Placement)
+# tcp6       0      0 :::13341    :::*        LISTEN      [PID]/python3  (Route & Save)
+
+# Check service health and API documentation
+curl http://localhost:13333/docs  # Synthesis API docs
+curl http://localhost:13340/docs  # Placement API docs
+curl http://localhost:13338/docs  # CTS API docs
+curl http://localhost:13341/docs  # Route & Save API docs
 ```
 
 ## Step 3: Your First Design
 
-### 3.1 Using Natural Language Interface (HTTP API)
+### 3.1 Using Natural Language Interface (AI Agent)
 
-The easiest way to run designs is through the natural language interface:
+The easiest way to run designs is through the AI-powered natural language interface:
 
 ```bash
-# Test the system with a simple synthesis setup
+# Test synthesis for a design
 curl -X POST http://localhost:8000/agent \
   -H "Content-Type: application/json" \
-  -d '{"user_query":"Run synth_setup for design=\"des\" and return the log path."}'
+  -d '{"user_query":"Run synthesis for design aes with high performance", "session_id":"demo"}'
 ```
 
 **Expected Response:**
 ```json
 {
-  "tool_called": "synth_setup",
+  "tool_called": "synth",
   "tool_input": {
-    "design": "des",
+    "design": "aes",
     "tech": "FreePDK45",
-    "version_idx": 0,
-    "force": true
+    "clk_period": 5.0,
+    "force": false,
+    "syn_version": "cpV1_clkP1_drcV1"
   },
   "tool_output": {
     "status": "ok",
-    "log_path": "/home/yl996/proj/mcp-eda-example/logs/setup/des_setup_20241219_143022.log"
-  }
+    "log_path": "/home/yl996/proj/mcp-eda-example/logs/synthesis/aes_synthesis_20241201_143022.log",
+    "reports": {...},
+    "tcl_path": "/home/yl996/proj/mcp-eda-example/result/aes/FreePDK45/complete_synthesis.tcl"
+  },
+  "ai_reasoning": "Selected synthesis with performance optimization strategy",
+  "suggestions": ["Consider running placement after synthesis completion"]
 }
 ```
 
-### 3.2 Using Interactive MCP Client
+### 3.2 Complete RTL-to-GDSII Flow
 
-For interactive command-line usage:
-
-```bash
-# Start interactive MCP client
-python3 mcp_eda_client_simple.py
-```
-
-**Example interactive session:**
-```
-=== Interactive MCP EDA Client ===
-Connected to MCP server. Type help for commands, exit to quit.
-
-MCP> help
-Available commands:
-  list                List all tools
-  call <tool> <args>  Call specific tool (supports natural language)
-  Direct input        Smart recognition and tool calling
-  exit                Exit client
-
-MCP> Please run synthesis setup for b14 design
-Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45', 'version_idx': 0, 'force': False}
-```
-
-### 3.3 Using Claude Desktop Integration
-
-1. Install Claude Desktop
-2. Add the MCP server to Claude Desktop configuration:
-
-```json
-{
-  "mcpServers": {
-    "mcp-eda": {
-      "command": "python3",
-      "args": ["/path/to/mcp-eda-example/server/mcp/mcp_eda_server.py"],
-      "env": {
-        "PYTHONPATH": "/path/to/mcp-eda-example"
-      }
-    }
-  }
-}
-```
-
-3. Restart Claude Desktop and use natural language to control EDA tools
-
-### 3.4 Complete Design Flow Example
-
-Run the complete design flow for the DES design:
+Run a complete design flow using natural language:
 
 ```bash
-# 1. Synthesis Setup
+# Complete flow for AES design
 curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run synth_setup for design=\"des\" and return the log path."}'
-
-# 2. Synthesis Compile
-curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run synth_compile for design=\"des\" and return the log path."}'
-
-# 3. Floorplan
-curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run floorplan for design=\"des\", top_module=\"des3\" and return the syn_ver and the path to floorplan.enc.dat."}'
-
-# 4. Power Planning
-curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run powerplan for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the path to powerplan.enc.dat."}'
-
-# 5. Placement
-curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run placement for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the path to placement.enc.dat."}'
-
-# 6. Clock Tree Synthesis
-curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run CTS for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the path to cts.enc.dat."}'
-
-# 7. Routing
-curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run routing for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the path to route_opt.enc.dat."}'
-
-# 8. Save Design
-curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run save for design=\"des\", top_module=\"des3\", impl_ver=\"cpV1_clkP1_drcV1__g0_p0\" and return the archive path."}'
+  -H "Content-Type: application/json" \
+  -d '{"user_query":"Run complete full_flow for design aes with performance optimization", "session_id":"demo"}'
 ```
 
-### 3.5 Using Automated Pipeline Script
+This will automatically execute:
+1. **Synthesis** - RTL to gate-level netlist
+2. **Unified Placement** - Floorplan + Powerplan + Placement
+3. **CTS** - Clock tree synthesis and optimization
+4. **Unified Route & Save** - Global/detail routing + final GDS generation
 
-For automated complete flow execution:
+### 3.3 Multi-Stage Flow Control
+
+You can also run specific flow stages:
 
 ```bash
-# Run complete pipeline for DES design
-./run_pipeline.sh
+# Just the physical design flow (P&R)
+curl -X POST http://localhost:8000/agent \
+  -H "Content-Type: application/json" \
+  -d '{"user_query":"Run pnr flow for design aes using synthesis version cpV1_clkP1_drcV1_20241201_143022", "session_id":"demo"}'
 
-# The script automatically:
-# 1. Runs synthesis setup and compile
-# 2. Detects synthesis version
-# 3. Runs floorplan, powerplan, placement, CTS, routing
-# 4. Saves final design
-# 5. Provides status updates and error checking
+# Individual stages
+curl -X POST http://localhost:8000/agent \
+  -H "Content-Type: application/json" \
+  -d '{"user_query":"Run placement for design aes with target utilization 0.8", "session_id":"demo"}'
 ```
 
-## Step 4: Direct API Usage
+### 3.4 Session Management
 
-### 4.1 Synthesis Setup
+The AI agent remembers your previous parameters and preferences:
 
 ```bash
-curl -X POST http://localhost:13333/setup/run \
+# First request - specify full parameters
+curl -X POST http://localhost:8000/agent \
+  -H "Content-Type: application/json" \
+  -d '{"user_query":"Run synthesis for design aes with 500MHz clock", "session_id":"my_session"}'
+
+# Follow-up request - agent remembers design and parameters
+curl -X POST http://localhost:8000/agent \
+  -H "Content-Type: application/json" \
+  -d '{"user_query":"Now run placement with high utilization", "session_id":"my_session"}'
+
+# Check session history
+curl -X GET http://localhost:8000/session/my_session/history
+```
+
+### 3.5 Strategy-Based Optimization
+
+The system supports different optimization strategies:
+
+```bash
+# Fast flow (for quick verification)
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run fast synthesis for design aes", "session_id":"demo"}'
+
+# Performance optimization
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run high performance full_flow for design aes", "session_id":"demo"}'
+
+# Power optimization
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run low power placement for design aes", "session_id":"demo"}'
+
+# Area optimization
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run small area routing for design aes", "session_id":"demo"}'
+```
+
+## Step 4: Direct Service API Usage
+
+### 4.1 Synthesis Service (Port 13333)
+
+```bash
+curl -X POST http://localhost:13333/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "des",
+    "design": "aes",
     "tech": "FreePDK45",
-    "version_idx": 0,
+    "clk_period": 5.0,
+    "syn_version": "cpV1_clkP1_drcV1",
     "force": true
   }'
 ```
 
-### 4.2 Floorplan
+### 4.2 Unified Placement Service (Port 13340)
 
 ```bash
-curl -X POST http://localhost:13335/floorplan/run \
+curl -X POST http://localhost:13340/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "des",
-    "top_module": "des3",
+    "design": "aes",
     "tech": "FreePDK45",
-    "syn_ver": "cpV1_clkP1_drcV1",
-    "g_idx": 0,
-    "p_idx": 0,
+    "syn_ver": "cpV1_clkP1_drcV1_20241201_143022",
+    "top_module": "aes_cipher_top",
+    "target_util": 0.8,
+    "ASPECT_RATIO": 1.0,
     "force": true
   }'
 ```
 
-### 4.3 Placement
+### 4.3 CTS Service (Port 13338)
 
 ```bash
-curl -X POST http://localhost:13337/place/run \
+curl -X POST http://localhost:13338/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "des",
-    "top_module": "des3",
+    "design": "aes",
     "tech": "FreePDK45",
-    "impl_ver": "cpV1_clkP1_drcV1__g0_p0",
-    "g_idx": 0,
-    "p_idx": 0,
-    "restore_enc": "/home/yl996/proj/mcp-eda-example/designs/des/FreePDK45/implementation/powerplan.enc.dat",
+    "impl_ver": "cpV1_clkP1_drcV1_20241201_143022__g0_p0",
+    "top_module": "aes_cipher_top",
+    "restore_enc": "/path/to/placement.enc.dat",
+    "force": true
+  }'
+```
+
+### 4.4 Unified Route & Save Service (Port 13341)
+
+```bash
+curl -X POST http://localhost:13341/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "design": "aes",
+    "tech": "FreePDK45",
+    "impl_ver": "cpV1_clkP1_drcV1_20241201_143022__g0_p0",
+    "top_module": "aes_cipher_top",
+    "restore_enc": "/path/to/cts.enc.dat",
+    "archive": true,
     "force": true
   }'
 ```
 
 ## Step 5: Experimental Framework
 
-### 5.1 Running TCL Accuracy Experiments
+### 5.1 Running CodeBLEU Evaluation Experiments
 
-The project includes a comprehensive experimental framework for evaluating TCL generation accuracy:
+The project includes a comprehensive experimental framework for evaluating TCL generation quality:
 
 ```bash
 # Navigate to experiment directory
-cd experiment
+cd exp_v1/experiment
 
-# Run complete experiment (generate + evaluate)
-python run_experiment.py --full
+# Run complete experiment for specific designs
+python3 run_experiment.py --designs aes,des --methods baseline1,baseline2,ours
 
-# Run only generation for specific methods
-python run_experiment.py --generate baseline1 ours
+# Run evaluation on existing results
+python3 evaluate/tcl_evaluator.py --results_dir results --timestamp 20241201_143022 --summary
 
-# Run only evaluation on existing results
-python run_experiment.py --evaluate --summary
-
-# Clean previous results and run
-python run_experiment.py --clean --full
+# Clean previous results and run fresh
+python3 run_experiment.py --clean --full
 ```
 
-### 5.2 Experiment Methods
+### 5.2 Evaluation Methods
 
-The framework compares three TCL generation methods:
+The framework compares three TCL generation approaches:
 
-1. **Baseline1**: Pure LLM-based TCL generation
-2. **Baseline2**: LLM + template-based generation
-3. **Ours**: MCP agent with real EDA tool execution
+1. **Baseline1**: Simple template-based generation
+2. **Baseline2**: Enhanced template with parameter optimization
+3. **Ours**: AI-powered agent with GPT-4 integration
 
 ### 5.3 Viewing Results
 
@@ -341,58 +325,92 @@ ls results/ours/
 
 # Check evaluation results
 ls evaluation_results/
-cat evaluation_results/tcl_accuracy_evaluation.json
+cat evaluation_results/latest/tcl_codebleu_evaluation.json
+
+# View summary statistics
+python3 evaluate/tcl_evaluator.py --results_dir results --summary
 ```
 
-## Step 6: Testing
+### 5.4 Evaluation Metrics
 
-### 6.1 Run Test Suite
+The framework uses CodeBLEU metrics:
+- **CodeBLEU Score**: Overall semantic similarity
+- **Syntax Match**: TCL syntax correctness
+- **Dataflow Analysis**: Logic flow preservation
+- **N-gram Matching**: Token-level similarity
+
+## Step 6: Testing and Validation
+
+### 6.1 Service Health Checks
 
 ```bash
-# Run all tests
-cd tests
-python run_tests.py
+# Check all services are responsive
+curl http://localhost:13333/docs  # Synthesis service
+curl http://localhost:13340/docs  # Unified placement service
+curl http://localhost:13338/docs  # CTS service
+curl http://localhost:13341/docs  # Route & save service
+curl http://localhost:8000/docs   # AI agent
 
-# Run specific test categories
-python -m pytest test_api_endpoints.py -v
-python -m pytest test_integration.py -v
-python -m pytest test_mcp_agent_client.py -v
+# Check agent functionality
+curl -X POST http://localhost:8000/agent \
+  -H "Content-Type: application/json" \
+  -d '{"user_query":"test connection", "session_id":"test"}'
 ```
 
 ### 6.2 Test Different Designs
 
+Available designs in the system:
+
 ```bash
-# Test design configurations
-python test_designs.py
+# List available designs
+ls designs/
 
-# Test API endpoints
-python test_api_endpoints.py
+# Test with AES design
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synthesis for design aes", "session_id":"test"}'
 
-# Test integration scenarios
-python test_integration.py
+# Test with DES design  
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synthesis for design des", "session_id":"test"}'
+
+# Test with B14 benchmark
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synthesis for design b14", "session_id":"test"}'
 ```
 
 ## Step 7: Working with Different Designs
 
-### 7.1 VHDL Design (B14)
+### 7.1 Design Configuration
 
-The B14 design uses VHDL and has a different clock port name:
+Each design has a configuration file that defines key parameters:
 
 ```bash
-# Check the B14 configuration
-cat designs/b14/config.tcl
+# Check AES configuration
+cat designs/aes/config.tcl
 
-# Run synthesis for B14
-curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run synth_setup for design=\"b14\" and return the log path."}'
+# Check DES configuration  
+cat designs/des/config.tcl
+
+# Check B14 configuration (VHDL design)
+cat designs/b14/config.tcl
 ```
 
-### 7.2 LEON2 Design
+### 7.2 Design-Specific Parameters
+
+Different designs may require different parameters:
 
 ```bash
-# Run synthesis for LEON2
+# AES design with specific clock frequency
 curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"Run synth_setup for design=\"leon2\" and return the log path."}'
+  -d '{"user_query":"Run synthesis for design aes with 1GHz clock frequency", "session_id":"demo"}'
+
+# DES design with power optimization
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run low power full_flow for design des", "session_id":"demo"}'
+
+# B14 design (VHDL) with area optimization
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run small area synthesis for design b14", "session_id":"demo"}'
 ```
 
 ### 7.3 Adding New Designs
@@ -401,105 +419,88 @@ To add a new design:
 
 1. Create design directory structure:
 ```bash
-mkdir -p designs/your_design/{rtl,FreePDK45/{synthesis,implementation}}
+mkdir -p designs/your_design/rtl
+mkdir -p designs/your_design/FreePDK45/{synthesis,implementation}
 ```
 
 2. Add RTL files to `designs/your_design/rtl/`
 
 3. Create configuration file `designs/your_design/config.tcl`:
 ```tcl
-set TOP_NAME "your_module"
+set TOP_NAME "your_module_name"
 set FILE_FORMAT "verilog"  # or "vhdl"
 set CLOCK_NAME "clk"       # must match RTL port name
-set clk_period 1.0
+set clk_period 10.0        # default clock period in ns
 ```
 
-## Step 8: Configuration Management
-
-### 8.1 Design Configuration
-
-Each design needs a `config.tcl` file:
-
-```tcl
-# designs/your_design/config.tcl
-set TOP_NAME "your_module"
-set FILE_FORMAT "verilog"  # or "vhdl"
-set CLOCK_NAME "clk"       # must match RTL port name
-set clk_period 1.0
+4. Test the new design:
+```bash
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"Run synthesis for design your_design", "session_id":"test"}'
 ```
 
-### 8.2 Synthesis Parameters
+## Step 8: Monitoring and Debugging
 
-Modify `config/synthesis.csv` for different synthesis configurations:
+### 8.1 Check Logs
 
-```csv
-clk_period,DRC_max_fanout,DRC_max_transition,DRC_max_capacitance,compile_cmd,map_effort,power_effort,area_effort
-1.0,10,0.5,5.0,compile_ultra,high,medium,medium
-2.0,15,1.0,10.0,compile_ultra,high,high,low
-```
-
-### 8.3 Implementation Parameters
-
-Modify `config/imp_global.csv` for different implementation configurations:
-
-```csv
-ASPECT_RATIO,target_util,design_flow_effort,design_power_effort
-1.0,0.7,standard,medium
-1.5,0.8,high,high
-```
-
-## Step 9: Monitoring and Debugging
-
-### 9.1 Check Logs
+All services generate detailed logs:
 
 ```bash
 # Monitor synthesis logs
-tail -f logs/setup/des_setup_*.log
+tail -f logs/synthesis/aes_synthesis_*.log
 
-# Monitor implementation logs
-tail -f logs/floorplan/des_floorplan_*.log
+# Monitor placement logs
+tail -f logs/unified_placement/aes_unified_placement_*.log
 
-# Monitor MCP agent logs
-tail -f logs/mcp_agent_*.log
+# Monitor CTS logs
+tail -f logs/cts/aes_cts_*.log
+
+# Monitor routing logs
+tail -f logs/unified_route_save/aes_unified_route_save_*.log
 ```
 
-### 9.2 Check Design Status
+### 8.2 Check Design Status
 
 ```bash
 # List available designs
 ls designs/
 
-# Check design configuration
-cat designs/des/config.tcl
+# Check design results
+ls designs/aes/FreePDK45/synthesis/
+ls designs/aes/FreePDK45/implementation/
 
-# Check synthesis results
-ls designs/des/FreePDK45/synthesis/
+# Check generated TCL scripts
+ls result/aes/FreePDK45/
 
-# Check implementation results
-ls designs/des/FreePDK45/implementation/
+# Check final deliverables
+ls deliverables/
 ```
 
-### 9.3 Health Check
+### 8.3 Debug Common Issues
 
+#### Service Connection Issues
 ```bash
-# Run health check for all services
-python docker/health_check.py
+# Check if services are running
+ps aux | grep -E "(synth_server|unified_placement_server|cts_server|unified_route_save_server)"
+
+# Restart services if needed
+./restart_servers.sh
 
 # Check specific service
-curl -X GET http://localhost:13333/health
+curl http://localhost:13333/docs
 ```
 
-### 9.4 Common Issues
-
-#### Port Already in Use
+#### AI Agent Issues
 ```bash
-# Kill existing processes
-pkill -f "synth_setup_server.py"
-pkill -f "floorplan_server.py"
-# ... repeat for other servers
+# Check OpenAI API key
+echo $OPENAI_API_KEY
+
+# Test agent connectivity
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"test", "session_id":"debug"}'
 ```
 
-#### EDA Tool Not Found
+#### EDA Tool Issues
 ```bash
 # Check tool installation
 which dc_shell
@@ -508,59 +509,34 @@ which innovus
 # Set up environment variables
 export SNPSLMD_LICENSE_FILE=/path/to/synopsys/license
 export CDS_LIC_FILE=/path/to/cadence/license
+
+# Check license servers
+lmstat -a
 ```
 
 #### Clock Port Mismatch
 ```bash
 # Check RTL clock port name
-grep -r "input.*clk" designs/des/rtl/
+grep -r "input.*clk" designs/aes/rtl/
 grep -r "input.*clock" designs/b14/rtl/
 
-# Update config.tcl to match
-sed -i 's/set CLOCK_NAME "clk"/set CLOCK_NAME "clock"/' designs/b14/config.tcl
+# Update config.tcl to match RTL
+nano designs/your_design/config.tcl
 ```
 
-#### MCP Connection Issues
+#### File Path Issues
 ```bash
-# Check MCP server status
-ps aux | grep mcp_eda_server
+# Check if required files exist
+ls designs/aes/FreePDK45/synthesis/*/results/
+ls designs/aes/FreePDK45/implementation/*/pnr_save/
 
-# Restart MCP server
-cd server/mcp
-./start_mcp_server.sh
+# Check restore_enc file paths in logs
+grep "restore_enc" logs/cts/aes_cts_*.log
 ```
 
-## Step 10: Advanced Usage
+## Step 9: Advanced Usage
 
-### 10.1 Using Different Configuration Versions
-
-```bash
-# Use version 1 for synthesis (different parameters)
-curl -X POST http://localhost:13333/setup/run \
-  -H "Content-Type: application/json" \
-  -d '{
-    "design": "des",
-    "tech": "FreePDK45",
-    "version_idx": 1,
-    "force": true
-  }'
-```
-
-### 10.2 Force Re-run
-
-```bash
-# Force re-run even if output exists
-curl -X POST http://localhost:13333/setup/run \
-  -H "Content-Type: application/json" \
-  -d '{
-    "design": "des",
-    "tech": "FreePDK45",
-    "version_idx": 0,
-    "force": true
-  }'
-```
-
-### 10.3 Batch Processing
+### 9.1 Batch Processing Multiple Designs
 
 Create a script for batch processing:
 
@@ -568,93 +544,130 @@ Create a script for batch processing:
 #!/bin/bash
 # batch_process.sh
 
-DESIGNS=("des" "b14" "leon2")
+DESIGNS=("aes" "des" "b14")
 
 for design in "${DESIGNS[@]}"; do
     echo "Processing design: $design"
     
-    # Synthesis
+    # Run complete flow
     curl -X POST http://localhost:8000/agent \
-      -d "{\"user_query\":\"Run synth_setup for design=\\\"$design\\\" and return the log path.\"}"
+      -H "Content-Type: application/json" \
+      -d "{\"user_query\":\"Run full_flow for design $design with performance optimization\", \"session_id\":\"batch_$design\"}"
     
-    curl -X POST http://localhost:8000/agent \
-      -d "{\"user_query\":\"Run synth_compile for design=\\\"$design\\\" and return the log path.\"}"
-    
-    echo "Completed synthesis for $design"
+    echo "Completed flow for $design"
+    sleep 10  # Wait between designs
 done
 ```
 
-### 10.4 Docker Deployment
+### 9.2 Custom Parameter Control
+
+Use specific parameters for fine-tuned control:
+
+```bash
+# Synthesis with custom clock period
+curl -X POST http://localhost:13333/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "design": "aes",
+    "clk_period": 2.0,
+    "DRC_max_fanout": 15,
+    "power_effort": "high",
+    "force": true
+  }'
+
+# Placement with custom utilization
+curl -X POST http://localhost:13340/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "design": "aes",
+    "syn_ver": "cpV1_clkP1_drcV1_20241201_143022",
+    "target_util": 0.85,
+    "ASPECT_RATIO": 1.2,
+    "force": true
+  }'
+```
+
+### 9.3 Docker Deployment
 
 For containerized deployment:
 
 ```bash
 # Build and run with Docker Compose
-docker-compose up -d
+docker-compose up --build -d
 
 # Check container status
 docker-compose ps
 
 # View logs
-docker-compose logs -f
+docker-compose logs -f mcp-agent
+docker-compose logs -f synth-service
+
+# Scale services
+docker-compose up --scale synth-service=2 -d
 ```
 
-## Step 11: Results and Deliverables
+## Step 10: Results and Deliverables
 
-### 11.1 Check Final Results
+### 10.1 Check Final Results
 
 ```bash
-# List deliverables
+# List deliverables (if archive option was used)
 ls deliverables/
 
-# Extract and view results
-tar -tzf deliverables/des_*.tar.gz
+# Extract and view tarball contents
+tar -tzf deliverables/aes_*_route_save_*.tgz
 
-# View timing reports
-cat designs/des/FreePDK45/implementation/timing.rpt
+# Check final GDS files
+ls designs/aes/FreePDK45/implementation/*/pnr_out/*.gds*
+
+# Check generated TCL scripts
+ls result/aes/FreePDK45/
 ```
 
-### 11.2 Performance Analysis
+### 10.2 Performance Analysis
 
 ```bash
-# Check area utilization
-cat designs/des/FreePDK45/implementation/area.rpt
+# Check synthesis reports
+ls designs/aes/FreePDK45/synthesis/*/reports/
+cat designs/aes/FreePDK45/synthesis/*/reports/qor.rpt
 
-# Check power consumption
-cat designs/des/FreePDK45/implementation/power.rpt
+# Check implementation reports
+ls designs/aes/FreePDK45/implementation/*/pnr_reports/
+cat designs/aes/FreePDK45/implementation/*/pnr_reports/route_summary.rpt
 
-# Check timing violations
-cat designs/des/FreePDK45/implementation/timing.rpt | grep -i violation
+# Check timing analysis
+cat designs/aes/FreePDK45/implementation/*/pnr_reports/route_timing.rpt.gz | gunzip
 ```
 
-### 11.3 Experiment Results
+### 10.3 Session History and Analysis
 
 ```bash
-# View experiment evaluation summary
-cd experiment
-python run_experiment.py --evaluate --summary
+# View session history
+curl -X GET http://localhost:8000/session/demo/history
 
-# Check detailed results
-cat evaluation_results/tcl_accuracy_evaluation.json | jq '.statistics'
+# Check agent reasoning and suggestions
+curl -X POST http://localhost:8000/agent \
+  -d '{"user_query":"analyze the results for design aes", "session_id":"demo"}'
 ```
 
 ## Next Steps
 
-1. **Explore Different Designs**: Try running the system with different designs (des, b14, leon2)
-2. **Experiment with Parameters**: Modify synthesis and implementation parameters
-3. **Run Experiments**: Use the experimental framework to evaluate TCL generation quality
+1. **Explore Different Designs**: Try running the system with different designs (aes, des, b14)
+2. **Experiment with Strategies**: Test different optimization strategies (fast, performance, power, area)
+3. **Run Experiments**: Use the CodeBLEU experimental framework to evaluate generation quality
 4. **Add Your Own Designs**: Create new designs following the existing structure
-5. **Customize Scripts**: Modify EDA tool scripts for your specific needs
-6. **Integrate with CI/CD**: Set up automated testing and deployment
-7. **Use Claude Desktop**: Integrate with Claude Desktop for natural language EDA control
+5. **Customize Parameters**: Fine-tune synthesis and implementation parameters
+6. **Session Management**: Leverage the AI agent's memory for complex multi-stage workflows
+7. **Integration**: Integrate with your existing EDA toolchain and CI/CD pipeline
 
 ## Getting Help
 
-- **Documentation**: See [API_DOCUMENTATION.md](API_DOCUMENTATION.md) for detailed API reference
-- **MCP Implementation**: See [MCP_IMPLEMENTATION.md](MCP_IMPLEMENTATION.md) for MCP protocol details
-- **Issues**: Report problems on [GitHub Issues](https://github.com/AndyLu666/MCP-EDA-Server/issues)
-- **Discussions**: Join [GitHub Discussions](https://github.com/AndyLu666/MCP-EDA-Server/discussions)
+- **API Documentation**: Check `/docs` endpoint on each service for detailed API reference
+- **Service Health**: Use the health check endpoints to monitor system status
+- **Logs**: Check service logs in the `logs/` directory for detailed execution information
+- **GitHub Issues**: Report problems and request features
+- **Natural Language**: Use the AI agent to ask questions about the system itself
 
 ---
 
-**Congratulations!** You've successfully set up and run your first design through the MCP EDA system. The system now supports multiple interfaces (HTTP API, interactive client, Claude Desktop) and includes comprehensive experimental and testing frameworks. 
+**Congratulations!** You've successfully set up and run your first design through the MCP EDA system. The AI-powered agent provides intelligent orchestration while the microservice architecture ensures scalability and maintainability. 
