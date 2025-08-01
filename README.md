@@ -24,60 +24,7 @@ MCP-EDA revolutionizes chip design workflows by providing:
 
 ## System Architecture
 
-### Core Components
 
-```mermaid
-graph TB
-    subgraph "Client Layer"
-        CLI[CLI Interface]
-        WEB[Web Interface]
-        API[REST API]
-    end
-    
-    subgraph "AI Orchestration Layer"
-        AGENT[Intelligent Agent<br/>FastAPI :8000]
-        GPT[OpenAI GPT-4<br/>Tool Selection & Strategy]
-    end
-    
-    subgraph "Microservice Layer"
-        SYNTH[Synthesis Service<br/>:13333]
-        PLACE[Unified Placement<br/>:13340]
-        CTS[CTS Service<br/>:13338]
-        ROUTE[Route & Save<br/>:13341]
-    end
-    
-    subgraph "Execution Layer"
-        EXEC1[synth_Executor.py]
-        EXEC2[unified_placement_Executor.py]
-        EXEC3[cts_Executor.py]
-        EXEC4[unified_route_save_Executor.py]
-    end
-    
-    subgraph "EDA Tools"
-        DC[Design Compiler]
-        INNOVUS[Cadence Innovus]
-    end
-    
-    CLI --> AGENT
-    WEB --> AGENT
-    API --> AGENT
-    
-    AGENT --> GPT
-    AGENT --> SYNTH
-    AGENT --> PLACE
-    AGENT --> CTS
-    AGENT --> ROUTE
-    
-    SYNTH --> EXEC1
-    PLACE --> EXEC2
-    CTS --> EXEC3
-    ROUTE --> EXEC4
-    
-    EXEC1 --> DC
-    EXEC2 --> INNOVUS
-    EXEC3 --> INNOVUS
-    EXEC4 --> INNOVUS
-```
 
 ### Service Architecture Details
 
