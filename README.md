@@ -24,7 +24,18 @@ MCP-EDA revolutionizes chip design workflows by providing:
 
 ## System Architecture
 
-
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   User Query    │───▶│  MCP Agent      │───▶│   MCP Servers   │
+│  (Natural Lang) │    │  Client (8000)  │    │    Executor     │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                │                       │
+                                ▼                       ▼
+                       ┌─────────────────┐    ┌─────────────────┐
+                       │   OpenAI LLM    │    │    EDA Tools    │
+                       │  (Tool Select)  │    │   (DC/Innovus)  │
+                       └─────────────────┘    └─────────────────┘
+```
 
 ### Service Architecture Details
 
