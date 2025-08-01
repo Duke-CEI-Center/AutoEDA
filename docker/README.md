@@ -7,7 +7,7 @@ This directory contains Docker configuration files for deploying the MCP-EDA pla
 The Docker setup provides containerized deployment of all MCP-EDA components:
 
 - **MCP Agent Client**: AI-powered EDA orchestration agent (port 8000)
-- **MCP Server**: MCP protocol server for Claude Desktop integration (port 8001)
+- **MCP Server**: MCP protocol server for Claude Desktop integration (stdio mode)
 - **EDA Servers**: 4 unified microservices for the complete EDA flow
   - Synthesis Server (port 13333)
   - Unified Placement Server (port 13340) - combines Floorplan + Powerplan + Placement
@@ -65,9 +65,10 @@ Use the deployment script for easy management:
 - **Health Check**: `http://localhost:8000/health`
 
 #### MCP EDA Server
-- **Port**: 8001 (8002 in development)
-- **Purpose**: MCP protocol server for Claude Desktop integration
-- **Health Check**: MCP protocol health check
+- **Mode**: stdio (for Claude Desktop integration)
+- **Purpose**: MCP protocol server with 4-server architecture support
+- **Communication**: stdio-based (no HTTP port needed)
+- **Health Check**: Dependency and import validation
 
 #### MCP Servers
 - **Ports**: 13333-13440 (14333-14440 in development)
