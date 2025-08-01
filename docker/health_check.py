@@ -9,16 +9,12 @@ import sys
 import os
 from typing import List, Dict, Optional
 
-# MCP server ports and names
-MCP_SERVERS = {
-    13333: "Synthesis Setup",
-    13334: "Synthesis Compile", 
-    13335: "Floorplan",
-    13336: "Power Planning",
-    13337: "Placement",
-    13338: "CTS",
-    13339: "Routing",
-    13440: "Save Design"
+# EDA server ports and names (updated architecture)
+EDA_SERVERS = {
+    13333: "Synthesis Server",
+    13338: "CTS Server",
+    13340: "Unified Placement Server (Floorplan + Powerplan + Placement)",
+    13341: "Unified Route Save Server (Routing + Save)"
 }
 
 # Additional services
@@ -121,14 +117,14 @@ def main():
     # Check directories
     dir_status = check_directories()
     
-    print("\nChecking MCP servers...")
+    print("\nChecking EDA servers...")
     print("-" * 30)
     
-    # Check each MCP server
+    # Check each EDA server
     healthy_servers = []
     unhealthy_servers = []
     
-    for port, name in MCP_SERVERS.items():
+    for port, name in EDA_SERVERS.items():
         if check_server_health(port, name):
             healthy_servers.append(port)
         else:
@@ -156,7 +152,7 @@ def main():
     print(f"EDA Tools: {'✓' if eda_accessible else '⚠'}")
     print(f"Directories: {sum(dir_status.values())}/{len(dir_status)} present")
     print(f"Licenses: {sum(license_status.values())}/{len(license_status)} accessible")
-    print(f"MCP Servers: {len(healthy_servers)}/{len(MCP_SERVERS)} healthy")
+    print(f"EDA Servers: {len(healthy_servers)}/{len(EDA_SERVERS)} healthy")
     
     if len(unhealthy_servers) == 0:
         print("\n✓ All services are healthy!")
@@ -165,8 +161,8 @@ def main():
         print(f"\n✗ Health check failed: {len(unhealthy_servers)} services unhealthy")
         print("Unhealthy services:")
         for port in unhealthy_servers:
-            if port in MCP_SERVERS:
-                print(f"  - {MCP_SERVERS[port]} (port {port})")
+            if port in EDA_SERVERS:
+                print(f"  - {EDA_SERVERS[port]} (port {port})")
             elif port in ADDITIONAL_SERVICES:
                 print(f"  - {ADDITIONAL_SERVICES[port]} (port {port})")
         return 1

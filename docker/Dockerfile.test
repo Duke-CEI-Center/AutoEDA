@@ -1,18 +1,17 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
+    wget \
+    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-
-# Install additional test dependencies
-RUN pip install --no-cache-dir pytest pytest-cov
 
 # Copy application code
 COPY tests/ ./tests/
@@ -21,13 +20,37 @@ COPY scripts/ ./scripts/
 COPY config/ ./config/
 COPY designs/ ./designs/
 COPY libraries/ ./libraries/
-COPY experiment/ ./experiment/
+COPY exp_v1/ ./exp_v1/
+COPY mcp_agent_client.py .
 
 # Create necessary directories
-RUN mkdir -p logs deliverables
+RUN mkdir -p logs deliverables temp
 
-# Set working directory to tests
-WORKDIR /app/tests
+# Create test runner script
+RUN echo '#!/bin/bash\n\
+echo "MCP-EDA Test Runner"\n\
+echo "=================="\n\
+echo "Available test suites:"\n\
+echo "- all: Run all tests"\n\
+echo "- unit: Run unit tests only"\n\
+echo "- integration: Run integration tests"\n\
+echo "- api: Test API endpoints"\n\
+echo "- load: Run load tests"\n\
+echo ""\n\
+echo "Environment:"\n\
+echo "- MCP_AGENT_URL: ${MCP_AGENT_URL:-http://mcp-agent-client:8000}"\n\
+echo "- EDA_SERVERS_URL: ${EDA_SERVERS_URL:-http://eda-servers:13333}"\n\
+echo ""\n\
+if [ $# -eq 0 ]; then\n\
+  echo "Running all tests..."\n\
+  exec python3 tests/run_tests.py all\n\
+else\n\
+  exec python3 tests/run_tests.py "$@"\n\
+fi\n\
+' > /app/run_tests.sh && chmod +x /app/run_tests.sh
 
-# Default command - run all tests
-CMD ["python3", "run_tests.py", "all"] 
+# Set working directory to app root
+WORKDIR /app
+
+# Default command
+CMD ["/app/run_tests.sh"] 

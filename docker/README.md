@@ -1,15 +1,19 @@
-# MCP-EDA-Server Docker Deployment
+# MCP-EDA Docker Deployment
 
-This directory contains Docker configuration files for deploying the complete MCP-EDA-Server stack.
+This directory contains Docker configuration files for deploying the MCP-EDA platform in a containerized environment using the current 4-server architecture.
 
 ## Overview
 
-The Docker setup provides containerized deployment of all MCP-EDA-Server components:
+The Docker setup provides containerized deployment of all MCP-EDA components:
 
-- **MCP Agent Client**: HTTP API interface (port 8000)
-- **MCP EDA Server**: MCP protocol server (port 8001)
-- **MCP Servers**: Microservices for each design stage (ports 13333-13440)
-- **Experiment Runner**: TCL accuracy evaluation framework
+- **MCP Agent Client**: AI-powered EDA orchestration agent (port 8000)
+- **MCP Server**: MCP protocol server for Claude Desktop integration (port 8001)
+- **EDA Servers**: 4 unified microservices for the complete EDA flow
+  - Synthesis Server (port 13333)
+  - Unified Placement Server (port 13340) - combines Floorplan + Powerplan + Placement
+  - CTS Server (port 13338)
+  - Unified Route Save Server (port 13341) - combines Routing + Save
+- **Experiment Runner**: CodeBLEU evaluation framework
 - **Test Runner**: Comprehensive test suite
 
 ## Quick Start
@@ -25,7 +29,7 @@ The Docker setup provides containerized deployment of all MCP-EDA-Server compone
 Copy the environment template and configure it:
 
 ```bash
-cp docker/env.example .env
+cp docker/env.docker.example .env
 # Edit .env with your configuration
 ```
 

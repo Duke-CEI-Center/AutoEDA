@@ -1,10 +1,12 @@
-FROM python:3.9-slim
+FROM python:3.11-slim
 
 WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
+    wget \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements and install Python dependencies
@@ -12,7 +14,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY experiment/ ./experiment/
+COPY exp_v1/ ./exp_v1/
 COPY server/ ./server/
 COPY scripts/ ./scripts/
 COPY config/ ./config/
@@ -20,10 +22,31 @@ COPY designs/ ./designs/
 COPY libraries/ ./libraries/
 
 # Create necessary directories
-RUN mkdir -p logs deliverables
+RUN mkdir -p logs deliverables temp
 
-# Set working directory to experiment
-WORKDIR /app/experiment
+# Create experiment runner script
+RUN echo '#!/bin/bash\n\
+echo "MCP-EDA Experiment Runner"\n\
+echo "========================"\n\
+echo "Available experiments:"\n\
+echo "- CodeBLEU evaluation: python3 exp_v1/experiment/evaluate/tcl_evaluator.py"\n\
+echo "- Run experiment: python3 exp_v1/experiment/run_experiment.py"\n\
+echo "- Generate results: python3 exp_v1/experiment/evaluation_results/generate_latex_tables.py"\n\
+echo ""\n\
+echo "Usage examples:"\n\
+echo "  docker-compose --profile experiment run experiment-runner python3 exp_v1/experiment/evaluate/tcl_evaluator.py --help"\n\
+echo "  docker-compose --profile experiment run experiment-runner python3 exp_v1/experiment/run_experiment.py --config config.json"\n\
+echo ""\n\
+if [ $# -eq 0 ]; then\n\
+  echo "No command provided. Use --help for usage information."\n\
+  exit 0\n\
+fi\n\
+\n\
+exec "$@"\n\
+' > /app/run_experiment.sh && chmod +x /app/run_experiment.sh
 
-# Default command - run experiment
-CMD ["python3", "run_experiment.py", "--help"] 
+# Set working directory to app root
+WORKDIR /app
+
+# Default command
+CMD ["/app/run_experiment.sh"] 
