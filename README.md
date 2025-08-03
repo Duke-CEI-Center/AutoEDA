@@ -535,10 +535,6 @@ request_duration = Histogram('request_duration_seconds', 'Request duration')
 
 ---
 
-## Contributing
-
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
-
 ### Development Workflow
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
