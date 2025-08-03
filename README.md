@@ -564,7 +564,7 @@ mypy server/
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the creative commons - see the [LICENSE](https://github.com/AndyLu666/MCP-EDA-Server/blob/main/LICENSE.md) file for details.
 
 ---
 
@@ -580,8 +580,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Support
 
-- **Email**: support@mcp-eda.org
-- **Discord**: [Join our community](https://discord.gg/mcp-eda)
+- **Email**: yl996@duke.edu
+- **Discussion**: [Join our discussion](https://discord.gg/mcp-eda)
 - **Documentation**: [docs.mcp-eda.org](https://docs.mcp-eda.org)
 - **Issues**: [GitHub Issues](https://github.com/your-org/mcp-eda-example/issues)
 
