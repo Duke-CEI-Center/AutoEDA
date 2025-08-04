@@ -170,32 +170,64 @@ pip install -r requirements.txt
 ```
 
 ### 3. Configuration
-```bash
-# Copy environment template
-cp .env.example .env
 
-# Edit configuration
-nano .env
+#### **Environment Variables Setup**
+```bash
+# Required: OpenAI API Key
+export OPENAI_API_KEY=your_openai_api_key_here
+
+# Optional: Server Configuration
+export MCP_SERVER_HOST=http://localhost
+export LOG_ROOT=./logs
+
+# Optional: Custom Service Ports (defaults shown)
+export SYNTH_SERVER_PORT=13333
+export UNIFIED_PLACEMENT_SERVER_PORT=13340
+export CTS_SERVER_PORT=13338
+export UNIFIED_ROUTE_SAVE_SERVER_PORT=13341
 ```
 
-**Required `.env` configuration:**
+#### **Persistent Configuration (Recommended)**
+Create a configuration script for easy setup:
 ```bash
-# OpenAI Configuration
-OPENAI_API_KEY=your_openai_api_key_here
+# Create config script
+cat > setup_env.sh << 'EOF'
+#!/bin/bash
+# MCP-EDA Environment Configuration
 
-# Server Configuration (optional)
-MCP_SERVER_HOST=http://localhost
-LOG_ROOT=./logs
+# Required Configuration
+export OPENAI_API_KEY="your_openai_api_key_here"
+
+# Optional Configuration
+export MCP_SERVER_HOST="http://localhost"
+export LOG_ROOT="./logs"
+
+# Service Ports (default values)
+export SYNTH_SERVER_PORT=13333
+export UNIFIED_PLACEMENT_SERVER_PORT=13340
+export CTS_SERVER_PORT=13338
+export UNIFIED_ROUTE_SAVE_SERVER_PORT=13341
 
 # EDA Tool Paths (adjust to your installation)
-SYNOPSYS_ROOT=/opt/synopsys
-CADENCE_ROOT=/opt/cadence
+export SYNOPSYS_ROOT="/opt/synopsys"
+export CADENCE_ROOT="/opt/cadence"
 
-# Service Ports (optional, uses defaults)
-SYN_PORT=13333
-UNIFIED_PLACEMENT_PORT=13340
-CTS_PORT=13338
-UNIFIED_ROUTE_SAVE_PORT=13341
+# Add EDA tools to PATH if needed
+export PATH="${SYNOPSYS_ROOT}/bin:${CADENCE_ROOT}/bin:${PATH}"
+
+echo "MCP-EDA environment configured successfully!"
+EOF
+
+# Make executable and source
+chmod +x setup_env.sh
+source setup_env.sh
+```
+
+#### **Quick Setup for Each Session**
+```bash
+# Add to your ~/.bashrc or ~/.zshrc for permanent setup
+echo 'export OPENAI_API_KEY="your_openai_api_key_here"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 ### 4. EDA Tool Setup
@@ -215,28 +247,40 @@ lmstat -a
 
 ## Quick Start
 
-### 1. Start All Services
+### 1. Environment Setup
 ```bash
-# Launch all microservices
-python run_server.py
+# Activate virtual environment
+source venv/bin/activate
+
+# Load environment configuration
+source setup_env.sh  # Created in step 3 above
+
+# Verify OpenAI API key is set
+echo "OpenAI API Key: ${OPENAI_API_KEY:0:10}..."
+```
+
+### 2. Start EDA Microservices
+```bash
+# Launch all 4 EDA microservices in background
+./restart_servers.sh
 
 # Verify services are running
 curl http://localhost:13333/docs  # Synthesis API docs
-curl http://localhost:13340/docs  # Placement API docs
+curl http://localhost:13340/docs  # Unified Placement API docs
 curl http://localhost:13338/docs  # CTS API docs
-curl http://localhost:13341/docs  # Route & Save API docs
+curl http://localhost:13341/docs  # Unified Route & Save API docs
 ```
 
-### 2. Start Intelligent Agent
+### 3. Start AI Agent
 ```bash
-# Launch AI agent
+# Launch intelligent agent (interactive mode)
 python3 mcp_agent_client.py
 
-# Or using uvicorn for production
-uvicorn mcp_agent_client:app --host 0.0.0.0 --port 8000
+# Or run as web service
+uvicorn mcp_agent_client:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### 3. Run Your First Design
+### 4. Run Your First Design
 ```bash
 # Complete RTL-to-GDSII flow with natural language
 curl -X POST http://localhost:8000/agent \
@@ -245,6 +289,9 @@ curl -X POST http://localhost:8000/agent \
     "user_query": "Run complete flow for design aes with high performance optimization",
     "session_id": "demo_session"
   }'
+
+# Or use the simple client for testing
+python3 simple_mcp_client.py
 ```
 
 ### 4. Alternative: Direct Service API
@@ -351,8 +398,9 @@ mcp-eda-example/
 ├── logs/                           # Service logs
 ├── result/                         # Generated TCL scripts
 ├── deliverables/                   # Final artifacts
-├── run_server.py                   # Service launcher
-├── requirements.txt                # Python dependencies        
+├── restart_servers.sh              # Service launcher
+├── setup_env.sh                    # Environment configuration
+├── requirements.txt                # Python dependencies
 └── README.md                       # This file
 ```
 
@@ -428,6 +476,58 @@ STRATEGY_PARAMS["custom_strategy"] = {
 
 ---
 
+## Production Deployment
+
+### Process Management with systemd
+Create systemd services for production deployment:
+
+```bash
+# Create service files
+sudo tee /etc/systemd/system/mcp-eda-servers.service > /dev/null << 'EOF'
+[Unit]
+Description=MCP-EDA Microservices
+After=network.target
+
+[Service]
+Type=forking
+User=your_username
+WorkingDirectory=/path/to/mcp-eda-example
+Environment=OPENAI_API_KEY=your_api_key
+ExecStart=/path/to/mcp-eda-example/restart_servers.sh
+ExecStop=/usr/bin/pkill -f "server.*\.py"
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start services
+sudo systemctl daemon-reload
+sudo systemctl enable mcp-eda-servers
+sudo systemctl start mcp-eda-servers
+```
+
+### Load Balancing with Nginx
+```nginx
+# /etc/nginx/sites-available/mcp-eda
+upstream mcp_agent {
+    server localhost:8000;
+}
+
+server {
+    listen 80;
+    server_name your-domain.com;
+    
+    location / {
+        proxy_pass http://mcp_agent;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}
+```
+
+---
 
 ## Testing
 
