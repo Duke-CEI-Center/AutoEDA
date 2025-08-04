@@ -218,7 +218,7 @@ lmstat -a
 ### 1. Start All Services
 ```bash
 # Launch all microservices
-./restart_servers.sh
+python run_server.py
 
 # Verify services are running
 curl http://localhost:13333/docs  # Synthesis API docs
@@ -351,7 +351,7 @@ mcp-eda-example/
 ├── logs/                           # Service logs
 ├── result/                         # Generated TCL scripts
 ├── deliverables/                   # Final artifacts
-├── restart_servers.sh              # Service launcher
+├── run_server.py                   # Service launcher
 ├── requirements.txt                # Python dependencies        
 └── README.md                       # This file
 ```
