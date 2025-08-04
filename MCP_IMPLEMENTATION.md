@@ -162,9 +162,6 @@ Add the following configuration to your Claude Desktop configuration file (`clau
 cd server/mcp
 python3 test_mcp_server.py
 
-# Test EDA servers health
-python3 docker/health_check.py
-```
 
 ### 6. Start AI Agent (Optional)
 ```bash
@@ -273,7 +270,6 @@ curl -X POST http://localhost:8000/agent \
 ### 5. Integration Capabilities
 - **Claude Desktop**: Direct integration with Claude Desktop for natural language interaction
 - **HTTP API**: RESTful API through mcp_agent_client.py for programmatic access
-- **Docker Support**: Complete containerization with docker-compose
 - **Health Monitoring**: Comprehensive health checks and monitoring tools
 
 ## Troubleshooting
@@ -286,7 +282,6 @@ curl -X POST http://localhost:8000/agent \
    - Verify port availability: `netstat -tlnp | grep -E "(13333|13338|13340|13341)"`
 
 2. **EDA Server Communication Errors**
-   - Check server health: `python3 docker/health_check.py`
    - Verify server processes: `ps aux | grep -E "(synth_server|unified_placement_server|cts_server|unified_route_save_server)"`
    - Check server logs in `logs/` directory
 
@@ -304,8 +299,6 @@ curl -X POST http://localhost:8000/agent \
 
 1. **Check All Services Status**
    ```bash
-   # Check EDA servers
-   python3 docker/health_check.py
    
    # Check MCP server
    cd server/mcp
@@ -394,18 +387,12 @@ curl -X POST http://localhost:8000/agent \
 2. Add corresponding executor (e.g., `server/new_Executor.py`)
 3. Update `EDA_SERVERS` configuration in `mcp_eda_server.py`
 4. Update `restart_servers.sh` script
-5. Update Docker configuration and health checks
 
 ### Testing New Features
 1. **Unit Testing**: Test individual MCP tools
    ```bash
    cd server/mcp
    python3 test_mcp_server.py
-   ```
-
-2. **Integration Testing**: Test with EDA servers
-   ```bash
-   python3 docker/health_check.py
    ```
 
 3. **End-to-End Testing**: Test complete flows
@@ -437,7 +424,6 @@ curl -X POST http://localhost:8000/agent \
 ### Production-Ready Features
 - **Comprehensive Logging**: Detailed logs across all components
 - **Health Monitoring**: Real-time service health checks and monitoring
-- **Docker Support**: Complete containerization for easy deployment
 - **Legacy Compatibility**: Smooth migration path from older implementations
 
 ## Summary
@@ -449,7 +435,6 @@ This advanced MCP EDA implementation provides a modern, AI-powered framework for
 - **Complete EDA Flow Coverage**: From RTL to GDSII with intelligent checkpoint management
 - **Claude Desktop Integration**: Natural language interaction for hardware design workflows
 - **AI-Powered Orchestration**: GPT-4 integration for intelligent tool selection and parameter extraction
-- **Production-Ready Deployment**: Docker support, health monitoring, and comprehensive logging
 
 ### Impact
 - **Improved Efficiency**: Reduced setup complexity and faster development cycles
