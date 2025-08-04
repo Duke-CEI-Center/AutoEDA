@@ -352,8 +352,7 @@ mcp-eda-example/
 ├── result/                         # Generated TCL scripts
 ├── deliverables/                   # Final artifacts
 ├── restart_servers.sh              # Service launcher
-├── requirements.txt                # Python dependencies
-├── docker-compose.yml              # Container orchestration
+├── requirements.txt                # Python dependencies        
 └── README.md                       # This file
 ```
 
@@ -429,38 +428,6 @@ STRATEGY_PARAMS["custom_strategy"] = {
 
 ---
 
-## Docker Deployment
-
-### Development Setup
-```bash
-# Build and run all services
-docker-compose up --build
-
-# Scale specific services
-docker-compose up --scale synth-service=2
-```
-
-### Production Deployment
-```yaml
-# docker-compose.prod.yml
-version: '3.8'
-services:
-  agent:
-    image: mcp-eda/agent:latest
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-    ports:
-      - "8000:8000"
-    
-  synth-service:
-    image: mcp-eda/synth:latest
-    volumes:
-      - /opt/eda:/opt/eda:ro
-    ports:
-      - "13333:13333"
-```
-
----
 
 ## Testing
 
