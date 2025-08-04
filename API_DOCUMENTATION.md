@@ -541,7 +541,7 @@ curl -X POST http://localhost:13341/run \
 
 ```bash
 # Run complete pipeline using the restart script
-./restart_servers.sh
+run_server.py
 
 # Start the AI agent
 python3 mcp_agent_client.py
@@ -649,7 +649,7 @@ tail -f logs/agent/agent_*.log
 
 ```bash
 # Check service health with detailed output
-./restart_servers.sh status
+run_server.py status
 
 # Monitor all services simultaneously
 watch -n 5 'netstat -tlnp | grep -E "(13333|13338|13340|13341|8000)"'
