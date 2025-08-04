@@ -66,7 +66,7 @@ ls libraries/FreePDK45/
 
 ```bash
 # Start all four microservices
-./restart_servers.sh
+python run_server.py
 ```
 
 This script starts:
@@ -484,7 +484,7 @@ ls deliverables/
 ps aux | grep -E "(synth_server|unified_placement_server|cts_server|unified_route_save_server)"
 
 # Restart services if needed
-./restart_servers.sh
+python run_server.py
 
 # Check specific service
 curl http://localhost:13333/docs
