@@ -38,7 +38,7 @@ server/
 
 mcp_agent_client.py             # AI-powered HTTP agent client
 simple_mcp_client.py            # Simple MCP client for testing
-restart_servers.sh              # Server management script
+run_server.py              # Server management script
 MCP_IMPLEMENTATION.md           # This document
 ```
 
@@ -122,7 +122,7 @@ pip install -r requirements.txt
 ### 2. Start EDA Servers
 ```bash
 # Option 1: Use restart script (recommended)
-./restart_servers.sh
+run_server.py
 
 # Option 2: Manual startup
 python3 server/synth_server.py &
@@ -278,7 +278,7 @@ curl -X POST http://localhost:8000/agent \
 
 1. **MCP Server Connection Failures**
    - Ensure MCP server is running: `cd server/mcp && python3 mcp_eda_server.py`
-   - Check if all 4 EDA servers are running: `./restart_servers.sh`
+   - Check if all 4 EDA servers are running: `python run_server.py`
    - Verify port availability: `netstat -tlnp | grep -E "(13333|13338|13340|13341)"`
 
 2. **EDA Server Communication Errors**
@@ -386,7 +386,7 @@ curl -X POST http://localhost:8000/agent \
 1. Create new server file (e.g., `server/new_server.py`)
 2. Add corresponding executor (e.g., `server/new_Executor.py`)
 3. Update `EDA_SERVERS` configuration in `mcp_eda_server.py`
-4. Update `restart_servers.sh` script
+4. Update `run_server.py` script
 
 ### Testing New Features
 1. **Unit Testing**: Test individual MCP tools
