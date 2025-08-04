@@ -587,24 +587,6 @@ curl -X POST http://localhost:13340/run \
   }'
 ```
 
-### 9.3 Docker Deployment
-
-For containerized deployment:
-
-```bash
-# Build and run with Docker Compose
-docker-compose up --build -d
-
-# Check container status
-docker-compose ps
-
-# View logs
-docker-compose logs -f mcp-agent
-docker-compose logs -f synth-service
-
-# Scale services
-docker-compose up --scale synth-service=2 -d
-```
 
 ## Step 10: Results and Deliverables
 
