@@ -42,9 +42,9 @@ MCP-EDA revolutionizes chip design workflows by providing:
 |---------|------|---------|--------------|
 | **Intelligent Agent** | 8000 | AI orchestration & workflow management | GPT-4 integration, session management, conflict detection |
 | **Synthesis Service** | 13333 | RTL-to-gate synthesis | Template-driven TCL, Design Compiler integration |
-| **Unified Placement** | 13340 | Floorplan + Powerplan + Placement | Multi-stage unified flow, workspace management |
+| **Placement Service** | 13340 | Floorplan + Powerplan + Placement | Multi-stage unified flow, workspace management |
 | **CTS Service** | 13338 | Clock tree synthesis | Post-placement optimization, timing-driven CTS |
-| **Route & Save** | 13341 | Global/detail routing + final save | Complete backend flow, artifact generation |
+| **Routing Service** | 13341 | Global/detail routing + final save | Complete backend flow, artifact generation |
 
 ### Data Flow Architecture
 
@@ -179,55 +179,16 @@ export OPENAI_API_KEY=your_openai_api_key_here
 # Optional: Server Configuration
 export MCP_SERVER_HOST=http://localhost
 export LOG_ROOT=./logs
-
-# Optional: Custom Service Ports (defaults shown)
-export SYNTH_SERVER_PORT=13333
-export UNIFIED_PLACEMENT_SERVER_PORT=13340
-export CTS_SERVER_PORT=13338
-export UNIFIED_ROUTE_SAVE_SERVER_PORT=13341
 ```
 
 #### **Persistent Configuration (Recommended)**
-Create a configuration script for easy setup:
-```bash
-# Create config script
-cat > setup_env.sh << 'EOF'
-#!/bin/bash
-# MCP-EDA Environment Configuration
-
-# Required Configuration
-export OPENAI_API_KEY="your_openai_api_key_here"
-
-# Optional Configuration
-export MCP_SERVER_HOST="http://localhost"
-export LOG_ROOT="./logs"
-
-# Service Ports (default values)
-export SYNTH_SERVER_PORT=13333
-export UNIFIED_PLACEMENT_SERVER_PORT=13340
-export CTS_SERVER_PORT=13338
-export UNIFIED_ROUTE_SAVE_SERVER_PORT=13341
-
-# EDA Tool Paths (adjust to your installation)
-export SYNOPSYS_ROOT="/opt/synopsys"
-export CADENCE_ROOT="/opt/cadence"
-
-# Add EDA tools to PATH if needed
-export PATH="${SYNOPSYS_ROOT}/bin:${CADENCE_ROOT}/bin:${PATH}"
-
-echo "MCP-EDA environment configured successfully!"
-EOF
-
-# Make executable and source
-chmod +x setup_env.sh
-source setup_env.sh
-```
-
-#### **Quick Setup for Each Session**
 ```bash
 # Add to your ~/.bashrc or ~/.zshrc for permanent setup
 echo 'export OPENAI_API_KEY="your_openai_api_key_here"' >> ~/.bashrc
 source ~/.bashrc
+
+# Optional: Add EDA tools to PATH if needed
+echo 'export PATH="/opt/synopsys/bin:/opt/cadence/bin:$PATH"' >> ~/.bashrc
 ```
 
 ### 4. EDA Tool Setup
@@ -252,23 +213,26 @@ lmstat -a
 # Activate virtual environment
 source venv/bin/activate
 
-# Load environment configuration
-source setup_env.sh  # Created in step 3 above
-
 # Verify OpenAI API key is set
 echo "OpenAI API Key: ${OPENAI_API_KEY:0:10}..."
 ```
 
 ### 2. Start EDA Microservices
 ```bash
-# Launch all 4 EDA microservices in background
-python run_server.py
+# Launch all 4 EDA microservices
+python3 run_server.py --server all
+
+# Or start individual servers
+python3 run_server.py --server synthesis    # Port 13333
+python3 run_server.py --server placement    # Port 13340
+python3 run_server.py --server cts          # Port 13338
+python3 run_server.py --server routing      # Port 13341
 
 # Verify services are running
 curl http://localhost:13333/docs  # Synthesis API docs
-curl http://localhost:13340/docs  # Unified Placement API docs
+curl http://localhost:13340/docs  # Placement API docs
 curl http://localhost:13338/docs  # CTS API docs
-curl http://localhost:13341/docs  # Unified Route & Save API docs
+curl http://localhost:13341/docs  # Routing API docs
 ```
 
 ### 3. Start AI Agent
@@ -286,7 +250,7 @@ uvicorn mcp_agent_client:app --host 0.0.0.0 --port 8000 --reload
 curl -X POST http://localhost:8000/agent \
   -H "Content-Type: application/json" \
   -d '{
-    "user_query": "Run complete flow for design aes with high performance optimization",
+    "user_query": "Run complete flow for design des with high performance optimization",
     "session_id": "demo_session"
   }'
 
@@ -372,15 +336,14 @@ Each service provides OpenAPI documentation at `http://localhost:<port>/docs`:
 
 ```
 mcp-eda-example/
-├── server/                          # Microservices
-│   ├── synth_server.py             # Synthesis service
-│   ├── unified_placement_server.py # Placement service  
+├── unified_server/                 # Unified EDA microservices
+│   ├── unified_server.py           # Main unified server
+│   ├── synthesis_server.py         # Synthesis service
+│   ├── placement_server.py         # Placement service  
 │   ├── cts_server.py               # CTS service
-│   ├── unified_route_save_server.py# Route & save service
-│   ├── synth_Executor.py           # Synthesis executor
-│   ├── unified_placement_Executor.py# Placement executor
-│   ├── cts_Executor.py             # CTS executor
-│   └── unified_route_save_Executor.py# Route executor
+│   ├── routing_server.py           # Routing service
+│   └── unified_executor.py         # Unified executor
+├── run_server.py                   # Server launcher script
 ├── mcp_agent_client.py             # AI orchestration agent
 ├── simple_mcp_client.py            # Simple client example
 ├── scripts/                        # TCL templates
@@ -389,17 +352,15 @@ mcp-eda-example/
 │       ├── frontend/               # Synthesis templates
 │       └── backend/                # Physical design templates
 ├── designs/                        # Sample designs
-│   ├── aes/                        # AES crypto design
 │   ├── des/                        # DES crypto design
-│   └── b14/                        # Benchmark design
+│   ├── fpu/                        # FPU design
+│   └── leon2/                      # Leon2 processor design
 ├── exp_v1/                         # Experiment framework
-│   └── experiment/                 # CodeBLEU evaluation
+│   └── codebleu_tcl/               # CodeBLEU evaluation
 ├── libraries/                      # PDK and libraries
 ├── logs/                           # Service logs
 ├── result/                         # Generated TCL scripts
 ├── deliverables/                   # Final artifacts
-├── run_server.py                   # Service launcher
-├── setup_env.sh                    # Environment configuration
 ├── requirements.txt                # Python dependencies
 └── README.md                       # This file
 ```
@@ -493,7 +454,7 @@ Type=forking
 User=your_username
 WorkingDirectory=/path/to/mcp-eda-example
 Environment=OPENAI_API_KEY=your_api_key
-ExecStart=/path/to/mcp-eda-example/run_server.py
+ExecStart=/usr/bin/python3 /path/to/mcp-eda-example/run_server.py --server all
 ExecStop=/usr/bin/pkill -f "server.*\.py"
 Restart=always
 RestartSec=10
