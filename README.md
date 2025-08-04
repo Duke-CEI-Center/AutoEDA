@@ -262,7 +262,7 @@ echo "OpenAI API Key: ${OPENAI_API_KEY:0:10}..."
 ### 2. Start EDA Microservices
 ```bash
 # Launch all 4 EDA microservices in background
-./restart_servers.sh
+python run_server.py
 
 # Verify services are running
 curl http://localhost:13333/docs  # Synthesis API docs
@@ -398,7 +398,7 @@ mcp-eda-example/
 ├── logs/                           # Service logs
 ├── result/                         # Generated TCL scripts
 ├── deliverables/                   # Final artifacts
-├── restart_servers.sh              # Service launcher
+├── run_server.py                   # Service launcher
 ├── setup_env.sh                    # Environment configuration
 ├── requirements.txt                # Python dependencies
 └── README.md                       # This file
@@ -493,7 +493,7 @@ Type=forking
 User=your_username
 WorkingDirectory=/path/to/mcp-eda-example
 Environment=OPENAI_API_KEY=your_api_key
-ExecStart=/path/to/mcp-eda-example/restart_servers.sh
+ExecStart=/path/to/mcp-eda-example/run_server.py
 ExecStop=/usr/bin/pkill -f "server.*\.py"
 Restart=always
 RestartSec=10
