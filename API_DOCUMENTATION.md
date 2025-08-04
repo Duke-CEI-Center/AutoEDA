@@ -617,8 +617,6 @@ Each log file contains:
 ### Check Service Status
 
 ```bash
-# Run health check for all services (updated for 4-server architecture)
-python3 docker/health_check.py
 
 # Check specific services
 curl -X GET http://localhost:13333/docs    # Synthesis Server
@@ -656,8 +654,7 @@ tail -f logs/agent/agent_*.log
 # Monitor all services simultaneously
 watch -n 5 'netstat -tlnp | grep -E "(13333|13338|13340|13341|8000)"'
 
-# Check EDA tool connectivity
-python3 docker/health_check.py --check-eda-tools
+
 
 # View service documentation
 open http://localhost:13333/docs  # Synthesis
