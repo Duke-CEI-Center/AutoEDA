@@ -139,80 +139,14 @@ class UnifiedRoutingServer(UnifiedServerBase):
         
         # Auto-version impl_ver if not set
         if req.impl_ver is None:
-            req.impl_ver = self._find_latest_implementation_version(req.design, req.tech, req.syn_ver)
+            if not getattr(req, 'skip_execution', False):
+                req.impl_ver = self._find_latest_implementation_version(req.design, req.tech, req.syn_ver)
+
+        # Auto-detect placement.enc if not provided
+        if req.skip_execution is False:
+            _ = self._find_latest_enc_file(req.design, req.tech, req.syn_ver, req.impl_ver, "cts")
 
         return "impl_ver"
-    
-    # def setup_workspace(self, req, log_file: Path) -> Tuple[bool, str, Path, Dict]:
-    #     """
-    #     Custom workspace setup for routing that preserves directory.
-        
-    #     This is needed because routing requires cts.enc from the previous CTS run,
-    #     but the standard setup would delete pnr_save when force=True.
-    #     """
-    #     try:
-    #         workspace_dir = self.get_workspace_directory(req)
-            
-    #         # Check if directories exist
-    #         if workspace_dir.exists():
-    #             if not getattr(req, 'force', True):
-    #                 # Collect existing reports to return last call response
-    #                 reports = self._collect_existing_reports(workspace_dir)
-                    
-    #                 with log_file.open("w") as lf:
-    #                     lf.write(f"=== {self.server_name} Workspace Setup ===\n")
-    #                     lf.write(f"[Warning] {workspace_dir} already exists! Skipped...\n")
-    #                     lf.write(f"Returning last call response.\n")
-                    
-    #                 return True, "workspace created (already existed)", workspace_dir, reports
-    #             else:
-    #                 # Force overwrite - remove only routing-specific files, preserve cts.enc
-    #                 routing_files_to_remove = [
-    #                     workspace_dir / "pnr_save" / "global_route.enc",
-    #                     workspace_dir / "pnr_save" / "detail_route.enc",
-    #                     workspace_dir / "pnr_save" / "route_opt.enc",
-    #                     workspace_dir / "pnr_reports" / "route_summary.rpt",
-    #                     workspace_dir / "pnr_reports" / "route_timing.rpt.gz",
-    #                     workspace_dir / "pnr_reports" / "route_opt_timing.rpt.gz",
-    #                     workspace_dir / "pnr_reports" / "congestion.rpt",
-    #                     workspace_dir / "pnr_reports" / "postRoute_drc_max1M.rpt",
-    #                     workspace_dir / "pnr_reports" / "postOpt_drc_max1M.rpt",
-    #                     workspace_dir / "pnr_out" / "route.def",
-    #                     workspace_dir / "pnr_out" / "RC.spef.gz",
-    #                     workspace_dir / "pnr_out" / f"{req.design}_pnr.lef",
-    #                     workspace_dir / "pnr_out" / f"{req.design}_lib.lef",
-    #                     workspace_dir / "pnr_out" / f"{req.design}_pnr.v",
-    #                     workspace_dir / "pnr_out" / f"{req.design}_pnr.gds.gz"
-    #                 ]
-                    
-    #                 for file_path in routing_files_to_remove:
-    #                     if file_path.exists():
-    #                         file_path.unlink()
-    #                         print(f"Removed existing routing file: {file_path}")
-            
-    #         # Create all necessary subdirectories
-    #         workspace_dir.mkdir(parents=True, exist_ok=True)
-    #         for subdir in self.get_output_directories():
-    #             (workspace_dir / subdir).mkdir(exist_ok=True)
-            
-    #         with log_file.open("w") as lf:
-    #             lf.write(f"=== {self.server_name} Workspace Setup ===\n")
-    #             lf.write(f"Workspace Directory: {workspace_dir}\n")
-    #             lf.write("Workspace setup completed successfully (preserved cts.enc).\n")
-
-    #         return True, "workspace created", workspace_dir, {}
-
-    #     except Exception as e:
-    #         return False, f"error: {e}", None, {}
-    
-    def _find_latest_cts_enc(self, design: str, tech: str, syn_ver: str, impl_ver: str) -> str:
-        """
-        Find the latest cts.enc file for a given design and technology.
-            
-        Returns:
-            Path to the latest cts.enc file
-        """
-        return super()._find_latest_enc_file(design, tech, syn_ver, impl_ver, "cts")
 
     def get_tcl_script_config(self, req) -> Dict:
         """
@@ -228,8 +162,7 @@ class UnifiedRoutingServer(UnifiedServerBase):
             'title': 'Complete Unified Routing TCL Script (Route + Save)',
             'version_info': f'Implementation Version: {req.impl_ver}',
             'script_paths': [
-                ROOT / "scripts" / req.tech / "backend" / "7_route.tcl",
-                ROOT / "scripts" / req.tech / "backend" / "8_save_design.tcl"
+                ROOT / "scripts" / req.tech / "backend" / "combined_routing.tcl",
             ],
             'script_section_title': 'Backend Scripts',
             'footer_title': 'Routing completed',

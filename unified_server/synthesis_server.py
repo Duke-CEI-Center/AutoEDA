@@ -154,7 +154,9 @@ class UnifiedSynthServer(UnifiedServerBase):
         return {
             'title': 'Complete Synthesis TCL Script',
             'version_info': f'Synthesis Version: {req.syn_version}',
-            'script_paths': sorted([f for f in (ROOT / "scripts" / req.tech / "frontend").iterdir() if f.suffix == '.tcl']),
+            'script_paths': [
+                ROOT / "scripts" / req.tech / "frontend" / "combined_synthesis.tcl",
+            ],
             'script_section_title': f'Frontend Scripts',
             'footer_title': 'Synthesis completed',
             'output_filename': 'complete_synthesis.tcl'
@@ -167,6 +169,10 @@ class UnifiedSynthServer(UnifiedServerBase):
     def get_reports_directory(self) -> str:
         """Define reports directory for synthesis workflow"""
         return "reports"
+
+    def get_output_files(self) -> List[str]:
+        """Define output files for synthesis workflow"""
+        return ["all"]
 
 
 if __name__ == "__main__":

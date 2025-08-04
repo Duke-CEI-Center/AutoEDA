@@ -114,26 +114,6 @@ class UnifiedServerBase(ABC):
         pass
     
     @abstractmethod
-    def get_report_files(self) -> List[Tuple[str, str]]:
-        """
-        Return list of (base_name, gz_name) report file pairs.
-        
-        This defines which reports the server should collect.
-        The method will look for both compressed (.gz) and uncompressed files.
-        
-        Returns:
-            List of tuples: [(base_name, gz_name), ...]
-            
-        Example:
-            return [
-                ("timing.rpt", "timing.rpt.gz"),
-                ("area.rpt", "area.rpt"),
-                ("power.rpt", "power.rpt.gz")
-            ]
-        """
-        pass
-    
-    @abstractmethod
     def get_workspace_directory(self, req) -> Path:
         """
         Return the workspace directory path for the given request.
@@ -222,6 +202,27 @@ class UnifiedServerBase(ABC):
         """
         pass
     
+        
+    @abstractmethod
+    def get_report_files(self) -> List[Tuple[str, str]]:
+        """
+        Return list of (base_name, gz_name) report file pairs.
+        
+        This defines which reports the server should collect.
+        The method will look for both compressed (.gz) and uncompressed files.
+        
+        Returns:
+            List of tuples: [(base_name, gz_name), ...]
+            
+        Example:
+            return [
+                ("timing.rpt", "timing.rpt.gz"),
+                ("area.rpt", "area.rpt"),
+                ("power.rpt", "power.rpt.gz")
+            ]
+        """
+        pass
+
     def collect_reports(self, workspace_dir: Path) -> Dict[str, str]:
         """
         Default implementation to collect reports from workspace.
@@ -257,6 +258,20 @@ class UnifiedServerBase(ABC):
         
         return reports
     
+    # def remove_output_files(self, workspace_dir: Path):
+    #     """
+    #     Remove output files from workspace.
+    #     """
+    #     for output_dir in self.get_output_directories():
+    #         output_path = workspace_dir / output_dir
+    #         if not output_path.exists():
+    #             continue
+    #         for file in self.get_output_files():
+    #             file_path = output_path / file
+    #             file_path.unlink(missing_ok=True)
+
+    #     return
+    
     def generate_tcl_script(self, req, result_dir: Path) -> Path:
         """
         Generic TCL script generation method.
@@ -280,7 +295,7 @@ class UnifiedServerBase(ABC):
         design_config = ROOT / "designs" / req.design / "config.tcl"
         design_config_content = ""
         if design_config.exists():
-            design_config_content = design_config.read_text().replace("{{design}}", req.design)
+            design_config_content = design_config.read_text()
         
         # Read tech config
         tech_tcl_path = ROOT / "scripts" / req.tech / "tech.tcl"
@@ -358,7 +373,7 @@ class UnifiedServerBase(ABC):
             if workspace_dir.exists():
                 if not getattr(req, 'force', True):
                     # Collect existing reports to return last call response
-                    reports = self._collect_existing_reports(workspace_dir)
+                    reports = self.collect_reports(workspace_dir)
                     
                     with log_file.open("w") as lf:
                         lf.write(f"=== {self.server_name} Workspace Setup ===\n")
@@ -366,12 +381,10 @@ class UnifiedServerBase(ABC):
                         lf.write(f"Returning last call response.\n")
                     
                     return True, "workspace created (already existed)", workspace_dir, reports
-                # else:
-                #     # Force overwrite - remove existing output directories
-                #     for subdir in self.get_output_directories():
-                #         target_dir = workspace_dir / subdir
-                #         if target_dir.exists():
-                #             shutil.rmtree(target_dir)
+                else:
+                    # Force overwrite - remove existing output directories
+                    # self.remove_output_files(workspace_dir) # TODO: all files produced by the server
+                    pass
             
             # Create all necessary subdirectories
             workspace_dir.mkdir(parents=True, exist_ok=True)
@@ -387,21 +400,6 @@ class UnifiedServerBase(ABC):
 
         except Exception as e:
             return False, f"error: {e}", None, {}
-    
-    def _collect_existing_reports(self, workspace_dir: Path) -> Dict[str, str]:
-        """
-        Collect existing reports from workspace (internal method).
-        
-        This is used when force=False to return cached results.
-        Delegates to the public collect_reports() method.
-        
-        Args:
-            workspace_dir: Path to the workspace directory
-            
-        Returns:
-            Dictionary of existing reports
-        """
-        return self.collect_reports(workspace_dir)
     
     def _find_latest_synthesis_version(self, design: str, tech: str) -> str:
         """
@@ -547,7 +545,7 @@ class UnifiedServerBase(ABC):
                 env=env,
                 capture_output=True,
                 text=True,
-                timeout=7200  # 2 hour timeout
+                timeout=36000  # 10 hour timeout
             )
             
             # Log the execution results
@@ -567,7 +565,7 @@ class UnifiedServerBase(ABC):
             return True, f"{self.server_name} completed successfully", reports
 
         except subprocess.TimeoutExpired:
-            return False, "executor timeout (2 hours)", {}
+            return False, "executor timeout (10 hours)", {}
         except Exception as e:
             return False, f"error: {e}", {}
     
@@ -600,25 +598,28 @@ class UnifiedServerBase(ABC):
             
             try:
                 # Phase 1: Setup workspace
-                workspace_success, workspace_status, workspace_dir, reports = self.setup_workspace(req, log_file)
-                
-                if not workspace_success:
-                    return self.get_response_model()(
-                        status=workspace_status,
-                        log_path=str(log_file),
-                        reports={"error": workspace_status},
-                        tcl_path=""
-                    )
-                
-                # If workspace already existed and force=False, return last call response
-                if "already existed" in workspace_status and not getattr(req, 'force', True):
-                    return self.get_response_model()(
-                        status="execution_completed (cached)",
-                        log_path=str(log_file),
-                        reports={"workspace": workspace_status, "workflow": "cached from previous run", **reports},
-                        tcl_path=""
-                    )
-                
+                if getattr(req, 'skip_execution', True):
+                    pass
+                else:
+                    workspace_success, workspace_status, workspace_dir, reports = self.setup_workspace(req, log_file)
+                    
+                    if not workspace_success:
+                        return self.get_response_model()(
+                            status=workspace_status,
+                            log_path=str(log_file),
+                            reports={"error": workspace_status},
+                            tcl_path=""
+                        )
+                    
+                    # If workspace already existed and force=False, return last call response
+                    if "already existed" in workspace_status and not getattr(req, 'force', True):
+                        return self.get_response_model()(
+                            status="execution_completed (cached)",
+                            log_path=str(log_file),
+                            reports={"workspace": workspace_status, "workflow": "cached from previous run", **reports},
+                            tcl_path=""
+                        )
+                    
                 # Phase 2: Generate complete TCL file
                 tcl_file = self.generate_tcl_script(req, result_dir)
                 
@@ -626,7 +627,7 @@ class UnifiedServerBase(ABC):
                 if getattr(req, 'skip_execution', True):
                     # Skip execution, just return TCL generation results
                     final_reports = {
-                        "workspace": workspace_status, 
+                        "workspace": "skipped_execution", 
                         "workflow": "skipped_execution",
                         "note": "TCL generation only - execution skipped"
                     }

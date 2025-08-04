@@ -98,7 +98,7 @@ class UnifiedPlacementServer(UnifiedServerBase):
             # Floorplan configuration parameters
             # 1_setup.tcl
             flowEffort: str = "standard"  # express, standard, extreme
-            powerEffort: str = "none"     # none, low, high
+            globalPowerEffort: str = "none"     # none, low, high
             # 2_floorplan.tcl
             aspectRatio: float = 1.0          
             rowDensity: float = 0.7    
@@ -108,9 +108,9 @@ class UnifiedPlacementServer(UnifiedServerBase):
             place_global_cong_effort: str = "low"     # low, medium, high, auto
             place_detail_wire_length_opt_effort: str = "none"  # none, medium, high
             place_global_max_density: float = 0.9        
-            activity_power_driven: str = "false"    
+            place_global_activity_power_driven: str = "false"    
             maxDensity: float = 0.8          
-            preCTS_powerEffort: str = "low"         # none, low, high
+            powerEffort: str = "low"         # none, low, high
             reclaimArea: str = "default"     # true, false, default
             fixFanoutLoad: str = "true"   # true, false
             syn_res_dir: str = None
@@ -170,24 +170,12 @@ class UnifiedPlacementServer(UnifiedServerBase):
         
         # Auto-version the impl_ver field if None
         if req.impl_ver is None:
-            impl_dir = ROOT / "designs" / req.design / req.tech / "implementation"
-            prefix = f"{req.syn_ver}__"
-            latest_impl_ver = None
-            latest_mtime = None
-            if impl_dir.exists():
-                for d in impl_dir.iterdir():
-                    if d.is_dir() and d.name.startswith(prefix):
-                        ver = d.name[len(prefix):]
-                        # Use directory modification time to find latest
-                        mtime = d.stat().st_mtime
-                        if (latest_mtime is None) or (mtime > latest_mtime):
-                            latest_impl_ver = ver
-                            latest_mtime = mtime
-            if latest_impl_ver is not None:
-                print(f"Auto-detected latest implementation version: {latest_impl_ver}")
-                req.impl_ver = latest_impl_ver
-            else:
-                return "impl_ver"
+            if not getattr(req, 'skip_execution', False):
+                try:
+                    req.impl_ver = self._find_latest_implementation_version(req.design, req.tech, req.syn_ver)
+                except FileNotFoundError as e:
+                    print(f"Cannot find implementation version: {e}")
+                    pass
 
         return "impl_ver"
 
@@ -205,10 +193,7 @@ class UnifiedPlacementServer(UnifiedServerBase):
             'title': 'Complete Unified Placement TCL Script (Floorplan + Powerplan + Placement)',
             'version_info': f'Synthesis Version: {req.syn_ver}, Implementation Version: {req.impl_ver}',
             'script_paths': [
-                ROOT / "scripts" / req.tech / "backend" / "1_setup.tcl",
-                ROOT / "scripts" / req.tech / "backend" / "2_floorplan.tcl",
-                ROOT / "scripts" / req.tech / "backend" / "3_powerplan.tcl",
-                ROOT / "scripts" / req.tech / "backend" / "4_place.tcl"
+                ROOT / "scripts" / req.tech / "backend" / "combined_placement.tcl",
             ],
             'script_section_title': 'Backend Scripts',
             'footer_title': 'Save final placement',
@@ -224,7 +209,7 @@ class UnifiedPlacementServer(UnifiedServerBase):
         return "pnr_reports"
     
     def get_workspace_setup_method(self):
-        """Use custom workspace setup that sets syn_res_dir"""
+        """ Use standard workspace setup"""
         return self.setup_workspace
 
 

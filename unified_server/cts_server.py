@@ -136,7 +136,8 @@ class UnifiedCtsServer(UnifiedServerBase):
         
         # Auto-version impl_ver if not set
         if req.impl_ver is None:
-            req.impl_ver = self._find_latest_implementation_version(req.design, req.tech, req.syn_ver)
+            if not getattr(req, 'skip_execution', False):
+                req.impl_ver = self._find_latest_implementation_version(req.design, req.tech, req.syn_ver)
 
         # Auto-detect placement.enc if not provided
         if req.restore_enc is None:
@@ -146,57 +147,6 @@ class UnifiedCtsServer(UnifiedServerBase):
                 req.restore_enc = None
 
         return "impl_ver"
-    
-    # def setup_workspace(self, req, log_file: Path) -> Tuple[bool, str, Path, Dict]:
-    #     """
-    #     Custom workspace setup for CTS that preserves directory.
-        
-    #     This is needed because CTS requires placement.enc from the previous placement run,
-    #     but the standard setup would delete pnr_save when force=True.
-    #     """
-    #     try:
-    #         workspace_dir = self.get_workspace_directory(req)
-            
-    #         # Check if directories exist
-    #         if workspace_dir.exists():
-    #             if not getattr(req, 'force', True):
-    #                 # Collect existing reports to return last call response
-    #                 reports = self._collect_existing_reports(workspace_dir)
-                    
-    #                 with log_file.open("w") as lf:
-    #                     lf.write(f"=== {self.server_name} Workspace Setup ===\n")
-    #                     lf.write(f"[Warning] {workspace_dir} already exists! Skipped...\n")
-    #                     lf.write(f"Returning last call response.\n")
-                    
-    #                 return True, "workspace created (already existed)", workspace_dir, reports
-    #             else:
-    #                 # Force overwrite - remove only CTS-specific files, preserve placement.enc
-    #                 cts_files_to_remove = [
-    #                     workspace_dir / "pnr_save" / "cts.enc",
-    #                     workspace_dir / "pnr_reports" / "cts_summary.rpt",
-    #                     workspace_dir / "pnr_reports" / "postcts_opt_max_density.rpt",
-    #                     workspace_dir / "pnr_reports" / "ccopt.txt"
-    #                 ]
-                    
-    #                 for file_path in cts_files_to_remove:
-    #                     if file_path.exists():
-    #                         file_path.unlink()
-    #                         print(f"Removed existing CTS file: {file_path}")
-            
-    #         # Create all necessary subdirectories
-    #         workspace_dir.mkdir(parents=True, exist_ok=True)
-    #         for subdir in self.get_output_directories():
-    #             (workspace_dir / subdir).mkdir(exist_ok=True)
-            
-    #         with log_file.open("w") as lf:
-    #             lf.write(f"=== {self.server_name} Workspace Setup ===\n")
-    #             lf.write(f"Workspace Directory: {workspace_dir}\n")
-    #             lf.write("Workspace setup completed successfully (preserved pnr_save).\n")
-
-    #         return True, "workspace created", workspace_dir, {}
-
-    #     except Exception as e:
-    #         return False, f"error: {e}", None, {}
     
     def get_tcl_script_config(self, req) -> Dict:
         """
@@ -212,7 +162,7 @@ class UnifiedCtsServer(UnifiedServerBase):
             'title': 'Complete Unified CTS TCL Script',
             'version_info': f'Implementation Version: {req.impl_ver}',
             'script_paths': [
-                ROOT / "scripts" / req.tech / "backend" / "5_cts.tcl"
+                ROOT / "scripts" / req.tech / "backend" / "combined_cts.tcl"
             ],
             'script_section_title': 'Backend Scripts',
             'footer_title': 'CTS completed',
