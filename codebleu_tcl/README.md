@@ -245,30 +245,11 @@ python -m pytest tests/
 ```
 5. Submit a pull request
 
-## License
-
-This project is released under the MIT License. See LICENSE file for details.
-
-## Citation
-
-If you use CodeBLEU-TCL in your research, please cite:
-
-```bibtex
-@software{codebleu_tcl,
-  title={CodeBLEU-TCL: Specialized Code Evaluation for Electronic Design Automation},
-  author={[Your Name]},
-  year={2024},
-  url={https://github.com/[your-username]/codebleu-tcl}
-}
-```
 
 ## Acknowledgments
 
 This work builds upon the original CodeBLEU implementation from Microsoft's CodeXGLUE project and incorporates improvements from the XLCoST project. We thank the authors for their foundational contributions to automated code evaluation.
 
-## Contact
-
-For questions, bug reports, or collaboration inquiries, please open an issue on GitHub or contact [your-email@domain.com].
 
 ---
 
