@@ -18,10 +18,10 @@ The framework consists of:
 
 | Stage | Service | Port | Description |
 |-------|---------|------|-------------|
-| **Synthesis** | `synth_server.py` | 13333 | Complete RTL-to-gate synthesis (setup + compile) |
-| **Unified Placement** | `unified_placement_server.py` | 13340 | Integrated placement flow (floorplan + powerplan + placement) |
-| **Clock Tree Synthesis** | `cts_server.py` | 13338 | Clock distribution network synthesis |
-| **Unified Route Save** | `unified_route_save_server.py` | 13341 | Integrated routing and save flow (routing + final save) |
+| **Synthesis** | `synthesis_server.py` | 13333 | Complete RTL-to-gate synthesis (setup + compile) |
+| **Unified Placement** | `placement_server.py` | 13340 | Integrated placement flow (floorplan + powerplan + placement) |
+| **Clock Tree Synthesis** | `cts_server.py` | 13341 | Clock distribution network synthesis |
+| **Unified Routing** | `routing_server.py` | 13342 | Integrated routing and save flow (routing + final save) |
 
 ## Interface Types
 
@@ -199,7 +199,7 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
 
 ### 3. Clock Tree Synthesis Server
 
-**Endpoint:** `http://localhost:13338/run`
+**Endpoint:** `http://localhost:13341/run`
 
 **Request Body:**
 ```json
@@ -229,15 +229,15 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
 ```json
 {
   "status": "ok",
-  "log_path": "/home/yl996/proj/mcp-eda-example/logs/cts/des_cts_20241219_143145.log",
+  "log_path": "/home/yl996/proj/mcp-eda-example/logs/unified_cts/des_unified_cts_20241219_143145.log",
   "report": "CTS summary report content",
   "tcl_path": "/home/yl996/proj/mcp-eda-example/result/des/FreePDK45/cts_complete.tcl"
 }
 ```
 
-### 4. Unified Route Save Server
+### 4. Unified Routing Server
 
-**Endpoint:** `http://localhost:13341/run`
+**Endpoint:** `http://localhost:13342/run`
 
 **Request Body:**
 ```json
@@ -271,7 +271,7 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
 ```json
 {
   "status": "ok",
-  "log_path": "/home/yl996/proj/mcp-eda-example/logs/unified_route_save/des_unified_route_save_20241219_143200.log",
+  "log_path": "/home/yl996/proj/mcp-eda-example/logs/unified_routing/des_unified_routing_20241219_143200.log",
   "reports": {
     "workspace": "Workspace setup completed",
     "route_save": "Unified routing and save completed successfully",
@@ -507,7 +507,7 @@ curl -X POST http://localhost:13340/run \
   }'
 
 # Direct CTS
-curl -X POST http://localhost:13338/run \
+curl -X POST http://localhost:13341/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -520,8 +520,8 @@ curl -X POST http://localhost:13338/run \
     "force": true
   }'
 
-# Direct unified route save (routing + final save)
-curl -X POST http://localhost:13341/run \
+# Direct unified routing (routing + final save)
+curl -X POST http://localhost:13342/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -541,7 +541,7 @@ curl -X POST http://localhost:13341/run \
 
 ```bash
 # Run complete pipeline using the restart script
-run_server.py
+./restart_servers.sh
 
 # Start the AI agent
 python3 mcp_agent_client.py
@@ -617,12 +617,14 @@ Each log file contains:
 ### Check Service Status
 
 ```bash
+# Check all services are running
+python3 run_server.py --check
 
 # Check specific services
 curl -X GET http://localhost:13333/docs    # Synthesis Server
 curl -X GET http://localhost:13340/docs    # Unified Placement Server
-curl -X GET http://localhost:13338/docs    # CTS Server
-curl -X GET http://localhost:13341/docs    # Unified Route Save Server
+curl -X GET http://localhost:13341/docs    # CTS Server
+curl -X GET http://localhost:13342/docs    # Unified Routing Server
 curl -X GET http://localhost:8000/health   # Agent Client
 ```
 
@@ -630,16 +632,16 @@ curl -X GET http://localhost:8000/health   # Agent Client
 
 ```bash
 # Check if all ports are listening (updated ports)
-netstat -tlnp | grep -E "(13333|13338|13340|13341|8000)"
+netstat -tlnp | grep -E "(13333|13340|13341|13342|8000)"
 
 # Check server processes (updated server names)
-ps aux | grep -E "(synth_server|unified_placement_server|cts_server|unified_route_save_server|mcp_agent_client)"
+ps aux | grep -E "(run_server|unified.*server|synthesis_server|placement_server|cts_server|routing_server|mcp_agent_client)"
 
 # Monitor logs in real-time (updated log paths)
 tail -f logs/synthesis/des_synthesis_*.log
 tail -f logs/unified_placement/des_unified_placement_*.log
-tail -f logs/cts/des_cts_*.log
-tail -f logs/unified_route_save/des_unified_route_save_*.log
+tail -f logs/unified_cts/des_unified_cts_*.log
+tail -f logs/unified_routing/des_unified_routing_*.log
 
 # Monitor agent logs
 tail -f logs/agent/agent_*.log
@@ -649,17 +651,18 @@ tail -f logs/agent/agent_*.log
 
 ```bash
 # Check service health with detailed output
-run_server.py status
+python3 run_server.py --status
 
 # Monitor all services simultaneously
-watch -n 5 'netstat -tlnp | grep -E "(13333|13338|13340|13341|8000)"'
+watch -n 5 'netstat -tlnp | grep -E "(13333|13340|13341|13342|8000)"'
 
-
+# Check EDA tool connectivity
+which dc_shell && which innovus
 
 # View service documentation
 open http://localhost:13333/docs  # Synthesis
 open http://localhost:13340/docs  # Unified Placement  
-open http://localhost:13338/docs  # CTS
-open http://localhost:13341/docs  # Unified Route Save
+open http://localhost:13341/docs  # CTS
+open http://localhost:13342/docs  # Unified Routing
 open http://localhost:8000/docs   # Agent Client
 ``` 

@@ -39,6 +39,12 @@ OPENAI_API_KEY=your_openai_api_key_here
 MCP_SERVER_HOST=http://localhost
 LOG_ROOT=./logs
 
+# Unified Server Port Configuration (optional - uses defaults if not set)
+UNIFIED_SYNTHESIS_PORT=13333
+UNIFIED_PLACEMENT_PORT=13340
+UNIFIED_CTS_PORT=13341
+UNIFIED_ROUTING_PORT=13342
+
 # EDA Tool Paths (adjust to your installation)
 SYNOPSYS_ROOT=/opt/synopsys
 CADENCE_ROOT=/opt/cadence
@@ -62,27 +68,33 @@ ls libraries/FreePDK45/
 
 ## Step 2: Start the Services
 
-### 2.1 Start All Microservices
+### 2.1 Start All Unified Servers
 
 ```bash
-# Start all four microservices
-python run_server.py
+# Start all four unified servers
+python3 run_server.py --server all
 ```
 
-This script starts:
-- **Synthesis Service** (port 13333)
-- **Unified Placement Service** (port 13340) - includes floorplan, powerplan, and placement
-- **CTS Service** (port 13338)
-- **Unified Route & Save Service** (port 13341) - includes routing and final save
+This command starts the unified server architecture:
+- **Synthesis Service** (port 13333) - RTL to gate-level netlist
+- **Unified Placement Service** (port 13340) - floorplan, powerplan, and placement
+- **CTS Service** (port 13341) - clock tree synthesis and optimization  
+- **Unified Routing Service** (port 13342) - global/detailed routing and final save
 
 **Alternative: Start servers individually**
 
 ```bash
-# Start each service individually
-python3 server/synth_server.py --port 13333 &
-python3 server/unified_placement_server.py --port 13340 &
-python3 server/cts_server.py --port 13338 &
-python3 server/unified_route_save_server.py --port 13341 &
+# Start each service individually using run_server.py
+python3 run_server.py --server synthesis --port 13333 &
+python3 run_server.py --server placement --port 13340 &
+python3 run_server.py --server cts --port 13341 &
+python3 run_server.py --server routing --port 13342 &
+
+# Or use the unified server files directly
+python3 unified_server/synthesis_server.py --port 13333 &
+python3 unified_server/placement_server.py --port 13340 &
+python3 unified_server/cts_server.py --port 13341 &
+python3 unified_server/routing_server.py --port 13342 &
 ```
 
 ### 2.2 Start AI Agent Client
@@ -99,20 +111,20 @@ uvicorn mcp_agent_client:app --host 0.0.0.0 --port 8000
 
 ```bash
 # Check if all ports are listening
-netstat -tlnp | grep -E "(8000|13333|13338|13340|13341)"
+netstat -tlnp | grep -E "(8000|1333[3]|1334[012])"
 
 # Expected output:
 # tcp6       0      0 :::8000     :::*        LISTEN      [PID]/python3  (Agent)
 # tcp6       0      0 :::13333    :::*        LISTEN      [PID]/python3  (Synthesis)
-# tcp6       0      0 :::13338    :::*        LISTEN      [PID]/python3  (CTS)
 # tcp6       0      0 :::13340    :::*        LISTEN      [PID]/python3  (Placement)
-# tcp6       0      0 :::13341    :::*        LISTEN      [PID]/python3  (Route & Save)
+# tcp6       0      0 :::13341    :::*        LISTEN      [PID]/python3  (CTS)
+# tcp6       0      0 :::13342    :::*        LISTEN      [PID]/python3  (Routing)
 
 # Check service health and API documentation
 curl http://localhost:13333/docs  # Synthesis API docs
 curl http://localhost:13340/docs  # Placement API docs
-curl http://localhost:13338/docs  # CTS API docs
-curl http://localhost:13341/docs  # Route & Save API docs
+curl http://localhost:13341/docs  # CTS API docs
+curl http://localhost:13342/docs  # Routing API docs
 ```
 
 ## Step 3: Your First Design
@@ -232,10 +244,9 @@ curl -X POST http://localhost:8000/agent \
 curl -X POST http://localhost:13333/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "aes",
+    "design": "des",
     "tech": "FreePDK45",
     "clk_period": 5.0,
-    "syn_version": "cpV1_clkP1_drcV1",
     "force": true
   }'
 ```
@@ -246,7 +257,7 @@ curl -X POST http://localhost:13333/run \
 curl -X POST http://localhost:13340/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "aes",
+    "design": "des",
     "tech": "FreePDK45",
     "syn_ver": "cpV1_clkP1_drcV1_20241201_143022",
     "top_module": "aes_cipher_top",
@@ -256,33 +267,30 @@ curl -X POST http://localhost:13340/run \
   }'
 ```
 
-### 4.3 CTS Service (Port 13338)
-
-```bash
-curl -X POST http://localhost:13338/run \
-  -H "Content-Type: application/json" \
-  -d '{
-    "design": "aes",
-    "tech": "FreePDK45",
-    "impl_ver": "cpV1_clkP1_drcV1_20241201_143022__g0_p0",
-    "top_module": "aes_cipher_top",
-    "restore_enc": "/path/to/placement.enc.dat",
-    "force": true
-  }'
-```
-
-### 4.4 Unified Route & Save Service (Port 13341)
+### 4.3 CTS Service (Port 13341)
 
 ```bash
 curl -X POST http://localhost:13341/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "aes",
+    "design": "des",
     "tech": "FreePDK45",
-    "impl_ver": "cpV1_clkP1_drcV1_20241201_143022__g0_p0",
-    "top_module": "aes_cipher_top",
-    "restore_enc": "/path/to/cts.enc.dat",
-    "archive": true,
+    "syn_ver": "20250804_172427",
+    "impl_ver": "20250804_172512",
+    "force": true
+  }'
+```
+
+### 4.4 Unified Routing Service (Port 13342)
+
+```bash
+curl -X POST http://localhost:13342/run \
+  -H "Content-Type: application/json" \
+  -d '{
+    "design": "des",
+    "tech": "FreePDK45",
+    "syn_ver": "20250804_172427",
+    "impl_ver": "20250804_172512",
     "force": true
   }'
 ```
@@ -347,8 +355,8 @@ The framework uses CodeBLEU metrics:
 # Check all services are responsive
 curl http://localhost:13333/docs  # Synthesis service
 curl http://localhost:13340/docs  # Unified placement service
-curl http://localhost:13338/docs  # CTS service
-curl http://localhost:13341/docs  # Route & save service
+curl http://localhost:13341/docs  # CTS service
+curl http://localhost:13342/docs  # Routing service
 curl http://localhost:8000/docs   # AI agent
 
 # Check agent functionality
@@ -443,20 +451,20 @@ curl -X POST http://localhost:8000/agent \
 
 ### 8.1 Check Logs
 
-All services generate detailed logs:
+All unified services generate detailed logs:
 
 ```bash
 # Monitor synthesis logs
-tail -f logs/synthesis/aes_synthesis_*.log
+tail -f logs/synthesis/des_synthesis_*.log
 
 # Monitor placement logs
-tail -f logs/unified_placement/aes_unified_placement_*.log
+tail -f logs/unified_placement/des_unified_placement_*.log
 
 # Monitor CTS logs
-tail -f logs/cts/aes_cts_*.log
+tail -f logs/unified_cts/des_unified_cts_*.log
 
 # Monitor routing logs
-tail -f logs/unified_route_save/aes_unified_route_save_*.log
+tail -f logs/unified_routing/des_unified_routing_*.log
 ```
 
 ### 8.2 Check Design Status
@@ -481,10 +489,10 @@ ls deliverables/
 #### Service Connection Issues
 ```bash
 # Check if services are running
-ps aux | grep -E "(synth_server|unified_placement_server|cts_server|unified_route_save_server)"
+ps aux | grep -E "(run_server|unified.*server)"
 
 # Restart services if needed
-python run_server.py
+python3 run_server.py --server all
 
 # Check specific service
 curl http://localhost:13333/docs
@@ -568,7 +576,7 @@ Use specific parameters for fine-tuned control:
 curl -X POST http://localhost:13333/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "aes",
+    "design": "des",
     "clk_period": 2.0,
     "DRC_max_fanout": 15,
     "power_effort": "high",
@@ -579,46 +587,58 @@ curl -X POST http://localhost:13333/run \
 curl -X POST http://localhost:13340/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "aes",
-    "syn_ver": "cpV1_clkP1_drcV1_20241201_143022",
+    "design": "des",
+    "syn_ver": "20250804_172427",
     "target_util": 0.85,
     "ASPECT_RATIO": 1.2,
     "force": true
   }'
 ```
 
+### 9.3 Production Deployment
+
+For production deployment, consider using process managers:
+
+```bash
+# Using systemd (recommended for production)
+# Create service files for each server in /etc/systemd/system/
+
+# Using PM2 (Node.js process manager)
+npm install -g pm2
+pm2 start run_server.py --name "eda-servers" --interpreter python3 -- --server all
+
+# Using supervisord
+# Add configuration to /etc/supervisor/conf.d/eda-servers.conf
+```
 
 ## Step 10: Results and Deliverables
 
 ### 10.1 Check Final Results
 
 ```bash
-# List deliverables (if archive option was used)
-ls deliverables/
+# Check final GDS files from unified routing server
+ls designs/des/FreePDK45/implementation/*/pnr_out/*.gds*
 
-# Extract and view tarball contents
-tar -tzf deliverables/aes_*_route_save_*.tgz
-
-# Check final GDS files
-ls designs/aes/FreePDK45/implementation/*/pnr_out/*.gds*
+# Check checkpoint files from each stage
+ls designs/des/FreePDK45/implementation/*/pnr_save/*.enc
 
 # Check generated TCL scripts
-ls result/aes/FreePDK45/
+ls result/des/FreePDK45/complete_*.tcl
 ```
 
 ### 10.2 Performance Analysis
 
 ```bash
 # Check synthesis reports
-ls designs/aes/FreePDK45/synthesis/*/reports/
-cat designs/aes/FreePDK45/synthesis/*/reports/qor.rpt
+ls designs/des/FreePDK45/synthesis/*/reports/
+cat designs/des/FreePDK45/synthesis/*/reports/qor.rpt
 
 # Check implementation reports
-ls designs/aes/FreePDK45/implementation/*/pnr_reports/
-cat designs/aes/FreePDK45/implementation/*/pnr_reports/route_summary.rpt
+ls designs/des/FreePDK45/implementation/*/pnr_reports/
+cat designs/des/FreePDK45/implementation/*/pnr_reports/route_summary.rpt
 
 # Check timing analysis
-cat designs/aes/FreePDK45/implementation/*/pnr_reports/route_timing.rpt.gz | gunzip
+gunzip -c designs/des/FreePDK45/implementation/*/pnr_reports/route_timing.rpt.gz
 ```
 
 ### 10.3 Session History and Analysis
@@ -629,7 +649,7 @@ curl -X GET http://localhost:8000/session/demo/history
 
 # Check agent reasoning and suggestions
 curl -X POST http://localhost:8000/agent \
-  -d '{"user_query":"analyze the results for design aes", "session_id":"demo"}'
+  -d '{"user_query":"analyze the results for design des", "session_id":"demo"}'
 ```
 
 ## Next Steps
