@@ -23,18 +23,7 @@ MCP-EDA revolutionizes chip design workflows by providing:
 
 ## System Architecture
 
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   User Query    │───▶│  MCP Agent      │───▶│   MCP Servers   │
-│  (Natural Lang) │    │  Client (8000)  │    │    Executor     │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │                       │
-                                ▼                       ▼
-                       ┌─────────────────┐    ┌─────────────────┐
-                       │   OpenAI LLM    │    │    EDA Tools    │
-                       │  (Tool Select)  │    │   (DC/Innovus)  │
-                       └─────────────────┘    └─────────────────┘
-```
+
 
 ### Service Architecture Details
 
@@ -162,8 +151,8 @@ cd mcp-eda-example
 ### 2. Python Environment Setup
 ```bash
 # Create virtual environment
-python3 -m venv venv
-source venv/bin/activate
+conda create -n autoeda python=3.9 -y
+conda activate autoeda
 
 # Install dependencies
 pip install -r requirements.txt
