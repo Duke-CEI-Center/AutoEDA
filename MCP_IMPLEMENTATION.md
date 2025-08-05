@@ -2,118 +2,177 @@
 
 ## Overview
 
-This project implements a comprehensive MCP (Model Context Protocol) EDA server and client system, providing a complete digital design flow from RTL to GDSII using a modern unified 4-server architecture. The implementation leverages Claude Desktop integration for natural language EDA tool interaction.
+This project implements a comprehensive MCP (Model Context Protocol) EDA server system, providing a complete digital design flow from RTL to GDSII using a modern unified 4-server architecture. The implementation leverages Claude Desktop integration for natural language EDA tool interaction and uses the FastMCP framework for robust server development.
 
 ## Architecture Design
 
 ### Unified 4-Server Architecture
 - **FastMCP Framework**: Uses the officially recommended FastMCP framework for robust MCP server development
-- **Unified Microservices**: 4 consolidated servers handle complete EDA stages (synthesis, unified placement, CTS, unified route+save)
+- **Consolidated Microservices**: 4 unified servers handle complete EDA stages:
+  - **SynthesisServer** (port 18001): Complete RTL-to-gate synthesis
+  - **PlacementServer** (port 18002): Floorplan + power planning + placement
+  - **CtsServer** (port 18003): Clock tree synthesis and optimization
+  - **RoutingServer** (port 18004): Global/detailed routing + final save
 - **Tool-based Design**: Each major EDA flow is encapsulated as an independent MCP tool with comprehensive parameter handling
 - **Legacy Compatibility**: Backward compatibility mapping for legacy tool names
 
 ### Client Architecture
-- **Asynchronous Design**: Full asyncio support for non-blocking EDA operations
+- **Claude Desktop Integration**: Direct integration with Claude Desktop for natural language interaction
 - **Type Safety**: Complete type annotations with comprehensive error handling
 - **Clean API**: Intuitive tool calling interface with natural language support
-- **Session Management**: User session context and parameter persistence
+- **Session Management**: Context-aware tool execution with checkpoint management
 
 ## File Structure
 
 ```
-server/mcp/
-├── mcp_eda_server.py           # Main MCP server (unified 4-server architecture)
-├── claude_desktop_config.json  # Claude Desktop configuration
-└── test_mcp_server.py          # MCP server test script
+unified_server/
+├── mcp/
+│   ├── mcp_eda_server.py           # Main MCP server (4-server architecture)
+│   ├── workflow_addition.py        # Additional workflow functions
+│   ├── claude_desktop_config.json  # Claude Desktop configuration
+│   ├── start_mcp_server.sh         # MCP server startup script
+│   └── __pycache__/                # Python cache directory
+├── synthesis_server.py             # Synthesis server (port 18001)
+├── placement_server.py             # Placement server (port 18002)
+├── cts_server.py                   # Clock tree synthesis server (port 18003)
+├── routing_server.py               # Routing server (port 18004)
+├── unified_server.py               # Base server class (BaseServer)
+├── unified_executor.py             # Unified executor class
+└── __init__.py                     # Package initialization
 
-server/
-├── synth_server.py             # Synthesis server (port 13333)
-├── unified_placement_server.py # Unified placement server (port 13340)
-├── cts_server.py               # Clock tree synthesis server (port 13338)
-├── unified_route_save_server.py # Unified route+save server (port 13341)
-├── synth_Executor.py           # Synthesis executor
-├── unified_placement_Executor.py # Unified placement executor
-├── cts_Executor.py             # CTS executor
-└── unified_route_save_Executor.py # Unified route+save executor
-
-mcp_agent_client.py             # AI-powered HTTP agent client
-simple_mcp_client.py            # Simple MCP client for testing
-run_server.py              # Server management script
-MCP_IMPLEMENTATION.md           # This document
+run_server.py                       # Server management script with port cleanup
+test_mcp_server.py                  # MCP server test script
+MCP_IMPLEMENTATION.md               # This document
 ```
 
-## Available MCP Tools (Unified 4-Server Architecture)
+## Available MCP Tools (4-Server Architecture)
 
 ### 1. synthesis
-- **Function**: Complete RTL-to-gate synthesis (setup + compile)
+- **Function**: Complete RTL-to-gate synthesis using Synopsys Design Compiler
+- **Description**: Performs the complete synthesis flow including environment setup, RTL analysis, and gate-level compilation. Transforms RTL design into optimized gate-level netlist while meeting timing, area, and power constraints.
 - **Parameters**: 
   - `design` (str, required): Design name (e.g., "b14", "leon2", "des")
   - `tech` (str, optional): Technology library (default: "FreePDK45")
   - `version_idx` (int, optional): Configuration version index (default: 0)
-  - `force` (bool, optional): Force re-run (default: False)
+  - `force` (bool, optional): Force re-run even if output exists (default: False)
 - **Returns**: JSON string with synthesis results, timing/area/power reports
-- **Server**: synth_server.py (port 13333)
+- **Server**: SynthesisServer (port 18001)
+- **Prerequisites**: 
+  - Design RTL files must exist in designs/{design}/rtl/
+  - Technology library must be available
+  - Synthesis configuration files must be present
 
-### 2. unified_placement
-- **Function**: Unified placement flow (floorplan + powerplan + placement)
+### 2. placement
+- **Function**: Complete placement flow including floorplanning, power planning, and standard cell placement
+- **Description**: Performs chip floorplanning and I/O placement, power grid planning and power mesh creation, and standard cell placement optimization using Cadence Innovus.
 - **Parameters**:
   - `design` (str, required): Design name
-  - `top_module` (str, required): Top-level module name
+  - `top_module` (str, required): Top-level module name from RTL design
   - `tech` (str, optional): Technology library (default: "FreePDK45")
-  - `syn_ver` (str, optional): Synthesis version (auto-detected if empty)
+  - `syn_ver` (str, optional): Synthesis version string (auto-detected if empty)
   - `g_idx` (int, optional): Global configuration index (default: 0)
   - `p_idx` (int, optional): Placement parameter index (default: 0)
-  - `force` (bool, optional): Force re-run (default: False)
-  - `restore_enc` (str, optional): Restore checkpoint file path
-- **Returns**: JSON string with unified placement results and checkpoint data
-- **Server**: unified_placement_server.py (port 13340)
+  - `force` (bool, optional): Force re-run even if output exists (default: False)
+  - `restore_enc` (str, optional): Path to restore checkpoint file
+- **Returns**: JSON string with placement results, placement files, and checkpoint data
+- **Server**: PlacementServer (port 18002)
+- **Prerequisites**: 
+  - synthesis must be completed successfully
+  - Top module must be correctly identified
+  - Implementation configuration files must be available
 
 ### 3. clock_tree_synthesis
-- **Function**: Clock distribution network synthesis
+- **Function**: Clock distribution network synthesis and optimization
+- **Description**: Synthesizes the clock distribution network by inserting clock buffers and optimizing clock tree topology. Ensures balanced clock distribution while meeting clock skew and transition time requirements.
 - **Parameters**:
   - `design` (str, required): Design name
-  - `top_module` (str, required): Top-level module name
-  - `restore_enc` (str, required): Placement checkpoint file path
+  - `top_module` (str, required): Top-level module name from RTL design
+  - `restore_enc` (str, required): Path to placement checkpoint file
   - `tech` (str, optional): Technology library (default: "FreePDK45")
   - `impl_ver` (str, optional): Implementation version (auto-generated if empty)
-  - `force` (bool, optional): Force re-run (default: False)
+  - `force` (bool, optional): Force re-run even if output exists (default: False)
   - `g_idx` (int, optional): Global configuration index (default: 0)
   - `c_idx` (int, optional): Clock tree parameter index (default: 0)
-- **Returns**: JSON string with CTS results and checkpoint data
-- **Server**: cts_server.py (port 13338)
+- **Returns**: JSON string with clock tree synthesis results, clock tree files, and checkpoint data
+- **Server**: CtsServer (port 18003)
+- **Prerequisites**: 
+  - placement must be completed successfully
+  - Placement checkpoint file must be valid
+  - Clock tree synthesis configuration must be available
 
-### 4. unified_route_save
-- **Function**: Unified routing and save flow (routing + final save)
+### 4. routing
+- **Function**: Complete routing and save flow including signal routing and final design save
+- **Description**: Performs global and detailed signal routing, post-route optimization, final design verification, and output file generation. Routes all signal nets between placed cells while meeting timing requirements and generates all required output files including GDSII, DEF, netlist, and reports.
 - **Parameters**:
   - `design` (str, required): Design name
-  - `top_module` (str, required): Top-level module name
-  - `restore_enc` (str, required): CTS checkpoint file path
+  - `top_module` (str, required): Top-level module name from RTL design
+  - `restore_enc` (str, required): Path to CTS checkpoint file
   - `tech` (str, optional): Technology library (default: "FreePDK45")
   - `impl_ver` (str, optional): Implementation version (auto-generated if empty)
-  - `force` (bool, optional): Force re-run (default: False)
+  - `force` (bool, optional): Force re-run even if output exists (default: False)
   - `g_idx` (int, optional): Global configuration index (default: 0)
   - `p_idx` (int, optional): Placement parameter index (default: 0)
   - `r_idx` (int, optional): Routing parameter index (default: 0)
-  - `archive` (bool, optional): Create archive of results (default: True)
-- **Returns**: JSON string with routing results and final deliverables
-- **Server**: unified_route_save_server.py (port 13341)
+  - `archive` (bool, optional): Create archive of final results (default: True)
+- **Returns**: JSON string with routing results, output files, and archive data
+- **Server**: RoutingServer (port 18004)
+- **Prerequisites**: 
+  - clock_tree_synthesis must be completed successfully
+  - CTS checkpoint file must be valid
+  - Routing configuration must be available
 
 ### 5. complete_eda_flow
-- **Function**: Complete RTL to GDSII flow using unified 4-server architecture
+- **Function**: Execute the complete EDA flow from RTL to GDSII using 4-server architecture
+- **Description**: Executes the complete digital design implementation flow automatically with proper checkpoint handling between stages.
 - **Parameters**:
   - `design` (str, required): Design name
-  - `top_module` (str, required): Top-level module name
+  - `top_module` (str, required): Top-level module name from RTL design
   - `tech` (str, optional): Technology library (default: "FreePDK45")
-  - `force` (bool, optional): Force re-run (default: False)
+  - `force` (bool, optional): Force re-run even if output exists (default: False)
 - **Returns**: JSON string with complete flow results and step-by-step status
-- **Flow**: Automatically executes all 4 stages with proper checkpoint handling
+- **Flow Steps**: 
+  1. RTL synthesis (synthesis server)
+  2. Placement: floorplan + power + placement (placement server)
+  3. Clock tree synthesis (CTS server)
+  4. Routing and save: routing + save (routing server)
+- **Prerequisites**: 
+  - Design RTL files must exist in designs/{design}/rtl/
+  - Technology library must be available
+  - All configuration files must be present
+
+## Server Configuration
+
+### EDA Server Ports (Unified 18001-18004)
+```python
+EDA_SERVERS = {
+    "synthesis": {"port": 18001, "endpoint": "run"},
+    "placement": {"port": 18002, "endpoint": "run"},
+    "cts": {"port": 18003, "endpoint": "run"},
+    "routing": {"port": 18004, "endpoint": "run"},
+}
+```
+
+### Legacy Tool Mapping (Backward Compatibility)
+```python
+LEGACY_TOOL_MAPPING = {
+    "synth_setup": "synthesis",
+    "synth_compile": "synthesis", 
+    "synth": "synthesis",
+    "floorplan": "placement",
+    "powerplan": "placement",
+    "unified_placement": "placement",
+    "route": "routing",
+    "save": "routing",
+    "unified_route_save": "routing",
+}
+```
 
 ## Installation and Configuration
 
 ### 1. Install Dependencies
 ```bash
 # Core MCP dependencies
-pip install mcp>=1.0.0 fastmcp requests
+pip install mcp fastmcp requests
 
 # Or install all project dependencies
 pip install -r requirements.txt
@@ -121,19 +180,30 @@ pip install -r requirements.txt
 
 ### 2. Start EDA Servers
 ```bash
-# Option 1: Use restart script (recommended)
-run_server.py
+# Option 1: Start all servers with automatic port cleanup
+python3 run_server.py --server all
 
-# Option 2: Manual startup
-python3 server/synth_server.py &
-python3 server/unified_placement_server.py &
-python3 server/cts_server.py &
-python3 server/unified_route_save_server.py &
+# Option 2: Start individual servers
+python3 run_server.py --server synthesis  # Port 18001
+python3 run_server.py --server placement  # Port 18002
+python3 run_server.py --server cts        # Port 18003
+python3 run_server.py --server routing    # Port 18004
+
+# Option 3: Direct server startup
+python3 unified_server/synthesis_server.py --port 18001 &
+python3 unified_server/placement_server.py --port 18002 &
+python3 unified_server/cts_server.py --port 18003 &
+python3 unified_server/routing_server.py --port 18004 &
 ```
 
 ### 3. Start MCP Server
 ```bash
-cd server/mcp
+# Option 1: Using startup script
+cd unified_server/mcp
+./start_mcp_server.sh
+
+# Option 2: Direct startup
+cd unified_server/mcp
 python3 mcp_eda_server.py
 ```
 
@@ -147,10 +217,10 @@ Add the following configuration to your Claude Desktop configuration file (`clau
       "command": "ssh",
       "args": [
         "yl996@hl279-cmp-00.egr.duke.edu",
-        "cd /home/yl996/proj/mcp-eda-example/server/mcp && python3 mcp_eda_server.py"
+        "cd /home/yl996/proj/mcp-eda-example/unified_server/mcp && python3 mcp_eda_server.py"
       ],
       "env": {},
-      "description": "MCP EDA Server with 4-server architecture (synthesis, unified_placement, cts, unified_route_save)"
+      "description": "MCP EDA Server with 4-server architecture (synthesis, placement, cts, routing)"
     }
   }
 }
@@ -159,206 +229,262 @@ Add the following configuration to your Claude Desktop configuration file (`clau
 ### 5. Test MCP Server
 ```bash
 # Test MCP server functionality
-cd server/mcp
+cd unified_server/mcp
 python3 test_mcp_server.py
 
-
-### 6. Start AI Agent (Optional)
-```bash
-# Start the intelligent HTTP agent client
-python3 mcp_agent_client.py
+# Check server health
+curl http://localhost:18001/docs  # Synthesis
+curl http://localhost:18002/docs  # Placement
+curl http://localhost:18003/docs  # CTS
+curl http://localhost:18004/docs  # Routing
 ```
 
 ## Usage Examples
 
-### Using MCP Client API
+### Using Claude Desktop (Natural Language)
+In Claude Desktop, you can directly use natural language to call the tools:
+
+```
+Please run the complete EDA flow for design "des" with top module "des3"
+```
+
+```
+Run synthesis for design "b14" and then placement with top module "b14"
+```
+
+```
+Execute clock tree synthesis for design "leon2" using the checkpoint from placement
+```
+
+### Direct MCP Tool Calls
 ```python
 import asyncio
-from simple_mcp_client import SimpleMCPClient
+import json
 
-async def main():
-    client = SimpleMCPClient()
+# Example tool calls (as they would be made by Claude Desktop)
+
+# 1. Run synthesis
+synthesis_result = await synthesis(
+    design="des",
+    tech="FreePDK45",
+    version_idx=0,
+    force=False
+)
+
+# 2. Run placement
+placement_result = await placement(
+    design="des",
+    top_module="des3",
+    tech="FreePDK45",
+    syn_ver="",  # Auto-detected
+    g_idx=0,
+    p_idx=0,
+    force=False,
+    restore_enc=""
+)
+
+# 3. Run complete flow
+complete_flow_result = await complete_eda_flow(
+    design="des",
+    top_module="des3",
+    tech="FreePDK45",
+    force=False
+)
+```
+
+## Technical Implementation Details
+
+### 1. MCP Server Architecture
+- **FastMCP Framework**: Uses the official FastMCP framework for robust MCP protocol implementation
+- **Async/Await Pattern**: Full asyncio support for non-blocking operations
+- **Type Safety**: Complete parameter type definitions with Pydantic-style validation
+- **Error Handling**: Comprehensive error handling with detailed error messages
+
+### 2. Server Communication
+- **HTTP-based Communication**: All EDA servers expose REST APIs
+- **JSON Protocol**: Standardized JSON payload format for all tool calls
+- **Timeout Management**: 300-second timeout for long-running EDA operations
+- **Connection Pooling**: Efficient connection reuse for better performance
+
+### 3. Checkpoint Management
+- **Automatic Version Detection**: Auto-detection of synthesis versions and implementation versions
+- **Checkpoint Chaining**: Proper checkpoint file handling between EDA stages
+- **Path Resolution**: Intelligent restore_enc path detection and management
+- **State Validation**: Checkpoint file validation before stage execution
+
+### 4. Legacy Compatibility Layer
+- **Backward Compatibility**: Full support for legacy tool names through mapping
+- **Graceful Migration**: Smooth transition from old to new tool names
+- **Warning System**: Informative warnings when legacy tools are used
+- **Documentation Updates**: Clear migration path documentation
+
+## Advanced Features
+
+### 1. Intelligent Auto-Detection
+```python
+def detect_synthesis_version(design: str) -> str:
+    """Automatically detect the latest synthesis version for a design"""
+    synth_dir = ROOT / "designs" / design / "FreePDK45" / "synthesis"
+    if not synth_dir.exists():
+        return ""
     
-    # Connect to MCP server
-    await client.connect()
+    subdirs = [d for d in synth_dir.iterdir() if d.is_dir()]
+    if not subdirs:
+        return ""
     
-    # Run complete synthesis (setup + compile)
-    result = await client.call_tool("synthesis", {
-        "design": "des",
-        "tech": "FreePDK45",
-        "version_idx": 0,
-        "force": False
-    })
-    print("Synthesis result:", result)
+    # Return the most recent version directory
+    return max(subdirs, key=lambda p: p.stat().st_mtime).name
+```
+
+### 2. Implementation Version Generation
+```python
+def make_implementation_version(syn_ver: str, g_idx: int = 0, p_idx: int = 0) -> str:
+    """Generate implementation version name from synthesis version and indices"""
+    return f"{syn_ver}__g{g_idx}_p{p_idx}"
+```
+
+### 3. EDA Server Communication
+```python
+def call_eda_server(tool_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+    """Call EDA microservice with specified payload"""
+    # Handle legacy tool names
+    if tool_name in LEGACY_TOOL_MAPPING:
+        actual_tool = LEGACY_TOOL_MAPPING[tool_name]
+        print(f"[MCP] Legacy tool '{tool_name}' mapped to '{actual_tool}'")
+        tool_name = actual_tool
     
-    # Run unified placement (floorplan + power + placement)
-    result = await client.call_tool("unified_placement", {
-        "design": "des",
-        "top_module": "des3",
-        "tech": "FreePDK45",
-        "syn_ver": "cpV1_clkP1_drcV1"
-    })
-    print("Unified placement result:", result)
+    if tool_name not in EDA_SERVERS:
+        return {"status": "error", "detail": f"Unknown tool: {tool_name}"}
     
-    # Run complete EDA flow
-    result = await client.call_tool("complete_eda_flow", {
-        "design": "des",
-        "top_module": "des3",
-        "tech": "FreePDK45",
-        "force": False
-    })
-    print("Complete flow result:", result)
+    server_info = EDA_SERVERS[tool_name]
+    url = f"http://localhost:{server_info['port']}/{server_info['endpoint']}"
     
-    # Disconnect
-    await client.disconnect()
-
-asyncio.run(main())
+    try:
+        response = requests.post(url, json=payload, timeout=300)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return {"status": "error", "detail": f"Failed to call EDA server: {str(e)}"}
 ```
-
-### Using Claude Desktop
-In Claude Desktop, you can directly use natural language to call the unified tools:
-
-```
-Please run the complete EDA flow for design "des" with top module "des3" using the unified 4-server architecture
-```
-
-```
-Run synthesis for design "b14" and then unified placement with top module "b14"
-```
-
-```
-Execute clock tree synthesis for design "leon2" using the checkpoint from unified placement
-```
-
-### Using HTTP Agent Client
-```bash
-# Start the AI agent
-python3 mcp_agent_client.py
-
-# In another terminal, call the agent
-curl -X POST http://localhost:8000/agent \
-  -H "Content-Type: application/json" \
-  -d '{"user_query":"Run complete EDA flow for design des with top module des3"}'
-```
-
-## Technical Features
-
-### 1. Unified 4-Server Architecture
-- **Consolidated Services**: 4 unified servers replace 8 individual stage servers
-- **Complete Flows**: Each server handles complete sub-flows (e.g., unified_placement = floorplan + power + placement)
-- **Efficient Communication**: Reduced inter-service communication overhead
-- **Checkpoint Management**: Automatic checkpoint file handling between stages
-
-### 2. Advanced MCP Implementation
-- **FastMCP Framework**: Uses officially recommended FastMCP for robust server development
-- **Legacy Compatibility**: Backward compatibility mapping for legacy tool names
-- **Type Safety**: Complete parameter type definitions and comprehensive validation
-- **Error Handling**: Detailed error messages with context and debugging information
-
-### 3. AI-Powered Orchestration
-- **Natural Language Processing**: GPT-4 integration for intelligent tool selection
-- **Parameter Extraction**: Automatic parameter extraction from natural language queries
-- **Strategy Recommendation**: AI-driven optimization strategy suggestions
-- **Session Management**: User session context and parameter persistence
-
-### 4. Enhanced Features
-- **Auto-detection**: Automatically detect synthesis versions and implementation versions
-- **Multi-Stage Flows**: Support for `pnr` and `full_flow` abstractions
-- **Intelligent Routing**: Automatic restore_enc path detection and management
-- **Comprehensive Logging**: Detailed logging across all servers and stages
-
-### 5. Integration Capabilities
-- **Claude Desktop**: Direct integration with Claude Desktop for natural language interaction
-- **HTTP API**: RESTful API through mcp_agent_client.py for programmatic access
-- **Health Monitoring**: Comprehensive health checks and monitoring tools
 
 ## Troubleshooting
 
 ### Common Issues
 
 1. **MCP Server Connection Failures**
-   - Ensure MCP server is running: `cd server/mcp && python3 mcp_eda_server.py`
-   - Check if all 4 EDA servers are running: `python run_server.py`
-   - Verify port availability: `netstat -tlnp | grep -E "(13333|13338|13340|13341)"`
+   ```bash
+   # Check if MCP server is running
+   cd unified_server/mcp && python3 mcp_eda_server.py
+   
+   # Check if all 4 EDA servers are running
+   python3 run_server.py --server all
+   
+   # Verify port availability
+   netstat -tlnp | grep -E "(1800[1-4])"
+   ```
 
 2. **EDA Server Communication Errors**
-   - Verify server processes: `ps aux | grep -E "(synth_server|unified_placement_server|cts_server|unified_route_save_server)"`
-   - Check server logs in `logs/` directory
+   ```bash
+   # Check server health
+   curl http://localhost:18001/docs  # Synthesis
+   curl http://localhost:18002/docs  # Placement
+   curl http://localhost:18003/docs  # CTS
+   curl http://localhost:18004/docs  # Routing
+   
+   # Check server processes
+   ps aux | grep -E "(synthesis_server|placement_server|cts_server|routing_server)"
+   ```
 
 3. **Tool Call Failures**
    - Verify design files exist in `designs/{design}/rtl/`
    - Check configuration files in `config/` directory
    - Ensure proper checkpoint file paths for dependent stages
+   - Verify synthesis completion before running placement
 
 4. **Claude Desktop Integration Issues**
-   - Verify `claude_desktop_config.json` configuration
+   - Verify `claude_desktop_config.json` configuration path
    - Check SSH connectivity to the server host
    - Ensure MCP server is accessible from Claude Desktop
+   - Verify the working directory path in the configuration
 
 ### Debugging Methods
 
 1. **Check All Services Status**
    ```bash
+   # Check EDA servers
+   for port in 18001 18002 18003 18004; do
+     curl -s http://localhost:$port/docs >/dev/null && echo "Port $port: OK" || echo "Port $port: FAIL"
+   done
    
    # Check MCP server
-   cd server/mcp
-   python3 test_mcp_server.py
+   cd unified_server/mcp
+   python3 -c "
+   import sys
+   sys.path.append('..')
+   from mcp_eda_server import EDA_SERVERS
+   print('EDA Servers:', list(EDA_SERVERS.keys()))
+   "
    ```
 
 2. **View Server Logs**
    ```bash
-   # MCP server logs
-   cd server/mcp
+   # MCP server logs (stdout)
+   cd unified_server/mcp
    python3 mcp_eda_server.py
    
    # EDA server logs
    tail -f logs/synthesis/des_synthesis_*.log
-   tail -f logs/unified_placement/des_unified_placement_*.log
+   tail -f logs/placement/des_placement_*.log
    tail -f logs/cts/des_cts_*.log
-   tail -f logs/unified_route_save/des_unified_route_save_*.log
+   tail -f logs/routing/des_routing_*.log
    ```
 
 3. **Test Individual Components**
    ```bash
-   # Test MCP tools
-   python3 -c "
-   import asyncio
-   from simple_mcp_client import SimpleMCPClient
-   
-   async def test():
-       client = SimpleMCPClient()
-       await client.connect()
-       tools = await client.list_tools()
-       print('Available tools:', [t['name'] for t in tools])
-       await client.disconnect()
-   
-   asyncio.run(test())
-   "
-   
    # Test direct server APIs
-   curl -X GET http://localhost:13333/docs
-   curl -X GET http://localhost:13340/docs
-   curl -X GET http://localhost:13338/docs
-   curl -X GET http://localhost:13341/docs
+   curl -X POST http://localhost:18001/run \
+     -H "Content-Type: application/json" \
+     -d '{"design": "des", "tech": "FreePDK45"}'
+   
+   # Test MCP server compilation
+   cd unified_server/mcp
+   python3 -c "
+   import mcp_eda_server
+   print('✓ MCP server imports OK')
+   print('Available tools:', [f.__name__ for f in [
+     mcp_eda_server.synthesis,
+     mcp_eda_server.placement,
+     mcp_eda_server.clock_tree_synthesis,
+     mcp_eda_server.routing,
+     mcp_eda_server.complete_eda_flow
+   ]])
+   "
    ```
 
 4. **Check Dependencies**
    ```bash
    # Verify MCP installation
-   python3 -c "import mcp.server.fastmcp; print('FastMCP OK')"
+   python3 -c "import mcp.server.fastmcp; print('✓ FastMCP OK')"
    
    # Check all required packages
-   pip check
+   python3 -c "import requests, json, pathlib; print('✓ All dependencies OK')"
    
-   # Verify EDA tools (if available)
-   which dc_shell
-   which innovus
+   # Verify server classes
+   python3 -c "
+   import sys
+   sys.path.append('unified_server')
+   from synthesis_server import SynthesisServer
+   from placement_server import PlacementServer
+   from cts_server import CtsServer
+   from routing_server import RoutingServer
+   print('✓ All server classes imported successfully')
+   "
    ```
 
 ## Development Guide
 
 ### Adding New MCP Tools
-1. Add new `@mcp.tool()` decorated function in `server/mcp/mcp_eda_server.py`
+1. Add new `@mcp.tool()` decorated function in `unified_server/mcp/mcp_eda_server.py`:
    ```python
    @mcp.tool()
    async def new_tool_name(
@@ -366,8 +492,22 @@ curl -X POST http://localhost:8000/agent \
        required_param: str,
        optional_param: str = "default"
    ) -> str:
-       """Tool description with comprehensive docstring"""
-       payload = {"design": design, "required_param": required_param}
+       """
+       Tool description with comprehensive docstring
+       
+       Args:
+           design: Design name description
+           required_param: Required parameter description
+           optional_param: Optional parameter description
+       
+       Returns:
+           JSON string containing tool results
+       """
+       payload = {
+           "design": design, 
+           "required_param": required_param,
+           "optional_param": optional_param
+       }
        result = call_eda_server("target_server", payload)
        return json.dumps(result, ensure_ascii=False, indent=2)
    ```
@@ -379,67 +519,76 @@ curl -X POST http://localhost:8000/agent \
 ### Modifying Existing Tools
 1. Update the tool function parameters and logic in `mcp_eda_server.py`
 2. Update corresponding server endpoint if needed
-3. Test with `python3 server/mcp/test_mcp_server.py`
+3. Test with MCP server compilation and functionality
 4. Update documentation and examples
 
-### Adding New EDA Servers
-1. Create new server file (e.g., `server/new_server.py`)
-2. Add corresponding executor (e.g., `server/new_Executor.py`)
-3. Update `EDA_SERVERS` configuration in `mcp_eda_server.py`
-4. Update `run_server.py` script
+### Server Class Structure
+All EDA servers inherit from the `BaseServer` class:
+```python
+from unified_server import BaseServer
 
-### Testing New Features
-1. **Unit Testing**: Test individual MCP tools
-   ```bash
-   cd server/mcp
-   python3 test_mcp_server.py
-   ```
+class NewServer(BaseServer):
+    def __init__(self, default_port=18005):
+        super().__init__(
+            name="new_server",
+            default_port=default_port
+        )
+    
+    # Implement server-specific methods
+```
 
-3. **End-to-End Testing**: Test complete flows
-   ```bash
-   python3 mcp_agent_client.py  # Start agent
-   # Test via HTTP API or Claude Desktop
-   ```
+## Performance Considerations
 
-### Extending AI Agent Capabilities
-1. Update `TOOLS` mapping in `mcp_agent_client.py`
-2. Add new flow definitions in `flow_definitions`
-3. Update parameter extraction and validation logic
-4. Test natural language understanding with GPT-4
+### 1. Port Management
+- **Automatic Cleanup**: `run_server.py` includes automatic port cleanup using `lsof` and `kill`
+- **Conflict Resolution**: Automatic termination of conflicting processes before server startup
+- **Health Monitoring**: Built-in health checks and status monitoring
+
+### 2. Memory Management
+- **Checkpoint Efficiency**: Optimized checkpoint file handling and memory usage
+- **Process Isolation**: Each EDA server runs in its own process space
+- **Resource Cleanup**: Automatic cleanup of temporary files and processes
+
+### 3. Scalability Features
+- **Async Operations**: Non-blocking MCP tool execution
+- **Connection Pooling**: Efficient HTTP connection reuse
+- **Load Balancing**: Support for multiple server instances (future enhancement)
 
 ## Architecture Benefits
 
 ### Modern Unified Design
-- **Simplified Architecture**: 4 unified servers vs. 8 individual stage servers
+- **Simplified Architecture**: 4 unified servers with clear responsibilities
 - **Reduced Complexity**: Fewer inter-service dependencies and communication overhead
 - **Better Maintainability**: Consolidated functionality in logical groups
 - **Enhanced Performance**: Optimized checkpoint handling and data flow
 
-### AI-First Approach
-- **Natural Language Interface**: Direct Claude Desktop integration for intuitive interaction
-- **Intelligent Orchestration**: GPT-4 powered tool selection and parameter extraction
-- **Context Awareness**: Session management and parameter persistence
-- **Error Recovery**: Intelligent error handling and user guidance
+### Claude Desktop Integration
+- **Natural Language Interface**: Direct integration for intuitive interaction
+- **Context Awareness**: Intelligent parameter extraction and validation
+- **Error Recovery**: Comprehensive error handling and user guidance
+- **Session Management**: Persistent context across tool calls
 
 ### Production-Ready Features
-- **Comprehensive Logging**: Detailed logs across all components
-- **Health Monitoring**: Real-time service health checks and monitoring
-- **Legacy Compatibility**: Smooth migration path from older implementations
+- **Comprehensive Logging**: Detailed logs across all components with structured output
+- **Health Monitoring**: Real-time service health checks and status reporting
+- **Process Management**: Robust process lifecycle management with automatic cleanup
+- **Legacy Compatibility**: Smooth migration path with backward compatibility
 
 ## Summary
 
 This advanced MCP EDA implementation provides a modern, AI-powered framework for digital design automation:
 
 ### Key Achievements
-- **Unified 4-Server Architecture**: Streamlined from 8 individual servers to 4 consolidated services
+- **Unified 4-Server Architecture**: Streamlined servers with ports 18001-18004
 - **Complete EDA Flow Coverage**: From RTL to GDSII with intelligent checkpoint management
 - **Claude Desktop Integration**: Natural language interaction for hardware design workflows
-- **AI-Powered Orchestration**: GPT-4 integration for intelligent tool selection and parameter extraction
+- **FastMCP Framework**: Modern, robust MCP protocol implementation
+- **Production-Ready Deployment**: Process management, health monitoring, and comprehensive logging
 
 ### Impact
 - **Improved Efficiency**: Reduced setup complexity and faster development cycles
 - **Enhanced Usability**: Natural language interface lowers barriers to EDA tool usage
-- **Better Maintainability**: Clean architecture and comprehensive documentation
+- **Better Maintainability**: Clean architecture with comprehensive documentation and testing
 - **Scalable Design**: Extensible framework for adding new tools and capabilities
 
-Through this implementation, hardware designers can leverage the power of AI and natural language processing to streamline their EDA workflows, significantly improving productivity and reducing the complexity of digital design implementation. 
+Through this implementation, hardware designers can leverage the power of AI and natural language processing to streamline their EDA workflows, significantly improving productivity and reducing the complexity of digital design implementation. The unified 4-server architecture with standardized ports (18001-18004) provides a robust foundation for scalable EDA automation.

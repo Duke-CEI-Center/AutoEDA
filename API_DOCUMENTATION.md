@@ -18,10 +18,10 @@ The framework consists of:
 
 | Stage | Service | Port | Description |
 |-------|---------|------|-------------|
-| **Synthesis** | `synthesis_server.py` | 13333 | Complete RTL-to-gate synthesis (setup + compile) |
-| **Unified Placement** | `placement_server.py` | 13340 | Integrated placement flow (floorplan + powerplan + placement) |
-| **Clock Tree Synthesis** | `cts_server.py` | 13341 | Clock distribution network synthesis |
-| **Unified Routing** | `routing_server.py` | 13342 | Integrated routing and save flow (routing + final save) |
+| **Synthesis** | `synthesis_server.py` | 18001 | Complete RTL-to-gate synthesis (setup + compile) |
+| **Placement** | `placement_server.py` | 18002 | Integrated placement flow (floorplan + powerplan + placement) |
+| **Clock Tree Synthesis** | `cts_server.py` | 18003 | Clock distribution network synthesis |
+| **Routing** | `routing_server.py` | 18004 | Integrated routing and save flow (routing + final save) |
 
 ## Interface Types
 
@@ -72,9 +72,9 @@ Direct MCP protocol interface for Claude Desktop integration with unified 4-serv
    - **Returns**: JSON string with synthesis results including timing, area, and power reports
 
 2. **unified_placement**
-   - **Function**: Unified placement flow (floorplan + powerplan + placement)
+   - **Function**: Placement flow (floorplan + powerplan + placement)
    - **Parameters**: design, top_module, tech, syn_ver, g_idx, p_idx, force, restore_enc
-   - **Returns**: JSON string with unified placement results and checkpoint data
+   - **Returns**: JSON string with placement results and checkpoint data
 
 3. **clock_tree_synthesis**
    - **Function**: Clock distribution network synthesis
@@ -82,7 +82,7 @@ Direct MCP protocol interface for Claude Desktop integration with unified 4-serv
    - **Returns**: JSON string with CTS results and checkpoint data
 
 4. **unified_route_save**
-   - **Function**: Unified routing and save flow (routing + final save)
+   - **Function**: Routing and save flow (routing + final save)
    - **Parameters**: design, top_module, restore_enc, tech, impl_ver, force, g_idx, p_idx, r_idx, archive
    - **Returns**: JSON string with routing results and final deliverables
 
@@ -120,7 +120,7 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
 
 ### 1. Synthesis Server
 
-**Endpoint:** `http://localhost:13333/run`
+**Endpoint:** `http://localhost:18001/run`
 
 **Request Body:**
 ```json
@@ -153,9 +153,9 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
 }
 ```
 
-### 2. Unified Placement Server
+### 2. Placement Server
 
-**Endpoint:** `http://localhost:13340/run`
+**Endpoint:** `http://localhost:18002/run`
 
 **Request Body:**
 ```json
@@ -188,7 +188,7 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
   "log_path": "/home/yl996/proj/mcp-eda-example/logs/unified_placement/des_unified_placement_20241219_143100.log",
   "reports": {
     "workspace": "Workspace setup completed",
-    "placement": "Unified placement completed successfully",
+    "placement": "Placement completed successfully",
     "floorplan_summary.rpt": "Floorplan summary report",
     "power_summary.rpt": "Power planning summary report",
     "placement_summary.rpt": "Placement summary report"
@@ -199,7 +199,7 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
 
 ### 3. Clock Tree Synthesis Server
 
-**Endpoint:** `http://localhost:13341/run`
+**Endpoint:** `http://localhost:18003/run`
 
 **Request Body:**
 ```json
@@ -219,10 +219,10 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
 - `design` (string, required): Design name
 - `top_module` (string, required): Top-level module name
 - `tech` (string, required): Technology library
-- `impl_ver` (string, required): Implementation version string (from unified placement)
+- `impl_ver` (string, required): Implementation version string (from placement)
 - `g_idx` (integer, required): Global configuration index
 - `c_idx` (integer, required): Clock tree parameter index
-- `restore_enc` (string, required): Path to unified placement checkpoint file
+- `restore_enc` (string, required): Path to placement checkpoint file
 - `force` (boolean, optional): Force re-run (default: false)
 
 **Response:**
@@ -235,9 +235,9 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
 }
 ```
 
-### 4. Unified Routing Server
+### 4. Routing Server
 
-**Endpoint:** `http://localhost:13342/run`
+**Endpoint:** `http://localhost:18004/run`
 
 **Request Body:**
 ```json
@@ -274,7 +274,7 @@ Calling tool: synthesis_setup, parameters: {'design': 'b14', 'tech': 'FreePDK45'
   "log_path": "/home/yl996/proj/mcp-eda-example/logs/unified_routing/des_unified_routing_20241219_143200.log",
   "reports": {
     "workspace": "Workspace setup completed",
-    "route_save": "Unified routing and save completed successfully",
+    "route_save": "Routing and save completed successfully",
     "routing_summary.rpt": "Routing summary report",
     "timing_summary.rpt": "Final timing report",
     "drc_summary.rpt": "DRC check report"
@@ -428,7 +428,7 @@ curl -X POST http://localhost:8000/agent \
   -H "Content-Type: application/json" \
   -d '{"user_query":"Run synthesis for design=\"des\" and return the log path."}'
 
-# 2. Unified Placement (Floorplan + Power + Placement)
+# 2. Placement (Floorplan + Power + Placement)
 curl -X POST http://localhost:8000/agent \
   -H "Content-Type: application/json" \
   -d '{"user_query":"Run unified_placement for design=\"des\", top_module=\"des3\" and return the checkpoint path."}'
@@ -438,7 +438,7 @@ curl -X POST http://localhost:8000/agent \
   -H "Content-Type: application/json" \
   -d '{"user_query":"Run CTS for design=\"des\", top_module=\"des3\" and return the checkpoint path."}'
 
-# 4. Unified Route Save (Routing + Final Save)
+# 4. Route Save (Routing + Final Save)
 curl -X POST http://localhost:8000/agent \
   -H "Content-Type: application/json" \
   -d '{"user_query":"Run unified_route_save for design=\"des\", top_module=\"des3\" with archive=true and return all deliverables."}'
@@ -459,7 +459,7 @@ Please run the complete EDA flow for design "des" with top module "des3" using t
 ```
 
 ```
-Run synthesis for design "b14" and then unified placement with top module "b14"
+Run synthesis for design "b14" and then placement with top module "b14"
 ```
 
 ```
@@ -483,7 +483,7 @@ MCP> Execute complete_eda_flow for design b14 top_module b14
 
 ```bash
 # Direct synthesis (complete setup + compile)
-curl -X POST http://localhost:13333/run \
+curl -X POST http://localhost:18001/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -492,8 +492,8 @@ curl -X POST http://localhost:13333/run \
     "force": true
   }'
 
-# Direct unified placement (floorplan + power + placement)
-curl -X POST http://localhost:13340/run \
+# Direct placement (floorplan + power + placement)
+curl -X POST http://localhost:18002/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -507,7 +507,7 @@ curl -X POST http://localhost:13340/run \
   }'
 
 # Direct CTS
-curl -X POST http://localhost:13341/run \
+curl -X POST http://localhost:18003/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -520,8 +520,8 @@ curl -X POST http://localhost:13341/run \
     "force": true
   }'
 
-# Direct unified routing (routing + final save)
-curl -X POST http://localhost:13342/run \
+# Direct routing (routing + final save)
+curl -X POST http://localhost:18004/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -549,9 +549,9 @@ python3 mcp_agent_client.py
 # The agent automatically:
 # 1. Runs complete synthesis (setup + compile)
 # 2. Detects synthesis version
-# 3. Runs unified placement (floorplan + power + placement)
+# 3. Runs placement (floorplan + power + placement)
 # 4. Executes CTS with proper checkpoint handling
-# 5. Runs unified route save (routing + final save)
+# 5. Runs route save (routing + final save)
 # 6. Provides intelligent status updates and error handling
 # 7. Supports multi-stage flows (pnr, full_flow)
 ```
@@ -598,9 +598,9 @@ All operations generate detailed logs in the `logs/` directory using the unified
 ```
 logs/
 ├── synthesis/           # Complete synthesis logs (setup + compile)
-├── unified_placement/   # Unified placement logs (floorplan + power + placement)
+├── unified_placement/   # Placement logs (floorplan + power + placement)
 ├── cts/                # Clock tree synthesis logs
-├── unified_route_save/  # Unified route save logs (routing + final save)
+├── unified_route_save/  # Route save logs (routing + final save)
 └── agent/              # AI agent orchestration logs
 ```
 
@@ -621,10 +621,10 @@ Each log file contains:
 python3 run_server.py --check
 
 # Check specific services
-curl -X GET http://localhost:13333/docs    # Synthesis Server
-curl -X GET http://localhost:13340/docs    # Unified Placement Server
-curl -X GET http://localhost:13341/docs    # CTS Server
-curl -X GET http://localhost:13342/docs    # Unified Routing Server
+curl -X GET http://localhost:18001/docs    # Synthesis Server
+curl -X GET http://localhost:18002/docs    # Placement Server
+curl -X GET http://localhost:18003/docs    # CTS Server
+curl -X GET http://localhost:18004/docs    # Routing Server
 curl -X GET http://localhost:8000/health   # Agent Client
 ```
 
@@ -632,7 +632,7 @@ curl -X GET http://localhost:8000/health   # Agent Client
 
 ```bash
 # Check if all ports are listening (updated ports)
-netstat -tlnp | grep -E "(13333|13340|13341|13342|8000)"
+netstat -tlnp | grep -E "(18001|18002|18003|18004|8000)"
 
 # Check server processes (updated server names)
 ps aux | grep -E "(run_server|unified.*server|synthesis_server|placement_server|cts_server|routing_server|mcp_agent_client)"
@@ -654,15 +654,15 @@ tail -f logs/agent/agent_*.log
 python3 run_server.py --status
 
 # Monitor all services simultaneously
-watch -n 5 'netstat -tlnp | grep -E "(13333|13340|13341|13342|8000)"'
+watch -n 5 'netstat -tlnp | grep -E "(18001|18002|18003|18004|8000)"'
 
 # Check EDA tool connectivity
 which dc_shell && which innovus
 
 # View service documentation
-open http://localhost:13333/docs  # Synthesis
-open http://localhost:13340/docs  # Unified Placement  
-open http://localhost:13341/docs  # CTS
-open http://localhost:13342/docs  # Unified Routing
+open http://localhost:18001/docs  # Synthesis
+open http://localhost:18002/docs  # Placement  
+open http://localhost:18003/docs  # CTS
+open http://localhost:18004/docs  # Routing
 open http://localhost:8000/docs   # Agent Client
 ``` 

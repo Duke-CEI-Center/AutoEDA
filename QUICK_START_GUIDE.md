@@ -40,10 +40,10 @@ MCP_SERVER_HOST=http://localhost
 LOG_ROOT=./logs
 
 # Unified Server Port Configuration (optional - uses defaults if not set)
-UNIFIED_SYNTHESIS_PORT=13333
-UNIFIED_PLACEMENT_PORT=13340
-UNIFIED_CTS_PORT=13341
-UNIFIED_ROUTING_PORT=13342
+UNIFIED_SYNTHESIS_PORT=18001
+UNIFIED_PLACEMENT_PORT=18002
+UNIFIED_CTS_PORT=18003
+UNIFIED_ROUTING_PORT=18004
 
 # EDA Tool Paths (adjust to your installation)
 SYNOPSYS_ROOT=/opt/synopsys
@@ -76,25 +76,25 @@ python3 run_server.py --server all
 ```
 
 This command starts the unified server architecture:
-- **Synthesis Service** (port 13333) - RTL to gate-level netlist
-- **Unified Placement Service** (port 13340) - floorplan, powerplan, and placement
-- **CTS Service** (port 13341) - clock tree synthesis and optimization  
-- **Unified Routing Service** (port 13342) - global/detailed routing and final save
+- **Synthesis Service** (port 18001) - RTL to gate-level netlist
+- **Placement Service** (port 18002) - floorplan, powerplan, and placement
+- **CTS Service** (port 18003) - clock tree synthesis and optimization  
+- **Routing Service** (port 18004) - global/detailed routing and final save
 
 **Alternative: Start servers individually**
 
 ```bash
 # Start each service individually using run_server.py
-python3 run_server.py --server synthesis --port 13333 &
-python3 run_server.py --server placement --port 13340 &
-python3 run_server.py --server cts --port 13341 &
-python3 run_server.py --server routing --port 13342 &
+python3 run_server.py --server synthesis --port 18001 &
+python3 run_server.py --server placement --port 18002 &
+python3 run_server.py --server cts --port 18003 &
+python3 run_server.py --server routing --port 18004 &
 
 # Or use the unified server files directly
-python3 unified_server/synthesis_server.py --port 13333 &
-python3 unified_server/placement_server.py --port 13340 &
-python3 unified_server/cts_server.py --port 13341 &
-python3 unified_server/routing_server.py --port 13342 &
+python3 unified_server/synthesis_server.py --port 18001 &
+python3 unified_server/placement_server.py --port 18002 &
+python3 unified_server/cts_server.py --port 18003 &
+python3 unified_server/routing_server.py --port 18004 &
 ```
 
 ### 2.2 Start AI Agent Client
@@ -111,20 +111,20 @@ uvicorn mcp_agent_client:app --host 0.0.0.0 --port 8000
 
 ```bash
 # Check if all ports are listening
-netstat -tlnp | grep -E "(8000|1333[3]|1334[012])"
+netstat -tlnp | grep -E "(8000|1800[1-4])"
 
 # Expected output:
 # tcp6       0      0 :::8000     :::*        LISTEN      [PID]/python3  (Agent)
-# tcp6       0      0 :::13333    :::*        LISTEN      [PID]/python3  (Synthesis)
-# tcp6       0      0 :::13340    :::*        LISTEN      [PID]/python3  (Placement)
-# tcp6       0      0 :::13341    :::*        LISTEN      [PID]/python3  (CTS)
-# tcp6       0      0 :::13342    :::*        LISTEN      [PID]/python3  (Routing)
+# tcp6       0      0 :::18001    :::*        LISTEN      [PID]/python3  (Synthesis)
+# tcp6       0      0 :::18002    :::*        LISTEN      [PID]/python3  (Placement)
+# tcp6       0      0 :::18003    :::*        LISTEN      [PID]/python3  (CTS)
+# tcp6       0      0 :::18004    :::*        LISTEN      [PID]/python3  (Routing)
 
 # Check service health and API documentation
-curl http://localhost:13333/docs  # Synthesis API docs
-curl http://localhost:13340/docs  # Placement API docs
-curl http://localhost:13341/docs  # CTS API docs
-curl http://localhost:13342/docs  # Routing API docs
+curl http://localhost:18001/docs  # Synthesis API docs
+curl http://localhost:18002/docs  # Placement API docs
+curl http://localhost:18003/docs  # CTS API docs
+curl http://localhost:18004/docs  # Routing API docs
 ```
 
 ## Step 3: Your First Design
@@ -175,9 +175,9 @@ curl -X POST http://localhost:8000/agent \
 
 This will automatically execute:
 1. **Synthesis** - RTL to gate-level netlist
-2. **Unified Placement** - Floorplan + Powerplan + Placement
+2. **Placement** - Floorplan + Powerplan + Placement
 3. **CTS** - Clock tree synthesis and optimization
-4. **Unified Route & Save** - Global/detail routing + final GDS generation
+4. **Route & Save** - Global/detail routing + final GDS generation
 
 ### 3.3 Multi-Stage Flow Control
 
@@ -238,10 +238,10 @@ curl -X POST http://localhost:8000/agent \
 
 ## Step 4: Direct Service API Usage
 
-### 4.1 Synthesis Service (Port 13333)
+### 4.1 Synthesis Service (Port 18001)
 
 ```bash
-curl -X POST http://localhost:13333/run \
+curl -X POST http://localhost:18001/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -251,10 +251,10 @@ curl -X POST http://localhost:13333/run \
   }'
 ```
 
-### 4.2 Unified Placement Service (Port 13340)
+### 4.2 Placement Service (Port 18002)
 
 ```bash
-curl -X POST http://localhost:13340/run \
+curl -X POST http://localhost:18002/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -267,10 +267,10 @@ curl -X POST http://localhost:13340/run \
   }'
 ```
 
-### 4.3 CTS Service (Port 13341)
+### 4.3 CTS Service (Port 18003)
 
 ```bash
-curl -X POST http://localhost:13341/run \
+curl -X POST http://localhost:18003/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -281,10 +281,10 @@ curl -X POST http://localhost:13341/run \
   }'
 ```
 
-### 4.4 Unified Routing Service (Port 13342)
+### 4.4 Routing Service (Port 18004)
 
 ```bash
-curl -X POST http://localhost:13342/run \
+curl -X POST http://localhost:18004/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -353,10 +353,10 @@ The framework uses CodeBLEU metrics:
 
 ```bash
 # Check all services are responsive
-curl http://localhost:13333/docs  # Synthesis service
-curl http://localhost:13340/docs  # Unified placement service
-curl http://localhost:13341/docs  # CTS service
-curl http://localhost:13342/docs  # Routing service
+curl http://localhost:18001/docs  # Synthesis service
+curl http://localhost:18002/docs  # Placement service
+curl http://localhost:18003/docs  # CTS service
+curl http://localhost:18004/docs  # Routing service
 curl http://localhost:8000/docs   # AI agent
 
 # Check agent functionality
@@ -495,7 +495,7 @@ ps aux | grep -E "(run_server|unified.*server)"
 python3 run_server.py --server all
 
 # Check specific service
-curl http://localhost:13333/docs
+curl http://localhost:18001/docs
 ```
 
 #### AI Agent Issues
@@ -573,7 +573,7 @@ Use specific parameters for fine-tuned control:
 
 ```bash
 # Synthesis with custom clock period
-curl -X POST http://localhost:13333/run \
+curl -X POST http://localhost:18001/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
@@ -584,7 +584,7 @@ curl -X POST http://localhost:13333/run \
   }'
 
 # Placement with custom utilization
-curl -X POST http://localhost:13340/run \
+curl -X POST http://localhost:18002/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "des",
