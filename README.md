@@ -22,7 +22,9 @@ MCP-EDA revolutionizes chip design workflows by providing:
 ---
 
 ## System Architecture
-
+<p align="center">
+    <img src="images/overall.png" width="100%">
+</p>
 
 
 ### Service Architecture Details
