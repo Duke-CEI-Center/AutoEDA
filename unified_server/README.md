@@ -4,10 +4,10 @@ This directory contains individual server implementations for different EDA work
 
 ## Server Files
 
-- **`synthesis_server.py`** - Synthesis server (port 13333)
-- **`placement_server.py`** - Placement server (port 13340)  
-- **`cts_server.py`** - Clock Tree Synthesis server (port 13341)
-- **`routing_server.py`** - Routing server (port 13342)
+- **`synthesis_server.py`** - Synthesis server (port 18001)
+- **`placement_server.py`** - Placement server (port 18002)  
+- **`cts_server.py`** - Clock Tree Synthesis server (port 18003)
+- **`routing_server.py`** - Routing server (port 18004)
 
 ## Unified Executor
 
@@ -26,16 +26,16 @@ Each server can be run directly:
 
 ```bash
 # Synthesis server
-python unified_server/synthesis_server.py --port 13333
+python unified_server/synthesis_server.py --port 18001
 
 # Placement server
-python unified_server/placement_server.py --port 13340
+python unified_server/placement_server.py --port 18002
 
 # CTS server
-python unified_server/cts_server.py --port 13341
+python unified_server/cts_server.py --port 18003
 
 # Routing server
-python unified_server/routing_server.py --port 13342
+python unified_server/routing_server.py --port 18004
 ```
 
 ### Using the Launcher Script
@@ -44,16 +44,16 @@ Or use the main launcher script from the project root:
 
 ```bash
 # Synthesis server
-python run_server.py --server synthesis --port 13333
+python run_server.py --server synthesis --port 18001
 
 # Placement server
-python run_server.py --server placement --port 13340
+python run_server.py --server placement --port 18002
 
 # CTS server
-python run_server.py --server cts --port 13341
+python run_server.py --server cts --port 18003
 
 # Routing server
-python run_server.py --server routing --port 13342
+python run_server.py --server routing --port 18004
 ```
 
 ## API Endpoints
@@ -68,22 +68,22 @@ POST /run
 
 ```bash
 # Synthesis
-curl -X POST http://localhost:13333/run \
+curl -X POST http://localhost:18001/run \
   -H "Content-Type: application/json" \
   -d '{"design": "des", "tech": "FreePDK45"}'
 
 # Placement
-curl -X POST http://localhost:13340/run \
+curl -X POST http://localhost:18002/run \
   -H "Content-Type: application/json" \
   -d '{"design": "des", "tech": "FreePDK45"}'
 
 # CTS
-curl -X POST http://localhost:13341/run \
+curl -X POST http://localhost:18003/run \
   -H "Content-Type: application/json" \
   -d '{"design": "des", "tech": "FreePDK45"}'
 
 # Routing
-curl -X POST http://localhost:13342/run \
+curl -X POST http://localhost:18004/run \
   -H "Content-Type: application/json" \
   -d '{"design": "des", "tech": "FreePDK45"}'
 ```
@@ -106,8 +106,8 @@ curl -X POST http://localhost:13342/run \
 
 You can use these env variables to customize your server:
 
-- `UNIFIED_SYNTHESIS_PORT` (default: 13333)
-- `UNIFIED_PLACEMENT_PORT` (default: 13340)
-- `UNIFIED_CTS_PORT` (default: 13341)
-- `UNIFIED_ROUTING_PORT` (default: 13342)
+- `UNIFIED_SYNTHESIS_PORT` (default: 18001)
+- `UNIFIED_PLACEMENT_PORT` (default: 18002)
+- `UNIFIED_CTS_PORT` (default: 18003)
+- `UNIFIED_ROUTING_PORT` (default: 18004)
 
