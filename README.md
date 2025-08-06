@@ -32,10 +32,10 @@ MCP-EDA revolutionizes chip design workflows by providing:
 | Service | Port | Purpose | Key Features |
 |---------|------|---------|--------------|
 | **Intelligent Agent** | 8000 | AI orchestration & workflow management | GPT-4 integration, session management, conflict detection |
-| **Synthesis Service** | 13333 | RTL-to-gate synthesis | Template-driven TCL, Design Compiler integration |
-| **Placement Service** | 13340 | Floorplan + Powerplan + Placement | Multi-stage unified flow, workspace management |
-| **CTS Service** | 13338 | Clock tree synthesis | Post-placement optimization, timing-driven CTS |
-| **Routing Service** | 13341 | Global/detail routing + final save | Complete backend flow, artifact generation |
+| **Synthesis Service** | 18001 | RTL-to-gate synthesis | Template-driven TCL, Design Compiler integration |
+| **Placement Service** | 18002 | Floorplan + Powerplan + Placement | Multi-stage unified flow, workspace management |
+| **CTS Service** | 18003 | Clock tree synthesis | Post-placement optimization, timing-driven CTS |
+| **Routing Service** | 18004 | Global/detail routing + final save | Complete backend flow, artifact generation |
 
 ### Data Flow Architecture
 
@@ -214,16 +214,16 @@ echo "OpenAI API Key: ${OPENAI_API_KEY:0:10}..."
 python3 run_server.py --server all
 
 # Or start individual servers
-python3 run_server.py --server synthesis    # Port 13333
-python3 run_server.py --server placement    # Port 13340
-python3 run_server.py --server cts          # Port 13338
-python3 run_server.py --server routing      # Port 13341
+python3 run_server.py --server synthesis    # Port 18001
+python3 run_server.py --server placement    # Port 18002
+python3 run_server.py --server cts          # Port 18003
+python3 run_server.py --server routing      # Port 18004
 
 # Verify services are running
-curl http://localhost:13333/docs  # Synthesis API docs
-curl http://localhost:13340/docs  # Placement API docs
-curl http://localhost:13338/docs  # CTS API docs
-curl http://localhost:13341/docs  # Routing API docs
+curl http://localhost:18001/docs  # Synthesis API docs
+curl http://localhost:18002/docs  # Placement API docs
+curl http://localhost:18003/docs  # CTS API docs
+curl http://localhost:18004/docs  # Routing API docs
 ```
 
 ### 3. Start AI Agent
@@ -252,7 +252,7 @@ python3 simple_mcp_client.py
 ### 4. Alternative: Direct Service API
 ```bash
 # Step 1: Synthesis
-curl -X POST http://localhost:13333/run \
+curl -X POST http://localhost:18001/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "aes",
@@ -262,7 +262,7 @@ curl -X POST http://localhost:13333/run \
   }'
 
 # Step 2: Placement (using synthesis results)
-curl -X POST http://localhost:13340/run \
+curl -X POST http://localhost:18002/run \
   -H "Content-Type: application/json" \
   -d '{
     "design": "aes",
@@ -316,10 +316,10 @@ Retrieve session history and preferences.
 
 Each service provides OpenAPI documentation at `http://localhost:<port>/docs`:
 
-- **Synthesis**: http://localhost:13333/docs
-- **Placement**: http://localhost:13340/docs  
-- **CTS**: http://localhost:13338/docs
-- **Route & Save**: http://localhost:13341/docs
+- **Synthesis**: http://localhost:18001/docs
+- **Placement**: http://localhost:18002/docs  
+- **CTS**: http://localhost:18003/docs
+- **Route & Save**: http://localhost:18004/docs
 
 ---
 
@@ -536,7 +536,7 @@ class JSONFormatter(logging.Formatter):
 ### Health Checks
 ```bash
 # Check service health
-curl http://localhost:13333/health
+curl http://localhost:18001/health
 curl http://localhost:8000/health
 
 # Check all services
