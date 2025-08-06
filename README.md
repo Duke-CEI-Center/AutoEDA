@@ -23,7 +23,7 @@ MCP-EDA revolutionizes chip design workflows by providing:
 
 ## System Architecture
 <p align="center">
-    <img src="images/overall.png" width="100%">
+    <img src="assets/overall.png" width="100%">
 </p>
 
 
@@ -94,19 +94,13 @@ sequenceDiagram
 ### Template System
 ```
 scripts/FreePDK45/
-├── tech.tcl                 # Technology configuration
-├── frontend/                # Synthesis templates
-│   ├── 1_setup.tcl
-│   └── 2_synthesis.tcl
-└── backend/                 # Physical design templates
-    ├── 1_setup.tcl          # Environment setup
-    ├── 2_floorplan.tcl      # Die planning
-    ├── 3_powerplan.tcl      # Power grid
-    ├── 4_place.tcl          # Placement
-    ├── 5_cts.tcl            # Clock tree synthesis
-    ├── 6_add_filler.tcl     # Filler cell insertion
-    ├── 7_route.tcl          # Routing
-    └── 8_save_design.tcl    # Final save
+├── tech.tcl                   # Technology configuration
+├── frontend/                  # Synthesis templates
+│   └── combined_synthesis.tcl
+└── backend/                   # Physical design templates
+    ├── combined_placement.tcl           
+    ├── combined_cts.tcl             
+    └── combined_routing.tcl        
 ```
 
 ### Session Management
@@ -255,21 +249,21 @@ python3 simple_mcp_client.py
 curl -X POST http://localhost:18001/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "aes",
+    "design": "des",
     "tech": "FreePDK45",
     "clk_period": 5.0,
-    "force": true
+    "syn_ver": "syn_demo"
   }'
 
 # Step 2: Placement (using synthesis results)
 curl -X POST http://localhost:18002/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "aes",
+    "design": "des",
     "tech": "FreePDK45",
-    "syn_ver": "cpV1_clkP1_drcV1_20241201_143022",
     "target_util": 0.8,
-    "force": true
+    "syn_ver": "syn_demo",
+    "impl_ver": "impl_demo"
   }'
 ```
 
@@ -364,10 +358,7 @@ The platform includes a comprehensive experiment framework for research and eval
 
 ### CodeBLEU Evaluation
 ```bash
-cd exp_v1/experiment
-
-# Run complete experiment
-python3 run_experiment.py --designs aes,des --methods baseline1,baseline2,ours
+cd codebleu_tcl
 
 # Evaluate existing results
 python3 evaluate/tcl_evaluator.py --results_dir results --timestamp 20241201_143022
@@ -378,32 +369,18 @@ python3 evaluate/tcl_evaluator.py --results_dir results --timestamp 20241201_143
 - **Syntax Match**: TCL syntax correctness
 - **Dataflow Analysis**: Logic flow preservation
 - **N-gram Matching**: Token-level similarity
-
-### Results Analysis
-```bash
-# View evaluation results
-cat exp_v1/experiment/evaluation_results/latest/tcl_codebleu_evaluation.json
-
-# Generate summary report
-python3 evaluate/generate_report.py --input evaluation_results/latest/
-```
-
 ---
 
 ## Advanced Configuration
 
 ### Custom EDA Tool Integration
 ```python
-# In server/custom_tool_server.py
+# In unified_server/custom_tool_server.py
 class CustomToolReq(BaseModel):
     design: str
     custom_param: float = 1.0
 
-def generate_custom_tcl(req: CustomToolReq) -> str:
-    # Your custom TCL generation logic
-    return tcl_content
-
-# Register in TOOLS dictionary
+# Register in TOOLS dictionary in mcp_agent_client.py
 TOOLS["custom_tool"] = {"port": 13342, "path": "/run"}
 ```
 

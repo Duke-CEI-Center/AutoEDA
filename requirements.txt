@@ -41,7 +41,6 @@ numpy>=1.26,<2.0               # numerical computing for metrics calculation
 # CodeBLEU evaluation framework
 codebleu>=0.5.0,<1.0.0         # code similarity evaluation metrics
 tree-sitter>=0.22.0,<0.24.0    # syntax tree parsing for code analysis
-tree-sitter-tcl>=0.21.0        # TCL language support for tree-sitter (custom)
 
 # NLP and evaluation tools
 nltk>=3.8,<4.0                 # natural language processing toolkit
