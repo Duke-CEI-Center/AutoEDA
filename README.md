@@ -405,59 +405,6 @@ STRATEGY_PARAMS["custom_strategy"] = {
 
 ---
 
-## Production Deployment
-
-### Process Management with systemd
-Create systemd services for production deployment:
-
-```bash
-# Create service files
-sudo tee /etc/systemd/system/mcp-eda-servers.service > /dev/null << 'EOF'
-[Unit]
-Description=MCP-EDA Microservices
-After=network.target
-
-[Service]
-Type=forking
-User=your_username
-WorkingDirectory=/path/to/mcp-eda-example
-Environment=OPENAI_API_KEY=your_api_key
-ExecStart=/usr/bin/python3 /path/to/mcp-eda-example/run_server.py --server all
-ExecStop=/usr/bin/pkill -f "server.*\.py"
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-# Enable and start services
-sudo systemctl daemon-reload
-sudo systemctl enable mcp-eda-servers
-sudo systemctl start mcp-eda-servers
-```
-
-### Load Balancing with Nginx
-```nginx
-# /etc/nginx/sites-available/mcp-eda
-upstream mcp_agent {
-    server localhost:8000;
-}
-
-server {
-    listen 80;
-    server_name your-domain.com;
-    
-    location / {
-        proxy_pass http://mcp_agent;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-    }
-}
-```
-
----
-
 ## Testing
 
 ### Unit Tests
