@@ -5,6 +5,6 @@ Unified Server Package
 This package contains the unified server implementations for EDA workflows.
 """
 
-from .unified_server import UnifiedServerBase
+from .unified_server import BaseServer
 
-__all__ = ['UnifiedServerBase'] 
+__all__ = ['BaseServer'] 

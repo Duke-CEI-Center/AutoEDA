@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 ROOT = Path(__file__).resolve().parent.parent
 load_dotenv(dotenv_path=ROOT / ".env")
 
-class UnifiedServerBase(ABC):
+class BaseServer(ABC):
     """
     Abstract base class for EDA servers.
     

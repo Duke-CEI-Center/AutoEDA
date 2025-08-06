@@ -2,7 +2,7 @@
 """
 Synthesis Server Implementation
 
-This module provides the UnifiedSynthServer class for synthesis workflows.
+This module provides the SynthesisServer class for synthesis workflows.
 
 Usage:
     python unified_server/synthesis_server.py
@@ -20,12 +20,12 @@ from pydantic import BaseModel
 from typing import Dict, List
 
 # Import the base class
-from unified_server import UnifiedServerBase
+from unified_server import BaseServer
 
 # Add project root to Python path
 ROOT = Path(__file__).resolve().parent.parent
 
-class UnifiedSynthServer(UnifiedServerBase):
+class SynthesisServer(BaseServer):
     """
     Unified Synthesis Server implementation.
     
@@ -71,7 +71,7 @@ class UnifiedSynthServer(UnifiedServerBase):
             server_name="synth",
             log_dir_name="synthesis",
             port_env="UNIFIED_SYNTHESIS_PORT",
-            default_port=13333
+            default_port=18001
         )
     
     def get_request_model(self):
@@ -181,10 +181,10 @@ if __name__ == "__main__":
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-- python unified_server/synthesis_server.py --port 13333     # Synthesis server
+- python unified_server/synthesis_server.py --port 18001     # Synthesis server
 
 API Usage:
-curl -X POST http://localhost:13333/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
+curl -X POST http://localhost:18001/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
         """
     )
     parser.add_argument(
@@ -196,5 +196,5 @@ curl -X POST http://localhost:13333/run -H "Content-Type: application/json" -d '
     args = parser.parse_args()
 
     print("Starting synthesis server...")
-    server = UnifiedSynthServer()
+    server = SynthesisServer()
     server.run_server(args.port) 

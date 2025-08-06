@@ -2,15 +2,15 @@
 """
 Routing Server Implementation
 
-This module provides the UnifiedRoutingServer class for routing workflows.
+This module provides the RoutingServer class for routing workflows.
 
 Usage:
     python unified_server/routing_server.py 
 
 API Endpoints:
     POST /run - Execute the routing workflow
-    curl -X POST http://localhost:15336/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'  | python -m json.tool
-    curl -X POST http://localhost:15336/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45", "force": false}'  | python -m json.tool
+    curl -X POST http://localhost:18004/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'  | python -m json.tool
+    curl -X POST http://localhost:18004/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45", "force": false}'  | python -m json.tool
 
 """
 
@@ -20,12 +20,12 @@ from pydantic import BaseModel
 from typing import Dict, List, Tuple
 
 # Import the base class
-from unified_server import UnifiedServerBase
+from unified_server import BaseServer
 
 # Add project root to Python path
 ROOT = Path(__file__).resolve().parent.parent
 
-class UnifiedRoutingServer(UnifiedServerBase):
+class RoutingServer(BaseServer):
     """
     Unified Routing Server implementation.
     
@@ -72,7 +72,7 @@ class UnifiedRoutingServer(UnifiedServerBase):
             server_name="routing",
             log_dir_name="unified_routing",
             port_env="UNIFIED_ROUTING_PORT",
-            default_port=13342
+            default_port=18004
         )
     
     def get_request_model(self):
@@ -183,10 +183,10 @@ if __name__ == "__main__":
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-- python unified_server/routing_server.py --port 13342      
+- python unified_server/routing_server.py --port 18004      
 
 API Usage:
-curl -X POST http://localhost:13342/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
+curl -X POST http://localhost:18004/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
         """
     )
     parser.add_argument(
@@ -198,5 +198,5 @@ curl -X POST http://localhost:13342/run -H "Content-Type: application/json" -d '
     args = parser.parse_args()
 
     print("Starting routing server...")
-    server = UnifiedRoutingServer()
+    server = RoutingServer()
     server.run_server(args.port) 

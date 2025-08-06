@@ -2,15 +2,15 @@
 """
 CTS (Clock Tree Synthesis) Server Implementation
 
-This module provides the UnifiedCtsServer class for CTS workflows.
+This module provides the CtsServer class for CTS workflows.
 
 Usage:
     python unified_server/cts_server.py
 
 API Endpoints:
     POST /run - Execute the CTS workflow
-    curl -X POST http://localhost:15335/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
-    curl -X POST http://localhost:15335/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45", "force": false}'
+    curl -X POST http://localhost:18003/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
+    curl -X POST http://localhost:18003/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45", "force": false}'
 """
 
 import argparse
@@ -19,12 +19,12 @@ from pydantic import BaseModel
 from typing import Dict, List, Tuple
 
 # Import the base class
-from unified_server import UnifiedServerBase
+from unified_server import BaseServer
 
 # Add project root to Python path
 ROOT = Path(__file__).resolve().parent.parent
 
-class UnifiedCtsServer(UnifiedServerBase):
+class CtsServer(BaseServer):
     """
     Unified CTS Server implementation.
     
@@ -58,7 +58,7 @@ class UnifiedCtsServer(UnifiedServerBase):
             server_name="cts",
             log_dir_name="unified_cts",
             port_env="UNIFIED_CTS_PORT",
-            default_port=13341
+            default_port=18003
         )
     
     def get_request_model(self):
@@ -183,20 +183,20 @@ if __name__ == "__main__":
     Main execution block for CTS server.
     
     Usage:
-    - python unified_server/cts_server.py --port 13341           # CTS server
+    - python unified_server/cts_server.py --port 18003           # CTS server
     
     API Usage:
-    curl -X POST http://localhost:13341/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
+    curl -X POST http://localhost:18003/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
     """
     parser = argparse.ArgumentParser(
         description="CTS Server Implementation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-- python unified_server/cts_server.py --port 13341           # CTS server
+- python unified_server/cts_server.py --port 18003           # CTS server
 
 API Usage:
-curl -X POST http://localhost:13341/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
+curl -X POST http://localhost:18003/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
         """
     )
     parser.add_argument(
@@ -208,5 +208,5 @@ curl -X POST http://localhost:13341/run -H "Content-Type: application/json" -d '
     args = parser.parse_args()
 
     print("Starting CTS server...")
-    server = UnifiedCtsServer()
+    server = CtsServer()
     server.run_server(args.port) 

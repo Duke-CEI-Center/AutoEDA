@@ -2,14 +2,14 @@
 """
 Placement Server Implementation
 
-This module provides the UnifiedPlacementServer class for placement workflows.
+This module provides the PlacementServer class for placement workflows.
 
 Usage:
     python unified_server/placement_server.py 
 
 API Endpoints:
     POST /run - Execute the placement workflow
-    curl -X POST http://localhost:15334/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
+    curl -X POST http://localhost:18002/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
 
 """
 
@@ -19,12 +19,12 @@ from pydantic import BaseModel
 from typing import Dict, List, Tuple
 
 # Import the base class
-from unified_server import UnifiedServerBase
+from unified_server import BaseServer
 
 # Add project root to Python path
 ROOT = Path(__file__).resolve().parent.parent
 
-class UnifiedPlacementServer(UnifiedServerBase):
+class PlacementServer(BaseServer):
     """
     Unified Placement Server implementation.
     
@@ -80,7 +80,7 @@ class UnifiedPlacementServer(UnifiedServerBase):
             server_name="placement",
             log_dir_name="unified_placement",
             port_env="UNIFIED_PLACEMENT_PORT",
-            default_port=13340
+            default_port=18002
         )
     
     def get_request_model(self):
@@ -219,10 +219,10 @@ if __name__ == "__main__":
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-- python unified_server/placement_server.py --port 13340 
+- python unified_server/placement_server.py --port 18002 
 
 API Usage:
-curl -X POST http://localhost:13340/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
+curl -X POST http://localhost:18002/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
         """
     )
     parser.add_argument(
@@ -234,5 +234,5 @@ curl -X POST http://localhost:13340/run -H "Content-Type: application/json" -d '
     args = parser.parse_args()
 
     print("Starting placement server...")
-    server = UnifiedPlacementServer()
+    server = PlacementServer()
     server.run_server(args.port) 
