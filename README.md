@@ -526,4 +526,4 @@ This project is licensed under the creative commons - see the [LICENSE](https://
 
 ---
 
-**Made with passion for the EDA and open-source community**
+**Made with passion for the EDA and open-source community from Duke University**
