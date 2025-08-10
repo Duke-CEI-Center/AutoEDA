@@ -354,38 +354,104 @@ mcp-eda-example/
 
 ---
 
-## Experiment Framework
+## TCL Code Quality Evaluation
 
-The platform includes a comprehensive experiment framework for research and evaluation:
+The platform includes a specialized CodeBLEU-TCL evaluation framework for assessing TCL script quality in EDA workflows:
 
-### CodeBLEU Evaluation
+### CodeBLEU-TCL Framework
+
+CodeBLEU-TCL is a domain-specific implementation of the CodeBLEU metric tailored for Electronic Design Automation TCL scripts. It provides:
+
+- **EDA-Aware Evaluation**: Specialized weights for synthesis, placement, CTS, and routing stages
+- **Domain-Specific Commands**: Recognition of 271+ EDA tool commands across the design flow
+- **Advanced TCL Parsing**: Custom parser optimized for EDA script analysis
+- **Multi-Dimensional Metrics**: Combines n-gram matching, syntax analysis, and dataflow analysis
+
+### Basic Usage
+
 ```bash
-cd exp_v1/experiment
+cd src/codebleu_tcl
 
-# Run complete experiment
-python3 run_experiment.py --designs aes,des --methods baseline1,baseline2,ours
+# Basic CodeBLEU evaluation
+python3 -c "
+from tcl_codebleu_evaluator import TCLCodeBLEUEvaluator
+from pathlib import Path
 
-# Evaluate existing results
-python3 evaluate/tcl_evaluator.py --results_dir results --timestamp 20241201_143022
+evaluator = TCLCodeBLEUEvaluator()
+
+# Example: Evaluate generated vs reference TCL
+result = evaluator.evaluate_generated_tcl(
+    generated_tcl_file=Path('generated_synth.tcl'),
+    reference_tcl_file=Path('reference_synth.tcl'),
+    tool_type='auto'  # Auto-detects: synthesis, placement, cts, routing
+)
+
+print(f'CodeBLEU Score: {result[\"summary\"][\"overall_score\"]:.2f}')
+print(f'Tool Type: {result[\"file_info\"][\"detected_tool_type\"]}')
+"
+```
+
+### Advanced Evaluation Features
+
+```python
+from codebleu.codebleu import calc_codebleu
+
+# Example TCL scripts
+reference = '''
+set DESIGN_NAME chip_top
+analyze -library WORK -format verilog {$DESIGN_NAME.v}
+elaborate $DESIGN_NAME
+compile_ultra -gate_clock
+report_timing
+'''
+
+candidate = '''
+set DESIGN_NAME chip_top
+analyze -library WORK -format verilog {$DESIGN_NAME.v}
+elaborate $DESIGN_NAME
+compile_ultra -no_boundary_optimization
+report_area
+'''
+
+# Calculate with EDA-specific weights
+result = calc_codebleu([reference], [candidate], 'tcl')
+print(f"CodeBLEU Score: {result['codebleu']:.2f}")
+print(f"Syntax Match: {result['syntax_match_score']:.2f}")
+print(f"Dataflow Match: {result['dataflow_match_score']:.2f}")
 ```
 
 ### Evaluation Metrics
-- **CodeBLEU**: Semantic code similarity
-- **Syntax Match**: TCL syntax correctness
-- **Dataflow Analysis**: Logic flow preservation
-- **N-gram Matching**: Token-level similarity
 
-### Results Analysis
-```bash
-# View evaluation results
-cat exp_v1/experiment/evaluation_results/latest/tcl_codebleu_evaluation.json
+The framework evaluates TCL code quality across four dimensions:
 
-# Generate summary report
-python3 evaluate/generate_report.py --input evaluation_results/latest/
+- **N-gram Match (BLEU)**: Traditional token-level similarity (0.0-1.0)
+- **Weighted N-gram Match**: EDA keyword-aware scoring with domain-specific terms (0.0-1.0)
+- **Syntax Match**: Structural analysis of TCL command hierarchies (0.0-1.0)
+- **Dataflow Match**: Variable dependency and data flow analysis (0.0-1.0)
+
+### EDA Stage-Specific Weights
+
+Different EDA stages use optimized evaluation weights:
+
+```python
+eda_weights = {
+    'synthesis': (0.20, 0.30, 0.25, 0.25),           # Emphasize weighted n-gram
+    'unified_placement': (0.15, 0.25, 0.30, 0.30),   # Focus on syntax and dataflow
+    'cts': (0.20, 0.25, 0.30, 0.25),                # Emphasize syntax structure
+    'unified_route_save': (0.20, 0.25, 0.25, 0.30),  # Highlight dataflow connectivity
+}
 ```
 
----
+### Supported EDA Commands
 
+The system recognizes 271+ domain-specific terms across:
+
+- **Synthesis**: `analyze`, `elaborate`, `compile_ultra`, `create_clock`, `report_timing`
+- **Placement**: `floorPlan`, `placeDesign`, `addStripe`, `globalNetConnect`
+- **Clock Tree**: `ccopt_design`, `create_clock_tree_spec`, `report_ccopt_skew_groups`
+- **Routing**: `routeDesign`, `setNanoRouteMode`, `saveDesign`, `streamOut`
+
+---
 ## Advanced Configuration
 
 ### Custom EDA Tool Integration
