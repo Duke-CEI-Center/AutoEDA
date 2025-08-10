@@ -93,14 +93,14 @@ sequenceDiagram
 
 ### Template System
 ```
-scripts/FreePDK45/
-├── tech.tcl                   # Technology configuration
-├── frontend/                  # Synthesis templates
-│   └── combined_synthesis.tcl
-└── backend/                   # Physical design templates
-    ├── combined_placement.tcl           
-    ├── combined_cts.tcl             
-    └── combined_routing.tcl        
+src/scripts/FreePDK45/
+├── tech.tcl                      # Technology configuration
+├── frontend/                     # Synthesis templates
+│   └── combined_synthesis.tcl    # Complete synthesis flow
+└── backend/                      # Physical design templates
+    ├── combined_placement.tcl    # Floorplan + power planning + placement
+    ├── combined_cts.tcl          # Clock tree synthesis
+    └── combined_routing.tcl      # Global/detailed routing + final save
 ```
 
 ### Session Management
@@ -147,8 +147,8 @@ cd mcp-eda-example
 ### 2. Python Environment Setup
 ```bash
 # Create virtual environment
-conda create -n autoeda python=3.9 -y
-conda activate autoeda
+python3 -m venv venv
+source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
@@ -205,28 +205,28 @@ echo "OpenAI API Key: ${OPENAI_API_KEY:0:10}..."
 ### 2. Start EDA Microservices
 ```bash
 # Launch all 4 EDA microservices
-python3 run_server.py --server all
+python3 src/run_server.py --server all
 
 # Or start individual servers
-python3 run_server.py --server synthesis    # Port 18001
-python3 run_server.py --server placement    # Port 18002
-python3 run_server.py --server cts          # Port 18003
-python3 run_server.py --server routing      # Port 18004
+python3 src/run_server.py --server synthesis    # Port 18001
+python3 src/run_server.py --server placement    # Port 18002
+python3 src/run_server.py --server cts          # Port 18003
+python3 src/run_server.py --server routing      # Port 18004
 
 # Verify services are running
 curl http://localhost:18001/docs  # Synthesis API docs
 curl http://localhost:18002/docs  # Placement API docs
 curl http://localhost:18003/docs  # CTS API docs
-curl http://localhost:18004/docs  # Routing API docs
+curl http://localhost:18003/docs  # Routing API docs
 ```
 
 ### 3. Start AI Agent
 ```bash
 # Launch intelligent agent (interactive mode)
-python3 mcp_agent_client.py
+python3 src/mcp_agent_client.py
 
 # Or run as web service
-uvicorn mcp_agent_client:app --host 0.0.0.0 --port 8000 --reload
+uvicorn src.mcp_agent_client:app --host 0.0.0.0 --port 8000 --reload
 ```
 
 ### 4. Run Your First Design
@@ -240,7 +240,7 @@ curl -X POST http://localhost:8000/agent \
   }'
 
 # Or use the simple client for testing
-python3 simple_mcp_client.py
+python3 src/simple_mcp_client.py
 ```
 
 ### 4. Alternative: Direct Service API
@@ -249,21 +249,21 @@ python3 simple_mcp_client.py
 curl -X POST http://localhost:18001/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "des",
+    "design": "aes",
     "tech": "FreePDK45",
     "clk_period": 5.0,
-    "syn_ver": "syn_demo"
+    "force": true
   }'
 
 # Step 2: Placement (using synthesis results)
 curl -X POST http://localhost:18002/run \
   -H "Content-Type: application/json" \
   -d '{
-    "design": "des",
+    "design": "aes",
     "tech": "FreePDK45",
+    "syn_ver": "cpV1_clkP1_drcV1_20241201_143022",
     "target_util": 0.8,
-    "syn_ver": "syn_demo",
-    "impl_ver": "impl_demo"
+    "force": true
   }'
 ```
 
@@ -313,7 +313,7 @@ Each service provides OpenAPI documentation at `http://localhost:<port>/docs`:
 - **Synthesis**: http://localhost:18001/docs
 - **Placement**: http://localhost:18002/docs  
 - **CTS**: http://localhost:18003/docs
-- **Route & Save**: http://localhost:18004/docs
+- **Route & Save**: http://localhost:18003/docs
 
 ---
 
@@ -321,27 +321,29 @@ Each service provides OpenAPI documentation at `http://localhost:<port>/docs`:
 
 ```
 mcp-eda-example/
-├── unified_server/                 # Unified EDA microservices
-│   ├── unified_server.py           # Main unified server
-│   ├── synthesis_server.py         # Synthesis service
-│   ├── placement_server.py         # Placement service  
-│   ├── cts_server.py               # CTS service
-│   ├── routing_server.py           # Routing service
-│   └── unified_executor.py         # Unified executor
-├── run_server.py                   # Server launcher script
-├── mcp_agent_client.py             # AI orchestration agent
-├── simple_mcp_client.py            # Simple client example
-├── scripts/                        # TCL templates
-│   └── FreePDK45/                  # Technology-specific scripts
-│       ├── tech.tcl                # Technology configuration
-│       ├── frontend/               # Synthesis templates
-│       └── backend/                # Physical design templates
+├── src/                            # Source code directory
+│   ├── server/                     # EDA microservices
+│   │   ├── base_server.py          # Base server class
+│   │   ├── synthesis_server.py     # Synthesis service
+│   │   ├── placement_server.py     # Placement service  
+│   │   ├── cts_server.py           # CTS service
+│   │   ├── routing_server.py       # Routing service
+│   │   ├── base_executor.py        # Base executor class
+│   │   └── mcp/                    # MCP server
+│   │       ├── mcp_eda_server.py   # MCP server implementation
+│   │       └── claude_desktop_config.json
+│   ├── mcp_agent_client.py         # AI orchestration agent
+│   ├── run_server.py               # Server launcher script
+│   ├── scripts/                    # TCL templates
+│   │   └── FreePDK45/              # Technology-specific scripts
+│   │       ├── tech.tcl            # Technology configuration
+│   │       ├── frontend/           # Synthesis templates
+│   │       └── backend/            # Physical design templates
+│   └── codebleu_tcl/               # CodeBLEU evaluation
 ├── designs/                        # Sample designs
 │   ├── des/                        # DES crypto design
 │   ├── fpu/                        # FPU design
 │   └── leon2/                      # Leon2 processor design
-├── exp_v1/                         # Experiment framework
-│   └── codebleu_tcl/               # CodeBLEU evaluation
 ├── libraries/                      # PDK and libraries
 ├── logs/                           # Service logs
 ├── result/                         # Generated TCL scripts
@@ -358,7 +360,10 @@ The platform includes a comprehensive experiment framework for research and eval
 
 ### CodeBLEU Evaluation
 ```bash
-cd codebleu_tcl
+cd exp_v1/experiment
+
+# Run complete experiment
+python3 run_experiment.py --designs aes,des --methods baseline1,baseline2,ours
 
 # Evaluate existing results
 python3 evaluate/tcl_evaluator.py --results_dir results --timestamp 20241201_143022
@@ -369,24 +374,38 @@ python3 evaluate/tcl_evaluator.py --results_dir results --timestamp 20241201_143
 - **Syntax Match**: TCL syntax correctness
 - **Dataflow Analysis**: Logic flow preservation
 - **N-gram Matching**: Token-level similarity
+
+### Results Analysis
+```bash
+# View evaluation results
+cat exp_v1/experiment/evaluation_results/latest/tcl_codebleu_evaluation.json
+
+# Generate summary report
+python3 evaluate/generate_report.py --input evaluation_results/latest/
+```
+
 ---
 
 ## Advanced Configuration
 
 ### Custom EDA Tool Integration
 ```python
-# In unified_server/custom_tool_server.py
+# In src/server/custom_tool_server.py
 class CustomToolReq(BaseModel):
     design: str
     custom_param: float = 1.0
 
-# Register in TOOLS dictionary in mcp_agent_client.py
-TOOLS["custom_tool"] = {"port": 13342, "path": "/run"}
+def generate_custom_tcl(req: CustomToolReq) -> str:
+    # Your custom TCL generation logic
+    return tcl_content
+
+# Register in TOOLS dictionary
+TOOLS["custom_tool"] = {"port": 18004, "path": "/run"}
 ```
 
 ### Template Customization
 ```tcl
-# scripts/FreePDK45/backend/custom_stage.tcl
+# src/scripts/FreePDK45/backend/combined_placement.tcl
 set custom_param $env(custom_param)
 
 # Your custom EDA commands
@@ -395,7 +414,7 @@ customCommand -param $custom_param
 
 ### Strategy Development
 ```python
-# In mcp_agent_client.py
+# In src/mcp_agent_client.py
 STRATEGY_PARAMS["custom_strategy"] = {
     "design_flow_effort": "custom",
     "target_util": 0.75,
@@ -416,7 +435,7 @@ pytest tests/
 pytest tests/test_synth_server.py -v
 
 # Run with coverage
-pytest --cov=server tests/
+pytest --cov=src/server tests/
 ```
 
 ### Integration Tests
@@ -474,29 +493,6 @@ from prometheus_client import Counter, Histogram
 
 request_count = Counter('requests_total', 'Total requests')
 request_duration = Histogram('request_duration_seconds', 'Request duration')
-```
-
----
-
-### Development Workflow
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and add tests
-4. Run the test suite: `pytest`
-5. Commit your changes: `git commit -m 'Add amazing feature'`
-6. Push to the branch: `git push origin feature/amazing-feature`
-7. Open a Pull Request
-
-### Code Style
-```bash
-# Format code
-black .
-
-# Check style
-flake8 .
-
-# Type checking
-mypy server/
 ```
 
 ---
