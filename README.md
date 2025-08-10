@@ -327,7 +327,7 @@ mcp-eda-example/
 │   │   ├── placement_server.py     # Placement service  
 │   │   ├── cts_server.py           # CTS service
 │   │   ├── routing_server.py       # Routing service
-│   │   ├── base_executor.py        # Base executor class
+│   │   ├── executor.py             # Executor class
 │   │   └── mcp/                    # MCP server
 │   │       ├── mcp_eda_server.py   # MCP server implementation
 │   │       └── claude_desktop_config.json
