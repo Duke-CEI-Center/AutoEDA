@@ -342,8 +342,7 @@ mcp-eda-example/
 │   └── codebleu_tcl/               # CodeBLEU evaluation
 ├── designs/                        # Sample designs
 │   ├── des/                        # DES crypto design
-│   ├── fpu/                        # FPU design
-│   └── leon2/                      # Leon2 processor design
+│   ├── b14/                        # b14 design
 ├── libraries/                      # PDK and libraries
 ├── logs/                           # Service logs
 ├── result/                         # Generated TCL scripts
