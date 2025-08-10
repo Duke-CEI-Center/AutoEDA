@@ -72,7 +72,7 @@ ls libraries/FreePDK45/
 
 ```bash
 # Start all four unified servers
-python3 run_server.py --server all
+python3 src/run_server.py --server all
 ```
 
 This command starts the unified server architecture:
@@ -85,26 +85,26 @@ This command starts the unified server architecture:
 
 ```bash
 # Start each service individually using run_server.py
-python3 run_server.py --server synthesis --port 18001 &
-python3 run_server.py --server placement --port 18002 &
-python3 run_server.py --server cts --port 18003 &
-python3 run_server.py --server routing --port 18004 &
+python3 src/run_server.py --server synthesis --port 18001 &
+python3 src/run_server.py --server placement --port 18002 &
+python3 src/run_server.py --server cts --port 18003 &
+python3 src/run_server.py --server routing --port 18004 &
 
-# Or use the unified server files directly
-python3 unified_server/synthesis_server.py --port 18001 &
-python3 unified_server/placement_server.py --port 18002 &
-python3 unified_server/cts_server.py --port 18003 &
-python3 unified_server/routing_server.py --port 18004 &
+# Or use the server files directly
+python3 src/server/synthesis_server.py --port 18001 &
+python3 src/server/placement_server.py --port 18002 &
+python3 src/server/cts_server.py --port 18003 &
+python3 src/server/routing_server.py --port 18004 &
 ```
 
 ### 2.2 Start AI Agent Client
 
 ```bash
 # Start the intelligent agent (GPT-4 powered)
-python3 mcp_agent_client.py
+python3 src/mcp_agent_client.py
 
 # Or using uvicorn for production
-uvicorn mcp_agent_client:app --host 0.0.0.0 --port 8000
+uvicorn src.mcp_agent_client:app --host 0.0.0.0 --port 8000
 ```
 
 ### 2.3 Verify Services are Running
@@ -302,50 +302,69 @@ curl -X POST http://localhost:18004/run \
 The project includes a comprehensive experimental framework for evaluating TCL generation quality:
 
 ```bash
-# Navigate to experiment directory
-cd exp_v1/experiment
+# Navigate to CodeBLEU-TCL directory
+cd src/codebleu_tcl
 
-# Run complete experiment for specific designs
-python3 run_experiment.py --designs aes,des --methods baseline1,baseline2,ours
+# Basic TCL evaluation example
+python3 -c "
+from tcl_codebleu_evaluator import TCLCodeBLEUEvaluator
+from pathlib import Path
 
-# Run evaluation on existing results
-python3 evaluate/tcl_evaluator.py --results_dir results --timestamp 20241201_143022 --summary
+evaluator = TCLCodeBLEUEvaluator()
 
-# Clean previous results and run fresh
-python3 run_experiment.py --clean --full
+# Example evaluation (requires TCL files)
+# result = evaluator.evaluate_generated_tcl(
+#     generated_tcl_file=Path('generated.tcl'),
+#     reference_tcl_file=Path('reference.tcl'),
+#     tool_type='auto'
+# )
+# print(f'CodeBLEU Score: {result[\"summary\"][\"overall_score\"]:.2f}')
+print('CodeBLEU-TCL evaluator loaded successfully')
+"
+
+# View CodeBLEU documentation
+cat README.md
 ```
 
-### 5.2 Evaluation Methods
+### 5.2 CodeBLEU-TCL Features
 
-The framework compares three TCL generation approaches:
+The evaluation framework provides specialized capabilities for EDA TCL scripts:
 
-1. **Baseline1**: Simple template-based generation
-2. **Baseline2**: Enhanced template with parameter optimization
-3. **Ours**: AI-powered agent with GPT-4 integration
+1. **EDA Command Recognition**: Supports 271+ domain-specific EDA commands
+2. **Stage-Specific Weights**: Optimized evaluation for synthesis, placement, CTS, and routing
+3. **Multi-Dimensional Analysis**: N-gram matching, syntax analysis, and dataflow analysis
+4. **Automatic Tool Detection**: Auto-detects EDA tool type from script content
 
-### 5.3 Viewing Results
+### 5.3 Advanced Usage
 
-```bash
-# Check generation results
-ls results/
-ls results/baseline1/
-ls results/ours/
+```python
+from tcl_codebleu_evaluator import TCLCodeBLEUEvaluator
+from codebleu.codebleu import calc_codebleu
 
-# Check evaluation results
-ls evaluation_results/
-cat evaluation_results/latest/tcl_codebleu_evaluation.json
+# Initialize evaluator
+evaluator = TCLCodeBLEUEvaluator()
 
-# View summary statistics
-python3 evaluate/tcl_evaluator.py --results_dir results --summary
+# Custom weights for different EDA stages
+eda_weights = {
+    'synthesis': (0.20, 0.30, 0.25, 0.25),           # Emphasize weighted n-gram
+    'unified_placement': (0.15, 0.25, 0.30, 0.30),   # Focus on syntax and dataflow
+    'cts': (0.20, 0.25, 0.30, 0.25),                # Emphasize syntax structure
+    'unified_route_save': (0.20, 0.25, 0.25, 0.30),  # Highlight dataflow connectivity
+}
+
+# Direct CodeBLEU calculation
+result = calc_codebleu([reference_tcl], [generated_tcl], 'tcl', 
+                      weights=eda_weights['synthesis'])
 ```
 
 ### 5.4 Evaluation Metrics
 
-The framework uses CodeBLEU metrics:
-- **CodeBLEU Score**: Overall semantic similarity
-- **Syntax Match**: TCL syntax correctness
-- **Dataflow Analysis**: Logic flow preservation
-- **N-gram Matching**: Token-level similarity
+The CodeBLEU-TCL framework evaluates four key dimensions:
+
+- **N-gram Match (BLEU)**: Traditional token-level similarity (0.0-1.0)
+- **Weighted N-gram Match**: EDA keyword-aware scoring with domain-specific terms (0.0-1.0)
+- **Syntax Match**: Structural analysis of TCL command hierarchies (0.0-1.0)
+- **Dataflow Match**: Variable dependency and data flow analysis (0.0-1.0)
 
 ## Step 6: Testing and Validation
 
@@ -489,10 +508,10 @@ ls deliverables/
 #### Service Connection Issues
 ```bash
 # Check if services are running
-ps aux | grep -E "(run_server|unified.*server)"
+ps aux | grep -E "(run_server|server.*\.py)"
 
 # Restart services if needed
-python3 run_server.py --server all
+python3 src/run_server.py --server all
 
 # Check specific service
 curl http://localhost:18001/docs

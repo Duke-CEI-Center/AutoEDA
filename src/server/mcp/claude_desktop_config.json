@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "mcp-eda-server": {
+      "command": "ssh",
+      "args": [
+        "yl996@hl279-cmp-00.egr.duke.edu",
+        "cd /home/yl996/proj/mcp-eda-example/src/server/mcp && python3 mcp_eda_server.py"
+      ],
+      "env": {},
+      "description": "MCP EDA Server with 4-server architecture (synthesis, placement, cts, routing)"
+    }
+  }
+} 

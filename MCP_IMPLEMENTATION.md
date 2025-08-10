@@ -25,24 +25,28 @@ This project implements a comprehensive MCP (Model Context Protocol) EDA server 
 ## File Structure
 
 ```
-unified_server/
-├── mcp/
-│   ├── mcp_eda_server.py           # Main MCP server (4-server architecture)
-│   ├── workflow_addition.py        # Additional workflow functions
-│   ├── claude_desktop_config.json  # Claude Desktop configuration
-│   ├── start_mcp_server.sh         # MCP server startup script
-│   └── __pycache__/                # Python cache directory
-├── synthesis_server.py             # Synthesis server (port 18001)
-├── placement_server.py             # Placement server (port 18002)
-├── cts_server.py                   # Clock tree synthesis server (port 18003)
-├── routing_server.py               # Routing server (port 18004)
-├── unified_server.py               # Base server class (BaseServer)
-├── unified_executor.py             # Unified executor class
-└── __init__.py                     # Package initialization
+src/
+├── server/
+│   ├── mcp/
+│   │   ├── mcp_eda_server.py           # Main MCP server (4-server architecture)
+│   │   ├── workflow_addition.py        # Additional workflow functions
+│   │   ├── claude_desktop_config.json  # Claude Desktop configuration
+│   │   ├── start_mcp_server.sh         # MCP server startup script
+│   │   └── __pycache__/                # Python cache directory
+│   ├── synthesis_server.py             # Synthesis server (port 18001)
+│   ├── placement_server.py             # Placement server (port 18002)
+│   ├── cts_server.py                   # Clock tree synthesis server (port 18003)
+│   ├── routing_server.py               # Routing server (port 18004)
+│   ├── base_server.py                  # Base server class (BaseServer)
+│   ├── base_executor.py                # Base executor class
+│   └── __init__.py                     # Package initialization
+├── mcp_agent_client.py              # AI agent client
+├── run_server.py                    # Server management script with port cleanup
+├── scripts/                         # TCL template scripts
+└── codebleu_tcl/                    # CodeBLEU evaluation
 
-run_server.py                       # Server management script with port cleanup
-test_mcp_server.py                  # MCP server test script
-MCP_IMPLEMENTATION.md               # This document
+test_mcp_server.py                   # MCP server test script
+MCP_IMPLEMENTATION.md                # This document
 ```
 
 ## Available MCP Tools (4-Server Architecture)
@@ -181,29 +185,29 @@ pip install -r requirements.txt
 ### 2. Start EDA Servers
 ```bash
 # Option 1: Start all servers with automatic port cleanup
-python3 run_server.py --server all
+python3 src/run_server.py --server all
 
 # Option 2: Start individual servers
-python3 run_server.py --server synthesis  # Port 18001
-python3 run_server.py --server placement  # Port 18002
-python3 run_server.py --server cts        # Port 18003
-python3 run_server.py --server routing    # Port 18004
+python3 src/run_server.py --server synthesis  # Port 18001
+python3 src/run_server.py --server placement  # Port 18002
+python3 src/run_server.py --server cts        # Port 18003
+python3 src/run_server.py --server routing    # Port 18004
 
 # Option 3: Direct server startup
-python3 unified_server/synthesis_server.py --port 18001 &
-python3 unified_server/placement_server.py --port 18002 &
-python3 unified_server/cts_server.py --port 18003 &
-python3 unified_server/routing_server.py --port 18004 &
+python3 src/server/synthesis_server.py --port 18001 &
+python3 src/server/placement_server.py --port 18002 &
+python3 src/server/cts_server.py --port 18003 &
+python3 src/server/routing_server.py --port 18004 &
 ```
 
 ### 3. Start MCP Server
 ```bash
 # Option 1: Using startup script
-cd unified_server/mcp
+cd src/server/mcp
 ./start_mcp_server.sh
 
 # Option 2: Direct startup
-cd unified_server/mcp
+cd src/server/mcp
 python3 mcp_eda_server.py
 ```
 
@@ -217,7 +221,7 @@ Add the following configuration to your Claude Desktop configuration file (`clau
       "command": "ssh",
       "args": [
         "yl996@hl279-cmp-00.egr.duke.edu",
-        "cd /home/yl996/proj/mcp-eda-example/unified_server/mcp && python3 mcp_eda_server.py"
+        "cd /home/yl996/proj/mcp-eda-example/src/server/mcp && python3 mcp_eda_server.py"
       ],
       "env": {},
       "description": "MCP EDA Server with 4-server architecture (synthesis, placement, cts, routing)"
@@ -229,7 +233,7 @@ Add the following configuration to your Claude Desktop configuration file (`clau
 ### 5. Test MCP Server
 ```bash
 # Test MCP server functionality
-cd unified_server/mcp
+cd src/server/mcp
 python3 test_mcp_server.py
 
 # Check server health
@@ -374,10 +378,10 @@ def call_eda_server(tool_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
 1. **MCP Server Connection Failures**
    ```bash
    # Check if MCP server is running
-   cd unified_server/mcp && python3 mcp_eda_server.py
+   cd src/server/mcp && python3 mcp_eda_server.py
    
    # Check if all 4 EDA servers are running
-   python3 run_server.py --server all
+   python3 src/run_server.py --server all
    
    # Verify port availability
    netstat -tlnp | grep -E "(1800[1-4])"
@@ -417,7 +421,7 @@ def call_eda_server(tool_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
    done
    
    # Check MCP server
-   cd unified_server/mcp
+   cd src/server/mcp
    python3 -c "
    import sys
    sys.path.append('..')
@@ -429,7 +433,7 @@ def call_eda_server(tool_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
 2. **View Server Logs**
    ```bash
    # MCP server logs (stdout)
-   cd unified_server/mcp
+   cd src/server/mcp
    python3 mcp_eda_server.py
    
    # EDA server logs
@@ -447,7 +451,7 @@ def call_eda_server(tool_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
      -d '{"design": "des", "tech": "FreePDK45"}'
    
    # Test MCP server compilation
-   cd unified_server/mcp
+   cd src/server/mcp
    python3 -c "
    import mcp_eda_server
    print('✓ MCP server imports OK')
@@ -472,7 +476,7 @@ def call_eda_server(tool_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
    # Verify server classes
    python3 -c "
    import sys
-   sys.path.append('unified_server')
+   sys.path.append('src/server')
    from synthesis_server import SynthesisServer
    from placement_server import PlacementServer
    from cts_server import CtsServer
@@ -484,7 +488,7 @@ def call_eda_server(tool_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
 ## Development Guide
 
 ### Adding New MCP Tools
-1. Add new `@mcp.tool()` decorated function in `unified_server/mcp/mcp_eda_server.py`:
+1. Add new `@mcp.tool()` decorated function in `src/server/mcp/mcp_eda_server.py`:
    ```python
    @mcp.tool()
    async def new_tool_name(
@@ -525,7 +529,7 @@ def call_eda_server(tool_name: str, payload: Dict[str, Any]) -> Dict[str, Any]:
 ### Server Class Structure
 All EDA servers inherit from the `BaseServer` class:
 ```python
-from unified_server import BaseServer
+from base_server import BaseServer
 
 class NewServer(BaseServer):
     def __init__(self, default_port=18005):
