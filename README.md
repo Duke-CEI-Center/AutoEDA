@@ -127,12 +127,6 @@ src/scripts/FreePDK45/
 | **Cadence Innovus** | 19.1+ or 22.1+ | Physical implementation |
 | **Valid Licenses** | Required | Both tools need proper licensing |
 
-### AI Services
-| Service | Requirement | Purpose |
-|---------|-------------|---------|
-| **OpenAI API Key** | GPT-4 access | Intelligent orchestration |
-| **Internet Connection** | Required | API communication |
-
 ---
 
 ## Installation
