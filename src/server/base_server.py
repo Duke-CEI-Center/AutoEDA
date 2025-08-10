@@ -1,11 +1,4 @@
 #!/usr/bin/env python3
-"""
-EDA Server Base Class
-
-This module provides an abstract base class for creating EDA (Electronic Design Automation) 
-servers. It implements a template pattern where common functionality is provided by the 
-base class, and specific EDA workflows are implemented by subclasses.
-"""
 
 import subprocess, datetime, os, argparse, gzip, shutil
 from pathlib import Path
@@ -519,7 +512,7 @@ class BaseServer(ABC):
         
         try:
             # Build unified executor command
-            executor_path = ROOT / "src" / "server" / "base_executor.py"
+            executor_path = ROOT / "src" / "server" / "executor.py"
             cmd = [
                 "python", str(executor_path),
                 "-mode", self.server_name,
