@@ -1,22 +1,4 @@
 #!/usr/bin/env python3
-"""
-Unified EDA Executor
-
-This script combines all EDA executors into one unified script:
-- Synthesis (using dc_shell)
-- Placement (using innovus)
-- CTS (using innovus) 
-- Routing (using innovus)
-
-Usage:
-    python base_executor.py -mode <mode> -tcl <tcl_file> -workspace <workspace_dir>
-
-Modes:
-    synth    - Synthesis using dc_shell
-    placement - Placement using innovus
-    cts      - Clock Tree Synthesis using innovus
-    routing  - Routing using innovus
-"""
 
 import argparse
 import pathlib
