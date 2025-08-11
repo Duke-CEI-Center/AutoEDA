@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""
-Placement Server Implementation
-
-This module provides the PlacementServer class for placement workflows.
-
-Usage:
-    python src/server/placement_server.py 
-
-API Endpoints:
-    POST /run - Execute the placement workflow
-    curl -X POST http://localhost:18002/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
-
-"""
 
 import argparse
 from pathlib import Path
