@@ -1,18 +1,4 @@
 #!/usr/bin/env python3
-"""
-Synthesis Server Implementation
-
-This module provides the SynthesisServer class for synthesis workflows.
-
-Usage:
-    python src/server/synthesis_server.py
-
-API Endpoints:
-    POST /run - Execute the synthesis workflow
-    curl -X POST http://localhost:15333/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
-    curl -X POST http://localhost:15333/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45", "syn_version": "20250729_140751", "force": false}'
-    curl -X POST http://localhost:15333/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45", "syn_version": "20250729_140751", "skip_execution": true}'
-"""
 
 import argparse
 from pathlib import Path
