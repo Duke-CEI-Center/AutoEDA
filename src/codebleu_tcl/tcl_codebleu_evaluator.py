@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-"""TCL CodeBLEU Evaluator for Experiment Framework Integration"""
 
 import os
 import json
