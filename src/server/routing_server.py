@@ -1,18 +1,4 @@
 #!/usr/bin/env python3
-"""
-Routing Server Implementation
-
-This module provides the RoutingServer class for routing workflows.
-
-Usage:
-    python src/server/routing_server.py 
-
-API Endpoints:
-    POST /run - Execute the routing workflow
-    curl -X POST http://localhost:18004/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'  | python -m json.tool
-    curl -X POST http://localhost:18004/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45", "force": false}'  | python -m json.tool
-
-"""
 
 import argparse
 from pathlib import Path
