@@ -1,17 +1,4 @@
 #!/usr/bin/env python3
-"""
-CTS (Clock Tree Synthesis) Server Implementation
-
-This module provides the CtsServer class for CTS workflows.
-
-Usage:
-    python src/server/cts_server.py
-
-API Endpoints:
-    POST /run - Execute the CTS workflow
-    curl -X POST http://localhost:18003/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45"}'
-    curl -X POST http://localhost:18003/run -H "Content-Type: application/json" -d '{"design": "des", "tech": "FreePDK45", "force": false}'
-"""
 
 import argparse
 from pathlib import Path
