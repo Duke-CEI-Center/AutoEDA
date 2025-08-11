@@ -1,4 +1,4 @@
-# MCP EDA Implementation Guide
+# MCP AutoEDA Implementation Guide
 
 ## Overview
 
