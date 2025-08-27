@@ -5,6 +5,8 @@
 
 A production-grade, microservice-based Electronic Design Automation (EDA) platform that transforms natural language instructions into complete RTL-to-GDSII flows. Built with AI-powered orchestration and commercial EDA tool integration.
 
+[[Paper](arxiv.org/abs/2508.01012)] [[Website](https://llm4chip.org/)][[Video](https://llm4chip.org/demo_v3.mp4)]
+
 ---
 
 
